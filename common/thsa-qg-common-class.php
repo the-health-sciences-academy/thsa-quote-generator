@@ -65,7 +65,7 @@ class thsa_qg_common_class
 	public function load_js()
 	{
 		wp_register_script( THSA_QG_PREFIX.'-common-js', THSA_QG_PLUGIN_URL.'common/assets/thsa-qg-common.js', array('jquery') );
-        wp_enqueue_script( THSA_QG_PREFIX.'-common-js-scripts' );
+        wp_enqueue_script( THSA_QG_PREFIX.'-common-js' );
 	}
 
 }

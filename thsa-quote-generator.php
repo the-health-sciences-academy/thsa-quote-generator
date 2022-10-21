@@ -98,7 +98,7 @@ spl_autoload_register(function ($class) {
 add_action('plugins_loaded','thsa_qg_init');
 function thsa_qg_init(){
     //load admin
-    new thsa\qg\admin\thsa_qg_admin();
+    new thsa\qg\admin\thsa_qg_admin_class();
     //load public
     new thsa\qg\public\thsa_qg_public_class();
 }
