@@ -54,5 +54,19 @@ class thsa_qg_common_class
 		}
     }
 
+
+	/**
+	 * 
+	 * load_js
+	 * load common js
+	 * @since 1.2.0
+	 * 
+	 */
+	public function load_js()
+	{
+		wp_register_script( THSA_QG_PREFIX.'-common-js', THSA_QG_PLUGIN_URL.'common/assets/thsa-qg-common.js', array('jquery') );
+        wp_enqueue_script( THSA_QG_PREFIX.'-common-js-scripts' );
+	}
+
 }
 ?>
