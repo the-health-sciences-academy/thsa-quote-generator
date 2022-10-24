@@ -1,0 +1,28 @@
+.thsa_qg_wrapper {
+  padding: 20px;
+  padding-top: 30px; }
+
+.thsa_admin_qg_tab {
+  margin: 0;
+  padding: 0; }
+  .thsa_admin_qg_tab li {
+    display: inline-block;
+    padding: 10px;
+    background-color: #dedede;
+    cursor: pointer;
+    border: 1px solid #dedede;
+    margin: 0;
+    border-bottom: 0; }
+    .thsa_admin_qg_tab li.active {
+      background-color: white; }
+
+.thsa_tab_content {
+  padding: 20px;
+  border: 1px solid #dedede;
+  margin-top: -1px; }
+  .thsa_tab_content .thsa_tab_child {
+    display: none; }
+    .thsa_tab_content .thsa_tab_child.active {
+      display: block; }
+
+/*# sourceMappingURL=thsa-qg-admin.css.map */

@@ -8,7 +8,7 @@
  * @package           thsa_quote_generator
  *
  * @wordpress-plugin
- * Plugin Name:       THSA Quote Generator
+ * Plugin Name:       THSA Quotation Generator
  * Plugin URI:        http://thehealthsciencesacademy.org/tool/plugins/thsa-quote-generator
  * Description:       THSA plugin that will generate custom quotation generator
  * Version:           1.2.0

@@ -39,18 +39,18 @@ class thsa_qg_common_class
 			$other = $params['other'].'/';
 		}
 
-		$path = get_template_directory().'/'.THSA_KW_FOLDER_NAME.'/'.$other.'templates';
-		$child = get_template_directory().'-child/'.THSA_KW_FOLDER_NAME.'/'.$other.'templates';
+		$path = get_template_directory().'/'.THSA_QG_FOLDER.'/'.$other.'templates';
+		$child = get_template_directory().'-child/'.THSA_QG_FOLDER.'/'.$other.'templates';
 
 		if(is_dir($path.'/'.$file)){
 			include $path.'/'.$file;
 		}elseif(is_dir($child.'/'.$file)){
 			include $child.'/'.$file;
 		}else{
-			if(isset($params['other'])){
-				$other = $params['other'];
+			if(isset($params['path'])){
+				$other = $params['path'];
 			}
-			include THSA_KW_API_PATH.$other.'/templates/'.$file;
+			include THSA_QG_PLUGIN_PATH.$other.'/templates/'.$file;
 		}
     }
 

@@ -1,0 +1,33 @@
+@import common.sass
+
+.thsa_qg_wrapper
+    padding: 20px
+    padding-top: 30px
+
+    
+.thsa_admin_qg_tab
+    margin: 0
+    padding: 0
+
+    li
+        display: inline-block
+        padding: 10px
+        background-color: $tab_grey
+        cursor: pointer
+        border: 1px solid $tab_grey
+        margin: 0
+        border-bottom: 0
+
+        &.active
+            background-color: $tab_active
+
+.thsa_tab_content
+    padding: 20px
+    border: 1px solid $tab_grey
+    margin-top: -1px
+
+    .thsa_tab_child
+        display: none
+
+        &.active
+            display: block
