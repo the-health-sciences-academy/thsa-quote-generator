@@ -38,7 +38,8 @@ define('THSA_QG_PREFIX','thsa_qg');
  * 
  * 
  */
-function codecorun_wcdr_load_textdomain() {
+add_action( 'init', 'thsa_qg_load_textdomain' );
+function thsa_qg_load_textdomain() {
 	load_plugin_textdomain( 'thsa-quote-generator', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' ); 
 }
 

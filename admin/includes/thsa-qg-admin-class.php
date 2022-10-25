@@ -14,6 +14,12 @@ use thsa\qg\common\thsa_qg_common_class;
 
 class thsa_qg_admin_class extends thsa_qg_common_class{
 
+    private $product_post_type = 'product';
+
+    private $product_category = 'product_cat';
+
+    private $product_tag = 'product_tag';
+
     /**
      * 
      * 
@@ -44,6 +50,32 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         add_action('add_meta_boxes', [$this, 'meta_box']);
 
         $this->load_ajax();
+
+
+
+        //debug data
+        add_action('admin_init', function(){
+            if(@$_GET['debug'] == 'product'){
+                $args = [
+                    'posts_per_page' => -1,
+                    'post_type' => $this->product_post_type,
+                    'order' => 'ASC',
+                    'orderby' => 'post_title',
+                    'post_status' => 'publish'
+                ];
+        
+                $args = apply_filters('thsa_product_select_arg', $args);
+                $products = get_posts($args);
+                foreach($products as $product){
+                    //extract details
+                    $product_obj = wc_get_product($product->ID);
+                    print_r($product_obj);
+                    echo '<br/>-----<br/>';
+                    echo $product_obj->get_price_html();
+                    break;
+                }
+            }
+        });
     }
 
     /**
@@ -63,9 +95,13 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         //load thsa js global variables
         wp_localize_script( THSA_QG_PREFIX.'-admin-js', 'thsaqgvars', 
             [
-                'ajaxurl' => admin_url( 'admin-ajax.php' ),
-                'nonce' => wp_create_nonce( 'thsa-quotation-generator' ),
-                'customer_action' => 'thsa_qg_customer_list'
+                'ajaxurl'           =>  admin_url( 'admin-ajax.php' ),
+                'nonce'             =>  wp_create_nonce( 'thsa-quotation-generator' ),
+                'customer_action'   =>  'thsa_qg_customer_list',
+                'customer_details'  =>  'thsa_qg_customer_details',
+                'product_options'   =>  'thsa_qg_product_select_options',
+                'product_from_cat'  =>  'thsa_qg_product_from_cat',
+                'labels'            =>  $this->labels()
             ]
         );
 
@@ -90,6 +126,9 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
     public function load_ajax()
     {
         add_action('wp_ajax_thsa_qg_customer_list', [$this, 'thsa_qg_customer_list']);
+        add_action('wp_ajax_thsa_qg_customer_details', [$this, 'thsa_qg_customer_details']);
+        add_action('wp_ajax_thsa_qg_product_select_options', [$this, 'thsa_qg_product_select_options']);
+        add_action('wp_ajax_thsa_qg_product_from_cat', [$this, 'thsa_qg_product_from_cat']);
     }
 
 
@@ -162,6 +201,55 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
             'normal',
             'high'
         );
+
+        add_meta_box(
+            'thsa_qg_currency',
+            'Currency',
+            [$this, 'currency_options'],
+            'thsa-quote-generator',
+            'side',
+            'high'
+        );
+
+        add_meta_box(
+            'thsa_qg_products_options',
+            'Products',
+            [$this, 'product_options'],
+            'thsa-quote-generator',
+            'normal',
+            'high'
+        );
+    }
+
+    /**
+     * 
+     * 
+     * product_options
+     * @since 1.2.0
+     * @param
+     * @return
+     * 
+     * 
+     */
+    public function product_options()
+    {
+        $this->set_template('products',['path' => 'admin']);
+    }
+
+    /**
+     * 
+     * 
+     * currency_options
+     * @since 1.2.0
+     * @param
+     * @return
+     * 
+     * 
+     */
+    public function currency_options()
+    {
+        $currencies = get_woocommerce_currencies();
+        $this->set_template('currency',['path' => 'admin', 'currency' => $currencies]);
     }
 
 
@@ -217,6 +305,270 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         echo json_encode($data);
         exit();
 
+    }
+
+
+    /**
+     * 
+     * 
+     * thsa_qg_customer_details
+     * @since 1.2.0
+     * @param
+     * @return
+     * 
+     * 
+     * 
+     */
+    public function thsa_qg_customer_details()
+    {
+        if ( ! wp_verify_nonce( $_POST['nonce'], 'thsa-quotation-generator' ) ) {
+            echo json_encode([
+                'status' => 'failed',
+                'message' => 'Error 105: Invalid Nonce'
+            ]);
+            exit();
+        }
+
+        $id = sanitize_text_field($_POST['id']);
+        $details = get_userdata($id);
+        if($details){
+            $billing = get_user_meta( $id, 'billing_address_1', true ); 
+            $billing_city = get_user_meta( $id, 'billing_city', true ); 
+            $billing_postcode = get_user_meta( $id, 'billing_postcode', true ); 
+            $billing_country = get_user_meta( $id, 'billing_country', true ); 
+            $billing_state = get_user_meta( $id, 'billing_state', true ); 
+            $billing = $billing.'<br/>'.$billing_postcode.', '.$billing_city.'<br/>'.$billing_state.', '.$billing_country;
+            echo json_encode(
+                [
+                    'ID' => $details->ID,
+                    'fullname' => $details->first_name.' '.$details->last_name,
+                    'email_address' => $details->user_email,
+                    'billing_address' => $billing
+                ]
+            );
+        }
+        exit();
+    }
+
+    /**
+     * 
+     * 
+     * thsa_qg_product_select_options
+     * @since 1.2.0
+     * @param
+     * @return
+     * 
+     * 
+     */
+    public function thsa_qg_product_select_options()
+    {
+        if ( ! wp_verify_nonce( $_GET['nonce'], 'thsa-quotation-generator' ) ) {
+            echo json_encode([
+                'status' => 'failed',
+                'message' => 'Error 105: Invalid Nonce'
+            ]);
+            exit();
+        }
+        
+        $s = sanitize_text_field($_GET['search']);
+        $type = sanitize_text_field($_GET['filter']);
+
+        switch($type){
+            case 'product':
+                echo $this->product_filter($s);
+                break;
+            case 'category':
+                echo $this->category_filter($s);
+                break;
+            case 'tag':
+                echo $this->tag_filter($s);
+                break;
+        }
+
+        exit();
+       
+    }
+
+    /**
+     * 
+     * 
+     * product_filter
+     * @since 1.2.0
+     * @param string
+     * @return json
+     * 
+     * 
+     * 
+     */
+    public function product_filter($s)
+    {
+        $args = [
+            'posts_per_page' => -1,
+            'post_type' => $this->product_post_type,
+            's' => $s,
+            'order' => 'ASC',
+            'orderby' => 'post_title',
+            'post_status' => 'publish'
+        ];
+
+        $args = apply_filters('thsa_product_select_arg', $args);
+        $products = get_posts($args);
+
+        $data = [];
+        if($products){
+            foreach($products as $product){
+
+                //extract details
+                $product_ = wc_get_product($product->ID);
+
+                $data[] = [
+                    'id' => $product->ID,
+                    'text' => $product->ID.' - '.$product->post_title,
+                    'price_html' => $product_->get_price_html(),
+                    'price_number' => $product_->get_price(),
+                    'price_regular_number' => $product_->get_regular_price(),
+                    'price_sale_number' => $product_->get_sale_price()
+                ];
+            }
+
+            return json_encode($data);
+        }
+
+    }
+
+    /**
+     * 
+     * 
+     * thsa_qg_category_select_options
+     * @since 1.2.0
+     * @param
+     * @return
+     * 
+     * 
+     */
+
+    public function category_filter($s)
+    {
+
+        $args = [
+            'taxonomy' => $this->product_category,
+            'hide_empty' => false,
+            'search' => $s,
+            'order' => 'ASC',
+            'orderby' => 'name'
+        ];
+
+        $cats_ = [];
+        $cats = get_terms($args);
+        if($cats){
+            foreach($cats as $cat){
+                $cats_[] = [
+                    'id' => $cat->term_id,
+                    'text' => $cat->name
+                ];
+            }
+
+            echo json_encode($cats_);
+        }
+        exit();
+    }
+
+     /**
+     * 
+     * 
+     * thsa_qg_category_select_options
+     * @since 1.2.0
+     * @param
+     * @return
+     * 
+     * 
+     */
+
+    public function tag_filter($s)
+    {
+
+        $args = [
+            'taxonomy' => $this->product_tag,
+            'hide_empty' => false,
+            'search' => $s,
+            'order' => 'ASC',
+            'orderby' => 'name'
+        ];
+
+        $cats_ = [];
+        $cats = get_terms($args);
+        if($cats){
+            foreach($cats as $cat){
+                $cats_[] = [
+                    'id' => $cat->term_id,
+                    'text' => $cat->name
+                ];
+            }
+
+            echo json_encode($cats_);
+        }
+        exit();
+    }
+
+
+    /**
+     * 
+     * 
+     * thsa_qg_product_from_cat
+     * @since 1.2.0
+     * @param
+     * @return json
+     * 
+     */
+    public function thsa_qg_product_from_cat()
+    {
+        if ( ! wp_verify_nonce( $_POST['nonce'], 'thsa-quotation-generator' ) ) {
+            echo json_encode([
+                'status' => 'failed',
+                'message' => 'Error 105: Invalid Nonce'
+            ]);
+            exit();
+        }
+
+        $cat = sanitize_text_field($_POST['term']);
+
+        $taxon = ($_POST['type'] == 'category')? $this->product_category : $this->product_tag;
+
+        if($cat){
+            $args = [
+                'posts_per_page' => -1,
+                'post_type' => 'product',
+                'tax_query' => [
+                    [
+                        'taxonomy' => $taxon,
+                        'field' => 'term_id',
+                        'terms' => $cat 
+                    ]
+                    ],
+                'order' => 'ASC',
+                'orderby' => 'post_title',
+                'post_status' => 'publish'
+            ];
+
+            $products = get_posts($args);
+            $data = [];
+            if($products){
+                foreach($products as $product){
+                    $product_ = wc_get_product($product->ID);
+                    $data[] = [
+                        'id' => $product->ID,
+                        'text' => $product->ID.' - '.$product->post_title,
+                        'price_html' => $product_->get_price_html(),
+                        'price_number' => $product_->get_price(),
+                        'price_regular_number' => $product_->get_regular_price(),
+                        'price_sale_number' => $product_->get_sale_price()
+                    ];
+                }
+
+                echo json_encode($data);
+            }
+        }
+        exit();
     }
 
 }

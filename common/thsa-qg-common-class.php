@@ -68,5 +68,25 @@ class thsa_qg_common_class
         wp_enqueue_script( THSA_QG_PREFIX.'-common-js' );
 	}
 
+	/**
+	 * 
+	 * 
+	 * common_labels
+	 * @since 1.2.0
+	 * @param
+	 * @return array
+	 * 
+	 * 
+	 */
+	public static function labels()
+	{
+		$labels = [
+			'select' => __('Select','thsa-quote-generator'),
+			'search_user' => __('Select User', 'thsa-quote-generator'),
+			'enter_keywords' => __('Enter Keywords', 'thsa-quote-generator')
+		];
+		return json_encode($labels);
+	}
+
 }
 ?>

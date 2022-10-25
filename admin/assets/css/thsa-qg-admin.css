@@ -1,6 +1,6 @@
 .thsa_qg_wrapper {
-  padding: 20px;
-  padding-top: 30px; }
+  padding: 10px;
+  padding-top: 15px; }
 
 .thsa_admin_qg_tab {
   margin: 0;
@@ -24,5 +24,22 @@
     display: none; }
     .thsa_tab_content .thsa_tab_child.active {
       display: block; }
+  .thsa_tab_content .thsa_qg_user_details {
+    margin-top: 20px; }
+    .thsa_tab_content .thsa_qg_user_details label {
+      color: #949292; }
+    .thsa_tab_content .thsa_qg_user_details span {
+      display: block; }
+
+.thsa_product_options .widefat.no-border {
+  border: 0; }
+  .thsa_product_options .widefat.no-border td {
+    padding: 10px;
+    padding-bottom: 20px;
+    padding-top: 0; }
+    .thsa_product_options .widefat.no-border td:first-child {
+      padding-left: 0; }
+    .thsa_product_options .widefat.no-border td:last-child {
+      padding-right: 0; }
 
 /*# sourceMappingURL=thsa-qg-admin.css.map */
