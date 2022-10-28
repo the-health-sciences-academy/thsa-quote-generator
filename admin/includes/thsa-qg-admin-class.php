@@ -195,45 +195,29 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
     {
         add_meta_box(
             'thsa_qg_client_meta',
-            'Client Details',
-            [$this, 'customer_details'],
+            'Quotation Builder',
+            [$this, 'quote_meta_section'],
             'thsa-quote-generator',
             'normal',
             'high'
         );
 
-        add_meta_box(
-            'thsa_qg_currency',
-            'Currency',
-            [$this, 'currency_options'],
-            'thsa-quote-generator',
-            'side',
-            'high'
-        );
-
-        add_meta_box(
-            'thsa_qg_products_options',
-            'Products',
-            [$this, 'product_options'],
-            'thsa-quote-generator',
-            'normal',
-            'high'
-        );
     }
 
     /**
      * 
-     * 
-     * product_options
+     * quote_meta_section
      * @since 1.2.0
      * @param
      * @return
      * 
      * 
      */
-    public function product_options()
+    public function quote_meta_section()
     {
+        $this->set_template('customer-details',['path' => 'admin']);
         $this->set_template('products',['path' => 'admin']);
+        $this->set_template('discounts',['path' => 'admin']);
     }
 
     /**
@@ -250,21 +234,6 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
     {
         $currencies = get_woocommerce_currencies();
         $this->set_template('currency',['path' => 'admin', 'currency' => $currencies]);
-    }
-
-
-    /**
-     * 
-     * client_details
-     * @since 1.2.0
-     * @param
-     * @return
-     * 
-     * 
-     */
-    public function customer_details($post)
-    {
-        $this->set_template('customer-details',['path' => 'admin']);
     }
 
 

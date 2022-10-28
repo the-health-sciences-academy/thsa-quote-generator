@@ -1,9 +1,9 @@
 /**
  * 
- * jquery simple field generator
+ * Javascript simple field generator
  * @since 1.1.0
  * @author Juls Terobias
- * 
+ * @fork thsa
  * 
  */
 

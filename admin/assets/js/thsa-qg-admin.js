@@ -3,6 +3,7 @@
  * 
  * admin js
  * @since 1.2.0
+ * @author thsa
  * 
  * 
  */
@@ -131,6 +132,42 @@ jQuery(document).ready(function(){
             });
         }
         jQuery('.thsa_qg_select_all').prop('checked',false);
+
+        if(jQuery('.thsa_qg_selected_products tr').length == 0){
+            var parent_tr = thsa_field_generator(
+                {
+                    type: 'tr',
+                    attributes: [
+                        {
+                            attr: 'class',
+                            value: 'thsa_qg_no_product'
+                        }
+                    ]
+                }
+            );
+            var none_td = thsa_field_generator(
+                {
+                    type: 'td',
+                    attributes: [
+                        {
+                            attr: 'colspan',
+                            value: 3
+                        }
+                    ]
+                }
+            );
+
+            var center = thsa_field_generator(
+                {
+                    type: 'center',
+                    text: labels_.no_products_added
+                }
+            );
+
+            jQuery(none_td).append(center);
+            jQuery(parent_tr).append(none_td);
+            jQuery('.thsa_qg_selected_products').append(parent_tr);
+        }
     });
 
     jQuery('.thsa_qg_select_all').click(function(){
@@ -217,6 +254,8 @@ function thsa_generate_field_to(data)
         },5);
         return;
     }
+
+    jQuery('tr.thsa_qg_no_product').remove();
 
     var body = jQuery('.thsa_qg_selected_products');
         //data

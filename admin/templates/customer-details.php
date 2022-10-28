@@ -1,5 +1,6 @@
 <div class="thsa_qg_wrapper">
     <div class="thsa_qg_inner">
+        <h3><?php _e('Customer', 'thsa-quote-generator'); ?></h3>
         <ul class="thsa_admin_qg_tab">
             <li class="active" data-target=".thsa_new_tab"><?php _e('New Customer', 'thsa-quote-generator'); ?></li>
             <li data-target=".thsa_existed_tab"><?php _e('Returning Customer', 'thsa-quote-generator'); ?></li>

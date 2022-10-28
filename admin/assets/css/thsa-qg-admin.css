@@ -1,6 +1,14 @@
 .thsa_qg_wrapper {
   padding: 10px;
   padding-top: 15px; }
+  .thsa_qg_wrapper h3 {
+    margin: 10px 0; }
+  .thsa_qg_wrapper .thsa_qg_discount_table1 {
+    width: 500px; }
+    .thsa_qg_wrapper .thsa_qg_discount_table1 tr td {
+      padding: 0 10px; }
+      .thsa_qg_wrapper .thsa_qg_discount_table1 tr td:first-child {
+        padding-left: 0; }
 
 .thsa_admin_qg_tab {
   margin: 0;
