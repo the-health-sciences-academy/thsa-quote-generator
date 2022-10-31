@@ -12,6 +12,14 @@ var labels_ = JSON.parse(thsaqgvars.labels);
 
 jQuery(document).ready(function(){
 
+    jQuery('.thsa_qg_payment_type').click(function(){
+        if(jQuery(this).val() == 'upfront'){
+            jQuery('.thsa_qg_plan_fields').hide();
+        }else{
+            jQuery('.thsa_qg_plan_fields').show();
+        }
+    });
+
     jQuery('.thsa_admin_qg_tab li').click(function(){
         var get_parent = jQuery(this).parent('ul');
         jQuery(get_parent).find('li').removeClass('active');
@@ -121,8 +129,33 @@ jQuery(document).ready(function(){
     });
 
     jQuery('.thsa_qg_remove_added_item').click(function(){
+
+        var source = jQuery(this).data('source');
+        var parent_wrap = null;
+        var colspan = 0;
+        var selectall = null;
+        var no_product_class = null;
+        var no_item_text = null;
+        
+        switch(source){
+            case 'products':
+                parent_wrap = 'thsa_qg_selected_products';
+                colspan = 3;
+                selectall = 'thsa_qg_select_all';
+                no_product_class = 'thsa_qg_no_product';
+                no_item_text = labels_.no_products_added;
+            break;
+            case 'fee':
+                parent_wrap = 'thsa_qg_added_fees';
+                colspan = 4;
+                selectall = 'thsa_qg_fee_select_all';
+                no_product_class = 'thsa_qg_no_fee';
+                no_item_text = labels_.no_fees_added;
+            break;
+        }
+
         if(confirm('Are you sure you want to remove selected item(s)')){
-            jQuery('.thsa_qg_selected_products tr').each(function(){
+            jQuery('.'+parent_wrap+' tr').each(function(){
                 var parent = jQuery(this);
                 var ftd = jQuery(this).find('td:first-child');
                 var selected = jQuery(ftd).find('input[type=checkbox]');
@@ -131,16 +164,16 @@ jQuery(document).ready(function(){
                 }
             });
         }
-        jQuery('.thsa_qg_select_all').prop('checked',false);
+        jQuery('.'+selectall).prop('checked',false);
 
-        if(jQuery('.thsa_qg_selected_products tr').length == 0){
+        if(jQuery('.'+parent_wrap+' tr').length == 0){
             var parent_tr = thsa_field_generator(
                 {
                     type: 'tr',
                     attributes: [
                         {
                             attr: 'class',
-                            value: 'thsa_qg_no_product'
+                            value: no_product_class
                         }
                     ]
                 }
@@ -151,7 +184,7 @@ jQuery(document).ready(function(){
                     attributes: [
                         {
                             attr: 'colspan',
-                            value: 3
+                            value: colspan
                         }
                     ]
                 }
@@ -160,14 +193,16 @@ jQuery(document).ready(function(){
             var center = thsa_field_generator(
                 {
                     type: 'center',
-                    text: labels_.no_products_added
+                    text: no_item_text
                 }
             );
 
             jQuery(none_td).append(center);
             jQuery(parent_tr).append(none_td);
-            jQuery('.thsa_qg_selected_products').append(parent_tr);
+            jQuery('.'+parent_wrap).append(parent_tr);
         }
+
+        thsa_qg_calculate();
     });
 
     jQuery('.thsa_qg_select_all').click(function(){
@@ -176,8 +211,99 @@ jQuery(document).ready(function(){
             var ftd = jQuery(this).find('td:first-child');
             jQuery(ftd).find('input[type=checkbox]').prop('checked', pro_status);
         });
+    }); 
+
+    jQuery('.thsa_qg_fee_select_all').click(function(){
+        
+        if(jQuery(this).is(':checked')){
+           
+        }
+        jQuery('.thsa_qg_added_fees tr').each(function(){
+            var td = jQuery(this).find('td');
+            var checkk = jQuery(td).find('input[type=checkbox]');
+        });
     });
 
+    //add fee
+    jQuery('.thsa_qg_add_fee').click(function(){
+
+        //get name
+        var name = jQuery('.thsa_qg_fee_name').val();
+        var amount = jQuery('.thsa_qg_fee_amount').val();
+        var recur = jQuery('.thsa_qg_fee_recurring').val();
+
+        if(!name || !amount || !recur)
+            return;
+
+       
+
+        jQuery('.thsa_qg_no_fee').remove();
+
+        var parent = jQuery('.thsa_qg_added_fees');
+        var parent_tr = thsa_field_generator(
+            {
+                type: 'tr'
+            }
+        );
+        var td = thsa_field_generator(
+            {
+                type: 'td',
+
+            }
+        );
+        var checkbox = thsa_field_generator(
+            {
+                type: 'input',
+                attributes: [
+                    {
+                        attr: 'type',
+                        value: 'checkbox'
+                    }
+                ]
+            }
+        );
+        jQuery(td).append(checkbox);
+
+        
+        var td_feename = thsa_field_generator(
+            {
+                type: 'td',
+                text: name
+
+            }
+        );
+        
+        var td_amount = thsa_field_generator(
+            {
+                type: 'td',
+                text: amount
+            }
+        );
+       
+        var td_recur = thsa_field_generator(
+            {
+                type: 'td',
+                text: recur
+            }
+        );
+        jQuery(parent_tr).append(td);
+        jQuery(parent_tr).append(td_feename);
+        jQuery(parent_tr).append(td_amount);
+        jQuery(parent_tr).append(td_recur);
+        
+        jQuery(parent).append(parent_tr);
+
+        //clear fields
+        jQuery('.thsa_qg_fee_name').val('');
+        jQuery('.thsa_qg_fee_amount').val('');
+        jQuery('.thsa_qg_fee_recurring').val('no');
+    });
+
+
+    //fix amount on keyup
+    jQuery('.thsa_qg_fix_amount').on('keyup', function(){
+        thsa_qg_calculate('fixed');
+    });
 
 });
 
@@ -240,6 +366,7 @@ function thsa_qg_gen_selected_product(obj)
 function thsa_generate_field_to(data)
 {
 
+    console.log(data);
     //check first if the data is added
     var is_added = false;
     jQuery('.thsa_qg_selected_products tr').each(function(){
@@ -274,6 +401,10 @@ function thsa_generate_field_to(data)
                     {
                         attr: 'data-selected-name',
                         value: data.text
+                    },
+                    {
+                        attr: 'data-price-num',
+                        value: data.price_number
                     }
                 ]
             }
@@ -317,6 +448,8 @@ function thsa_generate_field_to(data)
         jQuery(parent_tr).append(td_option_name);
         jQuery(parent_tr).append(td_option_price);
         jQuery(body).append(parent_tr);
+
+        thsa_qg_calculate();
 }
 
 function thsa_qg_gen_selected_category(obj, type = null){
@@ -344,4 +477,38 @@ function thsa_qg_gen_selected_category(obj, type = null){
         }
     );
 
+}
+
+//caculate numbers
+function thsa_qg_calculate(source = null)
+{
+    //calculate products
+    if(jQuery('.thsa_qg_selected_products tr').length > 0){
+        //there is products lets calculate
+        var temp_product_total = 0;
+        
+        //temp total
+        jQuery('.thsa_qg_selected_products tr').each(function(){
+            var price = jQuery(this).data('price-num');
+            temp_product_total += price;
+        });
+
+
+        if(source){
+            var get_dis_fixed = jQuery('.thsa_qg_fix_amount').val();
+            var get_dis_percent = jQuery('.thsa_qg_percent_amount').val(temp_percent);
+            switch(source){
+                case 'fixed':
+                    //conver fix to percent
+                    var temp_percent = get_discount / temp_product_total * 100;
+                    jQuery('.thsa_qg_percent_amount').val(temp_percent);
+                    break;
+                case 'percent':
+                    break;
+            }
+        }
+        
+
+        jQuery('.thsa_qg_total_field').val(temp_product_total);
+    }
 }

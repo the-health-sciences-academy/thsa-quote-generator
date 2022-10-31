@@ -21,7 +21,7 @@
                 </tr>
             </table>
 
-            <table class="widefat wp-list-table widefat fixed striped table-view-list">
+            <table class="widefat wp-list-table widefat fixed striped table-view-list thsa_qg_product_table">
                 <thead>
                     <tr>
                         <th width="2%"><input type="checkbox" class="thsa_qg_select_all"></th>
@@ -42,8 +42,7 @@
                     ?>
                 </tbody>
             </table>
-            <br/>
-            <input type="button" class="button button-secondary thsa_qg_remove_added_item" value="Remove">
+            <input type="button" class="button button-secondary thsa_qg_remove_added_item" data-source="products" value="Remove">
         </div>
     </div>
 </div>

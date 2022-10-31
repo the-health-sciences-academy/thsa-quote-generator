@@ -1,14 +1,59 @@
 .thsa_qg_wrapper {
   padding: 10px;
-  padding-top: 15px; }
-  .thsa_qg_wrapper h3 {
-    margin: 10px 0; }
-  .thsa_qg_wrapper .thsa_qg_discount_table1 {
-    width: 500px; }
-    .thsa_qg_wrapper .thsa_qg_discount_table1 tr td {
-      padding: 0 10px; }
-      .thsa_qg_wrapper .thsa_qg_discount_table1 tr td:first-child {
-        padding-left: 0; }
+  position: relative; }
+  .thsa_qg_wrapper .thsa_qg_inner {
+    position: relative; }
+    .thsa_qg_wrapper .thsa_qg_inner:after {
+      content: " ";
+      display: block;
+      clear: both; }
+    .thsa_qg_wrapper .thsa_qg_inner h3 {
+      margin: 10px 0; }
+    .thsa_qg_wrapper .thsa_qg_inner .thsa_qg_table_con {
+      padding: 5px 0; }
+      .thsa_qg_wrapper .thsa_qg_inner .thsa_qg_table_con .main_label {
+        margin-left: 3px; }
+      .thsa_qg_wrapper .thsa_qg_inner .thsa_qg_table_con .thsa_qg_discount_table1 tr td {
+        padding: 0 10px; }
+        .thsa_qg_wrapper .thsa_qg_inner .thsa_qg_table_con .thsa_qg_discount_table1 tr td:first-child {
+          padding-left: 0; }
+      .thsa_qg_wrapper .thsa_qg_inner .thsa_qg_table_con .thsa_qg_tail_text {
+        position: inline-block;
+        margin-left: 5px; }
+      .thsa_qg_wrapper .thsa_qg_inner .thsa_qg_table_con .thsa_qg_wide,
+      .thsa_qg_wrapper .thsa_qg_inner .thsa_qg_table_con .thsa_qg_wide tbody,
+      .thsa_qg_wrapper .thsa_qg_inner .thsa_qg_table_con .thsa_qg_wide tbody tr {
+        width: 100%;
+        display: block; }
+        .thsa_qg_wrapper .thsa_qg_inner .thsa_qg_table_con .thsa_qg_wide td,
+        .thsa_qg_wrapper .thsa_qg_inner .thsa_qg_table_con .thsa_qg_wide tbody td,
+        .thsa_qg_wrapper .thsa_qg_inner .thsa_qg_table_con .thsa_qg_wide tbody tr td {
+          vertical-align: middle; }
+      .thsa_qg_wrapper .thsa_qg_inner .thsa_qg_table_con .thsa_qg_plan_fields {
+        display: none; }
+    .thsa_qg_wrapper .thsa_qg_inner .thsa_qg_product_table,
+    .thsa_qg_wrapper .thsa_qg_inner .thsa_qg_fees_list {
+      margin-bottom: 10px; }
+    .thsa_qg_wrapper .thsa_qg_inner .thsa_qg_summary_box {
+      width: 400px;
+      float: right;
+      border: 1px solid #dedede; }
+      .thsa_qg_wrapper .thsa_qg_inner .thsa_qg_summary_box h3 {
+        margin: 0;
+        padding: 15px 20px;
+        background-color: #f6f7f7; }
+      .thsa_qg_wrapper .thsa_qg_inner .thsa_qg_summary_box .thsa_qg_summary_box_numbers {
+        padding: 20px; }
+      .thsa_qg_wrapper .thsa_qg_inner .thsa_qg_summary_box .thsa_qg_summary_box_numbers p:first-child {
+        margin-top: 0; }
+      .thsa_qg_wrapper .thsa_qg_inner .thsa_qg_summary_box .thsa_qg_summary_box_numbers p:last-child {
+        margin-bottom: 0; }
+      .thsa_qg_wrapper .thsa_qg_inner .thsa_qg_summary_box .thsa_qg_total_field_wrap {
+        background-color: #f6f7f7;
+        padding: 20px; }
+        .thsa_qg_wrapper .thsa_qg_inner .thsa_qg_summary_box .thsa_qg_total_field_wrap .thsa_qg_total_field {
+          font-size: 25px;
+          padding: 5px 10px; }
 
 .thsa_admin_qg_tab {
   margin: 0;
@@ -49,5 +94,14 @@
       padding-left: 0; }
     .thsa_product_options .widefat.no-border td:last-child {
       padding-right: 0; }
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0; }
+
+input[type=number] {
+  -moz-appearance: textfield;
+  text-align: right; }
 
 /*# sourceMappingURL=thsa-qg-admin.css.map */

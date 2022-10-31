@@ -202,6 +202,15 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
             'high'
         );
 
+        add_meta_box(
+            'thsa_qg_currency',
+            'Currency',
+            [$this, 'currency_options'],
+            'thsa-quote-generator',
+            'side',
+            'high'
+        );
+
     }
 
     /**
@@ -218,6 +227,8 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         $this->set_template('customer-details',['path' => 'admin']);
         $this->set_template('products',['path' => 'admin']);
         $this->set_template('discounts',['path' => 'admin']);
+        $this->set_template('fees',['path' => 'admin']);
+        $this->set_template('summary',['path' => 'admin']);
     }
 
     /**
