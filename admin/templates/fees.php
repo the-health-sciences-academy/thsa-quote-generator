@@ -42,12 +42,6 @@
                 </tr>
             </thead>
             <tbody class="thsa_qg_added_fees">
-                <!-- <tr>
-                    <td><input type="checkbox"></td>
-                    <td>Fee 1</td>
-                    <td>100</td>
-                    <td>No</td>
-                </tr> -->
                 <tr class="thsa_qg_no_fee">
                     <td colspan="4"><center><?php _e('No fees added', 'thsa-quote-generator'); ?></center></td>
                 </tr>

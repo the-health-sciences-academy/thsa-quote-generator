@@ -51,31 +51,9 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
 
         $this->load_ajax();
 
+        //save data
+        add_action('save_post_thsa-quote-generator', [$this, 'save_quote']);
 
-
-        //debug data
-        add_action('admin_init', function(){
-            if(@$_GET['debug'] == 'product'){
-                $args = [
-                    'posts_per_page' => -1,
-                    'post_type' => $this->product_post_type,
-                    'order' => 'ASC',
-                    'orderby' => 'post_title',
-                    'post_status' => 'publish'
-                ];
-        
-                $args = apply_filters('thsa_product_select_arg', $args);
-                $products = get_posts($args);
-                foreach($products as $product){
-                    //extract details
-                    $product_obj = wc_get_product($product->ID);
-                    print_r($product_obj);
-                    echo '<br/>-----<br/>';
-                    echo $product_obj->get_price_html();
-                    break;
-                }
-            }
-        });
     }
 
     /**
@@ -222,9 +200,9 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
      * 
      * 
      */
-    public function quote_meta_section()
+    public function quote_meta_section($post)
     {
-        $this->set_template('customer-details',['path' => 'admin']);
+        $this->set_template('customer-details',['path' => 'admin', 'post' => $post]);
         $this->set_template('products',['path' => 'admin']);
         $this->set_template('discounts',['path' => 'admin']);
         $this->set_template('fees',['path' => 'admin']);
@@ -244,7 +222,7 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
     public function currency_options()
     {
         $currencies = get_woocommerce_currencies();
-        $this->set_template('currency',['path' => 'admin', 'currency' => $currencies]);
+        $this->set_template('currency',['path' => 'admin', 'currency' => $currencies, 'current' => get_woocommerce_currency()]);
     }
 
 
@@ -549,6 +527,80 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
             }
         }
         exit();
+    }
+
+
+    /**
+     * 
+     * save_quote
+     * @since 1.2.0
+     * @param int
+     * @return
+     * 
+     */
+    public function save_quote($post_id){
+        
+        $quote_data = [];
+
+        //customer details
+        $customer_type = $_POST['thsa_qg_customer_type'];
+        $customer_details = null;
+        if($customer_type == 1){
+            $customer_details = [
+                'firstname' => sanitize_text_field($_POST['thsa_qg_customer_name']),
+                'lastname'  => sanitize_text_field($_POST['thsa_qg_customer_lastname']),
+                'email'     => sanitize_text_field($_POST['thsa_qg_customer_email'])  
+            ];
+        }else{
+            $customer_details = sanitize_text_field($_POST['thsa_qg_customer_select']);
+        }
+
+        if($customer_details){
+            $quote_data['customer'] = $customer_details;
+        }
+
+        //currency
+        $quote_data['currency'] = sanitize_text_field($_POST['thsa_qg_currency']);
+
+        //products
+        //sanitize product id
+        $saved_products = [];
+        if(!empty($_POST['thsa_qg_added_product'])){
+            foreach($_POST['thsa_qg_added_product'] as $product_id){
+                $saved_products[] = sanitize_text_field($product_id);
+            }
+            $quote_data['products'] = $saved_products;
+        }
+
+        //discounts
+        $quote_data['payment_type'] = (!empty($_POST['thsa_qg_payment_type']))? sanitize_text_field($_POST['thsa_qg_payment_type']) : null;
+        $quote_data['allow_payment_type_edit'] = (!empty($_POST['allow_payment_type_edit']))? sanitize_text_field($_POST['allow_payment_type_edit']) : null;
+        $quote_data['fixed_amount_discount'] = (!empty($_POST['thsa_qg_fix_amount']))? sanitize_text_field($_POST['thsa_qg_fix_amount']) : null; 
+        $quote_data['percent_amount_discount'] = (!empty($_POST['thsa_qg_percent_amount']))? sanitize_text_field($_POST['thsa_qg_percent_amount']) : null;
+        $quote_data['term_number'] = (!empty($_POST['thsa_qg_term_number']))? sanitize_text_field($_POST['thsa_qg_term_number']) : null;
+        $quote_data['term_plan_type'] = (!empty($_POST['thsa_qg_plan_term']))? sanitize_text_field($_POST['thsa_qg_plan_term']) : null;
+        $quote_data['allow_term_edit'] = (!empty($_POST['thsa_allow_term_edit']))? sanitize_text_field($_POST['thsa_allow_term_edit']) : null;
+
+        //fees
+        $fee_data = [];
+        //lets santize the json
+        if(!empty($_POST['thsa_qg_added_fee'])){
+            foreach($_POST['thsa_qg_added_fee'] as $fee){
+                $fee_ = $this->sanitize_json($fee);
+                $fee_data[] = $fee_;
+            }
+        }
+    
+        $quote_data['fees'] = (!empty($fee_data))? $fee_data : null;
+
+
+        if(!empty($quote_data)){
+            update_post_meta($post_id, 'thsa_quotation_data', $quote_data);
+        }else{
+            delete_post_meta($post_id, 'thsa_quotation_data');
+        }
+
+
     }
 
 }

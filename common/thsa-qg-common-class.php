@@ -90,5 +90,25 @@ class thsa_qg_common_class
 		return json_encode($labels);
 	}
 
+	/**
+	 * 
+	 * 
+	 * sanitize_json
+	 * @since 1.2.0
+	 * @param json
+	 * @return array
+	 * 
+	 * 
+	 */
+	public function sanitize_json($data)
+	{
+		$data = stripslashes($data);
+        $data_ = (array) json_decode($data);
+        array_map(function($key, $val){
+            return [sanitize_text_field($key), sanitize_text_field($val)];
+        },array_keys($data_),array_values($data_));
+		return $data_;
+	}
+
 }
 ?>
