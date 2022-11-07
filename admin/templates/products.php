@@ -1,7 +1,7 @@
 <div class="thsa_qg_wrapper">
     <div class="thsa_qg_inner">
         <h3><?php _e('Products', 'thsa-quote-generator'); ?></h3>
-        <div class="thsa_product_options">
+        <div class="thsa_product_options">        
             <table class="widefat no-border" border="0">
                 <tr>
                     <td width="20%">
@@ -31,13 +31,27 @@
                 </thead>
                 <tbody class="thsa_qg_selected_products">
                     <?php 
-                        if(!isset($params['products'])):
+                        if(empty($params['products'])):
                     ?>
                         <tr class="thsa_qg_no_product">
                             <td colspan="3"><center><?php _e('No products added', 'thsa-quote-generator'); ?></center></td>
                         </tr>
                     <?php
                         else:
+                            foreach($params['products'] as $product):    
+                                ?>
+                                    <tr class="thsa_parent_tr" data-selected="<?php echo $product['id'] ?>" data-selected-name="<?php echo $product['text']; ?>" data-price-num="<?php echo $product['price_number']; ?>">
+                                        <td>
+                                            <input type="checkbox">
+                                            <input name="thsa_qg_added_product[]" value="<?php echo $product['id'] ?>" type="hidden">
+                                        </td>
+                                        <td><?php echo $product['text'] ?></td>
+                                        <td>
+                                            <?php echo $product['price_html']; ?>
+                                        </td>
+                                    </tr>
+                                <?php 
+                            endforeach;  
                         endif;
                     ?>
                 </tbody>

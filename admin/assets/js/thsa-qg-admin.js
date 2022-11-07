@@ -12,6 +12,8 @@ var labels_ = JSON.parse(thsaqgvars.labels);
 
 jQuery(document).ready(function(){
 
+    thsa_qg_calculate();
+
     jQuery('.thsa_qg_payment_type').click(function(){
         if(jQuery(this).val() == 'upfront'){
             jQuery('.thsa_qg_plan_fields').hide();
@@ -354,7 +356,10 @@ jQuery(document).ready(function(){
         thsa_qg_calculate('percent');
     });
 
-
+    thsa_fee_field_status();
+    jQuery('.thsa_qg_payment_type').change(function(){
+        thsa_fee_field_status();
+    });
 
 });
 
@@ -586,7 +591,7 @@ function thsa_qg_product_total()
     var temp_product_total = 0;
     jQuery('.thsa_qg_selected_products tr').each(function(){
         var price = jQuery(this).data('price-num');
-        price = parseFloat(price);
+        price = (price)? parseFloat(price) : 0;
         temp_product_total += price;
     });
     return temp_product_total;
@@ -655,8 +660,19 @@ function thsa_qg_update_label()
    var get_set_total = thsa_qg_product_total();
    var fee = thsa_qg_fee_calculation();
    var discounts = jQuery('.thsa_qg_fix_amount').val();
+   discounts = (discounts)? discounts : 0;
    jQuery('.thsa_qg_original_total_label').text(get_set_total);
    jQuery('.thsa_qg_total_savings_label').text(discounts);
    jQuery('.thsa_qg_total_fee_label').text(fee);
 
+}
+
+function thsa_fee_field_status()
+{
+    var get_type = jQuery('.thsa_qg_payment_type').val();
+    if(get_type == 'upfront'){
+        jQuery('.thsa_qg_fee_recurring').prop('disabled',true);
+    }else{
+        jQuery('.thsa_qg_fee_recurring').prop('disabled',false);
+    }
 }

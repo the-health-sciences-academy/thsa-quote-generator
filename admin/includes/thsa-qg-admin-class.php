@@ -202,11 +202,61 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
      */
     public function quote_meta_section($post)
     {
-        $this->set_template('customer-details',['path' => 'admin', 'post' => $post]);
-        $this->set_template('products',['path' => 'admin']);
-        $this->set_template('discounts',['path' => 'admin']);
-        $this->set_template('fees',['path' => 'admin']);
-        $this->set_template('summary',['path' => 'admin']);
+        $data = get_post_meta($post->ID,'thsa_quotation_data',true);
+        
+       
+
+        //get student details
+        $customer = [];
+        $tab = 'new';
+        $customer_ = (isset($data['customer']))? $data['customer'] : null;
+        
+        if(!is_array($customer_)){
+            $user_id = $data['customer'];
+            $customer_details = get_userdata($user_id);
+            $billing =  get_user_meta( $user_id, 'billing_address_1', true ); 
+            $billing_city = get_user_meta( $user_id, 'billing_city', true ); 
+            $billing_postcode = get_user_meta( $user_id, 'billing_postcode', true ); 
+            $billing_country = get_user_meta( $user_id, 'billing_country', true ); 
+            $billing_state = get_user_meta( $user_id, 'billing_state', true ); 
+            $billing = $billing.'<br/>'.$billing_postcode.', '.$billing_city.'<br/>'.$billing_state.', '.$billing_country;
+            $customer = [ 
+                'fullname' => $customer_details->first_name.' '.$customer_details->last_name,
+                'email_address' => $customer_details->user_email,
+                'billing_address' => $billing
+            ];
+            $tab = 'exist';
+        
+        }elseif(isset($data['customer'])){
+            $customer = [
+                'firstname' => $data['customer']['firstname'],
+                'lastname' => $data['customer']['lastname'],
+                'email' => $data['customer']['email']
+            ];
+        }
+
+        //get products
+        $products = [];
+        if(!empty($data['products'])){
+            foreach($data['products'] as $product){
+                $product_details = wc_get_product($product);
+                $products[$product] = [
+                    'id' => $product_details->get_id(),
+                    'text' => $product_details->get_id().' - '.$product_details->get_title(),
+                    'price_html' => $product_details->get_price_html(),
+                    'price_number' => $product_details->get_price(),
+                    'price_regular_number' => $product_details->get_regular_price(),
+                    'price_sale_number' => $product_details->get_sale_price()
+                ];
+                
+            }
+        }
+
+        $this->set_template('customer-details',['path' => 'admin', 'post' => $post, 'data' => $customer, 'tab' =>  $tab]);
+        $this->set_template('products',['path' => 'admin', 'products' => $products]);
+        $this->set_template('discounts',['path' => 'admin','data' => $data]);
+        $this->set_template('fees',['path' => 'admin', 'data' => $data]);
+        $this->set_template('summary',['path' => 'admin', 'data' => $data]);
     }
 
     /**
@@ -219,10 +269,18 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
      * 
      * 
      */
-    public function currency_options()
+    public function currency_options($post)
     {
+        $currency = get_post_meta($post->ID,'thsa_quotation_data',true);
+        if(!empty($currency['currency'])){
+            //do nothing
+            $current = $currency['currency'];
+        }else{
+            $current = get_woocommerce_currency();
+        }
         $currencies = get_woocommerce_currencies();
-        $this->set_template('currency',['path' => 'admin', 'currency' => $currencies, 'current' => get_woocommerce_currency()]);
+        
+        $this->set_template('currency',['path' => 'admin', 'currency' => $currencies, 'current' => $current]);
     }
 
 
@@ -543,7 +601,7 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         $quote_data = [];
 
         //customer details
-        $customer_type = $_POST['thsa_qg_customer_type'];
+        $customer_type = (isset($_POST['thsa_qg_customer_type']))? $_POST['thsa_qg_customer_type'] : null;
         $customer_details = null;
         if($customer_type == 1){
             $customer_details = [
@@ -552,7 +610,8 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
                 'email'     => sanitize_text_field($_POST['thsa_qg_customer_email'])  
             ];
         }else{
-            $customer_details = sanitize_text_field($_POST['thsa_qg_customer_select']);
+            $customer_id = (isset($_POST['thsa_qg_customer_select']))? $_POST['thsa_qg_customer_select'] : null;
+            $customer_details = sanitize_text_field($customer_id);
         }
 
         if($customer_details){
@@ -560,7 +619,8 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         }
 
         //currency
-        $quote_data['currency'] = sanitize_text_field($_POST['thsa_qg_currency']);
+        $currency_ = (isset($_POST['thsa_qg_currency']))? $_POST['thsa_qg_currency'] : null;
+        $quote_data['currency'] = sanitize_text_field($currency_);
 
         //products
         //sanitize product id
@@ -583,14 +643,12 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
 
         //fees
         $fee_data = [];
-        //lets santize the json
         if(!empty($_POST['thsa_qg_added_fee'])){
             foreach($_POST['thsa_qg_added_fee'] as $fee){
                 $fee_ = $this->sanitize_json($fee);
                 $fee_data[] = $fee_;
             }
         }
-    
         $quote_data['fees'] = (!empty($fee_data))? $fee_data : null;
 
 

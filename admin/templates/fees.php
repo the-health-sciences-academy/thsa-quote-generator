@@ -19,9 +19,19 @@
                 <td>
                     <label>
                         <?php _e('Recurring','thsa-quote-generator'); ?><br/>
+                        <?php 
+                            $status = null;
+                            if(!empty($params['data']['payment_type'])){
+                                if($params['data']['payment_type'] == 'upfront'){
+                                    $status = 'no';
+                                }else{
+                                    $status = 'yes';
+                                }
+                            }
+                        ?>
                         <select class="widefat thsa_qg_fee_recurring">
-                            <option value="yes"><?php _e('Yes','thsa-quote-generator'); ?></option>
-                            <option value="no" selected><?php _e('No','thsa-quote-generator'); ?></option>
+                            <option value="yes" <?php echo ($status == 'yes')? 'selected' : null; ?>><?php _e('Yes','thsa-quote-generator'); ?></option>
+                            <option value="no" <?php echo ($status == 'no')? 'selected' : null; ?>><?php _e('No','thsa-quote-generator'); ?></option>
                         </select>
                     </label>
                 </td>
@@ -42,9 +52,32 @@
                 </tr>
             </thead>
             <tbody class="thsa_qg_added_fees">
+
+            <?php 
+                if(isset($params['data']['fees'])): 
+                    foreach($params['data']['fees'] as $fee):   
+                        $fee_json = json_encode($fee); 
+            ?>
+                    <tr data-fee="<?php echo $fee['fee_amount']; ?>">
+                        <td>
+                            <input type="checkbox">
+                            <input name="thsa_qg_added_fee[]" value="<?php echo htmlentities($fee_json); ?>" type="hidden">
+                        </td>
+                        <td><?php echo $fee['fee_name']; ?></td>
+                        <td><?php echo $fee['fee_amount']; ?></td>
+                        <td><?php echo $fee['fee_recur']; ?></td>
+                    </tr>
+            <?php 
+                    endforeach;
+                else:
+            ?>
                 <tr class="thsa_qg_no_fee">
                     <td colspan="4"><center><?php _e('No fees added', 'thsa-quote-generator'); ?></center></td>
                 </tr>
+            <?php
+                endif; 
+            ?>
+                
             </tbody>
         </table>
         <input type="button" class="button button-secondary thsa_qg_remove_added_item" data-source="fee" value="Remove">
