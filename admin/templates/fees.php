@@ -16,25 +16,6 @@
                         <input type="number" class="widefat thsa_qg_fee_amount" placeholder="0">
                     </label>
                 </td>
-                <td>
-                    <label>
-                        <?php _e('Recurring','thsa-quote-generator'); ?><br/>
-                        <?php 
-                            $status = null;
-                            if(!empty($params['data']['payment_type'])){
-                                if($params['data']['payment_type'] == 'upfront'){
-                                    $status = 'no';
-                                }else{
-                                    $status = 'yes';
-                                }
-                            }
-                        ?>
-                        <select class="widefat thsa_qg_fee_recurring">
-                            <option value="yes" <?php echo ($status == 'yes')? 'selected' : null; ?>><?php _e('Yes','thsa-quote-generator'); ?></option>
-                            <option value="no" <?php echo ($status == 'no')? 'selected' : null; ?>><?php _e('No','thsa-quote-generator'); ?></option>
-                        </select>
-                    </label>
-                </td>
                 <td valign="bottom">
                     <input type="button" class="button button-primary thsa_qg_add_fee" value="Add">
                 </td>
@@ -46,9 +27,8 @@
             <thead>
                 <tr>
                     <th width="2%"><input type="checkbox" class="thsa_qg_fee_select_all"></th>
-                    <th width="68%"><b><?php _e('Fee Name', 'thsa-quote-generator'); ?></b></th>
+                    <th width="73%"><b><?php _e('Fee Name', 'thsa-quote-generator'); ?></b></th>
                     <th width="15%"><b><?php _e('Amount', 'thsa-quote-generator'); ?></b></th>
-                    <th width="15%"><b><?php _e('Recurring', 'thsa-quote-generator'); ?></b></th>
                 </tr>
             </thead>
             <tbody class="thsa_qg_added_fees">
@@ -65,7 +45,6 @@
                         </td>
                         <td><?php echo $fee['fee_name']; ?></td>
                         <td><?php echo $fee['fee_amount']; ?></td>
-                        <td><?php echo $fee['fee_recur']; ?></td>
                     </tr>
             <?php 
                     endforeach;

@@ -204,8 +204,6 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
     {
         $data = get_post_meta($post->ID,'thsa_quotation_data',true);
         
-       
-
         //get student details
         $customer = [];
         $tab = 'new';

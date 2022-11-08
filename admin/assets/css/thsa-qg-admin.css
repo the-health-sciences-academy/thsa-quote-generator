@@ -54,6 +54,9 @@
         .thsa_qg_wrapper .thsa_qg_inner .thsa_qg_summary_box .thsa_qg_total_field_wrap .thsa_qg_total_field {
           font-size: 25px;
           padding: 5px 10px; }
+    .thsa_qg_wrapper .thsa_qg_inner .thsa_qg_plan_summary {
+      border-top: 1px solid #CCC;
+      display: none; }
 
 .thsa_admin_qg_tab {
   margin: 0;

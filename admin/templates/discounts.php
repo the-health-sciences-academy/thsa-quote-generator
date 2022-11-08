@@ -35,20 +35,19 @@
                         <label><input type="number" class="thsa_qg_percent_amount" name="thsa_qg_percent_amount" <?php echo (isset($params['data']['percent_amount_discount']))? $params['data']['fixed_amount_discount'] : null; ?> placeholder="Percentage discount"><span class="thsa_qg_tail_text">%</span></label>
                     </td>
                     <td valign="middle">
-                        <table class="thsa_qg_wide thsa_qg_plan_fields" border="0">
+                        <table class="thsa_qg_wide thsa_qg_plan_fields" border="0" <?php echo ($payment_type == 'plan')? 'style="display:block;"' : null; ?>>
                             <tr>
                                 <td>
-                                    <input type="number" name="thsa_qg_term_number" <?php echo (isset($params['term_number']))? $params['term_number'] : null; ?> placeholder="Term">
+                                    <input type="number" name="thsa_qg_term_number" class="thsa_qg_term_number" value="<?php echo (isset($params['data']['term_number']))? $params['data']['term_number'] : null; ?>" placeholder="Term">
                                 </td>
                                 <td>
                                     <?php 
                                         $plan_type = (isset($params['data']['term_plan_type']))? $params['data']['term_plan_type'] : null;
                                     ?>
                                     <select class="thsa_qg_plan_term" name="thsa_qg_plan_term">
-                                        <option>Select</option>
-                                        <option value="days" <?php echo ($plan_type == 'days')? 'selected' : null; ?>><?php _e('Day(s)','thsa-quote-generator'); ?></option>
-                                        <option value="weeks" <?php echo ($plan_type == 'weeks')? 'selected' : null; ?>><?php _e('Week(s)','thsa-quote-generator'); ?></option>
-                                        <option value="months" <?php echo ($plan_type == 'months')? 'selected' : null; ?>><?php _e('Month(s)','thsa-quote-generator'); ?></option>
+                                        <option value="day" <?php echo ($plan_type == 'day')? 'selected' : null; ?>><?php _e('Day(s)','thsa-quote-generator'); ?></option>
+                                        <option value="week" <?php echo ($plan_type == 'week')? 'selected' : null; ?>><?php _e('Week(s)','thsa-quote-generator'); ?></option>
+                                        <option value="month" <?php echo ($plan_type == 'month')? 'selected' : null; ?>><?php _e('Month(s)','thsa-quote-generator'); ?></option>
                                         <option value="year" <?php echo ($plan_type == 'year')? 'selected' : null; ?>><?php _e('Year(s)','thsa-quote-generator'); ?></option>
                                     </select>
                                 </td>

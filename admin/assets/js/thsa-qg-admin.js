@@ -244,9 +244,9 @@ jQuery(document).ready(function(){
         //get name
         var name = jQuery('.thsa_qg_fee_name').val();
         var amount = jQuery('.thsa_qg_fee_amount').val();
-        var recur = jQuery('.thsa_qg_fee_recurring').val();
+        //var recur = jQuery('.thsa_qg_fee_recurring').val();
 
-        if(!name || !amount || !recur)
+        if(!name || !amount)
             return;
 
        
@@ -287,8 +287,7 @@ jQuery(document).ready(function(){
         //generate hidden field
         var hidden_value = {
             fee_name: name,
-            fee_amount: amount,
-            fee_recur: recur
+            fee_amount: amount
         };
         var hidden_field = thsa_field_generator(
             {
@@ -326,23 +325,15 @@ jQuery(document).ready(function(){
             }
         );
        
-        var td_recur = thsa_field_generator(
-            {
-                type: 'td',
-                text: recur
-            }
-        );
         jQuery(parent_tr).append(td);
         jQuery(parent_tr).append(td_feename);
         jQuery(parent_tr).append(td_amount);
-        jQuery(parent_tr).append(td_recur);
         
         jQuery(parent).append(parent_tr);
 
         //clear fields
         jQuery('.thsa_qg_fee_name').val('');
         jQuery('.thsa_qg_fee_amount').val('');
-        jQuery('.thsa_qg_fee_recurring').val('no');
 
         thsa_qg_calculate('fee');
     });
@@ -356,9 +347,25 @@ jQuery(document).ready(function(){
         thsa_qg_calculate('percent');
     });
 
-    thsa_fee_field_status();
+
+    //plan
     jQuery('.thsa_qg_payment_type').change(function(){
-        thsa_fee_field_status();
+        var getstatus = jQuery(this).val();
+        if(getstatus == 'upfront'){
+            jQuery('.thsa_qg_plan_summary').hide();
+        }else{
+            jQuery('.thsa_qg_term_number').val('');
+            jQuery('.thsa_qg_plan_term').val('day');
+            jQuery('.thsa_qg_plan_summary').show();
+        }
+        thsa_qg_calculate();
+    });
+
+    jQuery('.thsa_qg_term_number').on('keyup',function(){
+        thsa_qg_calculate('term');
+    });
+    jQuery('.thsa_qg_plan_term').change(function(){
+        thsa_qg_calculate('term');
     });
 
 });
@@ -562,14 +569,26 @@ function thsa_qg_calculate(source = null)
     //calculate products
     if(jQuery('.thsa_qg_selected_products tr').length > 0){
         //there is products lets calculate
-
         switch(source){
             case 'percent':
                 get_set_total = thsa_qg_product_total();
                 var percent = thsa_qg_percent_calculation(get_set_total);
                 var fee = thsa_qg_fee_calculation();
-                get_set_total = (get_set_total - percent) + fee;
+    
+                var type = jQuery('.thsa_qg_payment_type').val();
+                if(type == 'upfront'){
+                    get_set_total = (get_set_total - percent) + fee;
+                }else{
+                    get_set_total = (get_set_total - discount);
+                    var term = thsa_qg_term_calculation(get_set_total);
+                    if(term > 0){
+                        get_set_total = term + fee;
+                    }else{
+                        get_set_total = get_set_total + fee;
+                    }
+                }
                 break;
+            case 'term':
             case 'product':
             case 'fixed':
             case 'fee':
@@ -577,11 +596,23 @@ function thsa_qg_calculate(source = null)
                 get_set_total = thsa_qg_product_total();
                 var discount = thsa_qg_fixed_calculation(get_set_total);
                 var fee = thsa_qg_fee_calculation();
-                get_set_total = (get_set_total - discount) + fee;
+
+                var type = jQuery('.thsa_qg_payment_type').val();
+                if(type == 'upfront'){
+                    get_set_total = (get_set_total - discount) + fee;
+                }else{
+                    get_set_total = (get_set_total - discount);
+                    var term = thsa_qg_term_calculation(get_set_total);
+                    if(term > 0){
+                        get_set_total = term + fee;
+                    }else{
+                        get_set_total = get_set_total + fee;
+                    }
+                }
                 break;
         }
-        thsa_qg_update_label();
         jQuery('.thsa_qg_total_field').val(thsa_qg_round_number(get_set_total));
+        thsa_qg_update_label();
         
     }
 }
@@ -647,6 +678,26 @@ function thsa_qg_fee_calculation()
     return total_fee;
 }
 
+function thsa_qg_term_calculation(get_set_total = 0)
+{
+    if(get_set_total == 0)
+        return 0;
+
+    var term = jQuery('.thsa_qg_term_number').val();
+    if(!term)
+        return 0;
+
+    term = parseInt(term);
+    term = (term % 1 != 0)? 0 : term;
+
+    if(term > 1){
+        return get_set_total / term;
+    }else{
+        return 0;
+    }
+
+}
+
 function thsa_qg_round_number(amount = 0)
 {
     if(amount < 0)
@@ -665,14 +716,29 @@ function thsa_qg_update_label()
    jQuery('.thsa_qg_total_savings_label').text(discounts);
    jQuery('.thsa_qg_total_fee_label').text(fee);
 
-}
+   //plan
+   var type = jQuery('.thsa_qg_payment_type').val();
+   if(type == 'plan'){
+        var term = jQuery('.thsa_qg_term_number').val();
+        var plan = jQuery('.thsa_qg_plan_term').val();
+        var total = jQuery('.thsa_qg_total_field').val();
 
-function thsa_fee_field_status()
-{
-    var get_type = jQuery('.thsa_qg_payment_type').val();
-    if(get_type == 'upfront'){
-        jQuery('.thsa_qg_fee_recurring').prop('disabled',true);
-    }else{
-        jQuery('.thsa_qg_fee_recurring').prop('disabled',false);
-    }
+        if(term > 0){
+            term = parseInt(term);
+            discounts = parseFloat(discounts);
+            var temp_total = get_set_total - discounts;
+            var term_num = temp_total / term;
+            term_num = thsa_qg_round_number(term_num);
+            term_text = term_num+' per '+plan;
+            jQuery('.thsa_qg_term_label').text(term_text);
+
+            var topay = term_num * term;
+            jQuery('.thsa_qg_topay_label').text(thsa_qg_round_number(topay));
+        }else{
+            jQuery('.thsa_qg_term_label').text('');
+            jQuery('.thsa_qg_topay_label').text('');
+        }
+        
+   }
+   
 }
