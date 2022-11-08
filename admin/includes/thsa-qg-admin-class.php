@@ -189,6 +189,33 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
             'high'
         );
 
+        add_meta_box(
+            'thsa_qg_action',
+            'Action',
+            [$this, 'customer_action'],
+            'thsa-quote-generator',
+            'side',
+            'high'
+        );
+
+        add_meta_box(
+            'thsa_qg_expiry',
+            'Expiry',
+            [$this, 'customer_expiry'],
+            'thsa-quote-generator',
+            'side',
+            'high'
+        );
+
+        add_meta_box(
+            'thsa_qg_shortcode',
+            'Shortcode',
+            [$this, 'customer_shortcode'],
+            'thsa-quote-generator',
+            'side',
+            'high'
+        );
+
     }
 
     /**
@@ -279,6 +306,51 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         $currencies = get_woocommerce_currencies();
         
         $this->set_template('currency',['path' => 'admin', 'currency' => $currencies, 'current' => $current]);
+    }
+
+
+    /**
+     * 
+     * customer_action
+     * @since 1.2,0
+     * @param
+     * @return
+     * 
+     */
+    public function customer_action()
+    {
+        $this->set_template('action',['path' => 'admin']);
+    }
+
+    /**
+     * 
+     * 
+     * customer_expiry
+     * @since 1.2.0
+     * @param
+     * @return
+     * 
+     * 
+     */
+    public function customer_expiry()
+    {
+        $this->set_template('expiry',['path' => 'admin']);
+    }
+
+
+    /**
+     * 
+     * 
+     * customer_shortcode
+     * @since 1.2.0
+     * @param
+     * @return
+     * 
+     * 
+     */
+    public function customer_shortcode()
+    {
+        $this->set_template('shortcode',['path' => 'admin']);
     }
 
 
