@@ -4,7 +4,7 @@
             <a href="javascript:void(0);" class="button button-primary widefat"><?php _e('Send quotation to customer','thsa_quote_generator'); ?></a>
         </p>
         <p>
-            <a href="javascript:void(0);" class="button button-secondary widefat"><?php _e('Manage Email Template','thsa_quote_generator'); ?></a>
+            <a href="javascript:void(0);" class="button button-secondary widefat"><?php _e('Manage Email Content','thsa_quote_generator'); ?></a>
         </p>
     </div>
 </div>

@@ -110,5 +110,59 @@ class thsa_qg_common_class
 		return $data_;
 	}
 
+	/**
+	 * 
+	 * tab_manager
+	 * @since 1.2.0
+	 * @param array
+	 * @return string
+	 * 
+	 */
+	public function tab_settings_manager($data = [])
+	{	
+		if(empty($data))
+			return;
+		
+		$data = apply_filters('thsa_quote_settings_tab_manager', $data);
+		$tabs = null;
+		foreach($data as $row){
+			$tabs .= '<li class="'.$row['status'].'" data-target="'.$row['target'].'">'.$row['text'].'</li>';
+		}
+		return $tabs;
+	}
+	
+	/**
+	 * 
+	 * tab_content_manager
+	 * @since 1.2.0
+	 * @param array
+	 * @return string
+	 * 
+	 */
+	public function tab_content_manager($data = [])
+	{
+		if(empty($data))
+			return;
+
+
+
+		$data = apply_filters('thsa_quote_settings_content_manager', $data);
+		$content = null;
+		foreach($data as $row){
+			if(is_array($row['content'])):
+				$cl = $row['content'][0];
+				$fn = $row['content'][1];
+			?>
+				<div class="thsa_qg_tab_content <?php echo $row['class'].' '.$row['status']; ?>"><?php $cl->$fn(); ?></div>
+			<?php
+			else:
+			?>
+				<div class="thsa_qg_tab_content <?php echo $row['class'].' '.$row['status']; ?>"><?php $row['content']; ?></div>
+			<?php
+			endif;
+		}
+		
+	}
+
 }
 ?>

@@ -51,7 +51,7 @@
                 else:
             ?>
                 <tr class="thsa_qg_no_fee">
-                    <td colspan="4"><center><?php _e('No fees added', 'thsa-quote-generator'); ?></center></td>
+                    <td colspan="3"><center><?php _e('No fees added', 'thsa-quote-generator'); ?></center></td>
                 </tr>
             <?php
                 endif; 

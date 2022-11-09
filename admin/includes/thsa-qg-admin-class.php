@@ -8,9 +8,12 @@
  * 
  * 
  */
-
 namespace thsa\qg\admin;
 use thsa\qg\common\thsa_qg_common_class;
+use thsa\qg\admin\settings as qgsettings;
+use thsa\qg\admin\shortcodes  as qgshortcodes;
+
+defined( 'ABSPATH' ) or die( 'No access area' );
 
 class thsa_qg_admin_class extends thsa_qg_common_class{
 
@@ -40,6 +43,7 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
 
     public function __construct()
     {
+
         //load common js
         add_action('admin_enqueue_scripts', [$this, 'load_admin_assets']);
 
@@ -54,6 +58,8 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         //save data
         add_action('save_post_thsa-quote-generator', [$this, 'save_quote']);
 
+        new qgsettings\thsa_qg_admin_settings_class();
+
     }
 
     /**
@@ -65,7 +71,7 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
      */
     public function load_admin_assets()
     {
-        $this->load_js();
+     
         wp_register_script( THSA_QG_PREFIX.'-admin-js', THSA_QG_PLUGIN_URL.'admin/assets/js/thsa-qg-admin.js', array('jquery') );
         wp_enqueue_script( THSA_QG_PREFIX.'-admin-js' );
         wp_enqueue_style( THSA_QG_PREFIX.'-admin-css', THSA_QG_PLUGIN_URL.'admin/assets/css/thsa-qg-admin.css');
@@ -173,7 +179,7 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
     {
         add_meta_box(
             'thsa_qg_client_meta',
-            'Quotation Builder',
+            __('Quotation Builder', 'thsa_quote_generator'),
             [$this, 'quote_meta_section'],
             'thsa-quote-generator',
             'normal',
@@ -182,7 +188,7 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
 
         add_meta_box(
             'thsa_qg_currency',
-            'Currency',
+            __('Currency', 'thsa_quote_generator'),
             [$this, 'currency_options'],
             'thsa-quote-generator',
             'side',
@@ -191,7 +197,7 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
 
         add_meta_box(
             'thsa_qg_action',
-            'Action',
+            __('Action', 'thsa_quote_generator'),
             [$this, 'customer_action'],
             'thsa-quote-generator',
             'side',
@@ -200,7 +206,7 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
 
         add_meta_box(
             'thsa_qg_expiry',
-            'Expiry',
+            __('Expiry', 'thsa_quote_generator'),
             [$this, 'customer_expiry'],
             'thsa-quote-generator',
             'side',
@@ -209,7 +215,7 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
 
         add_meta_box(
             'thsa_qg_shortcode',
-            'Shortcode',
+            __('Shortcode', 'thsa_quote_generator'),
             [$this, 'customer_shortcode'],
             'thsa-quote-generator',
             'side',
@@ -235,8 +241,10 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         $customer = [];
         $tab = 'new';
         $customer_ = (isset($data['customer']))? $data['customer'] : null;
+
         
-        if(!is_array($customer_)){
+        
+        if(!is_array($customer_) && $customer_){
             $user_id = $data['customer'];
             $customer_details = get_userdata($user_id);
             $billing =  get_user_meta( $user_id, 'billing_address_1', true ); 
@@ -276,6 +284,8 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
                 
             }
         }
+
+       
 
         $this->set_template('customer-details',['path' => 'admin', 'post' => $post, 'data' => $customer, 'tab' =>  $tab]);
         $this->set_template('products',['path' => 'admin', 'products' => $products]);
@@ -348,9 +358,14 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
      * 
      * 
      */
-    public function customer_shortcode()
+    public function customer_shortcode($post)
     {
-        $this->set_template('shortcode',['path' => 'admin']);
+        $data = get_post_meta($post->ID,'thsa_quotation_data',true);
+        $shortcode = null;
+        if(isset($data['customer'])){
+            $shortcode = htmlentities('[thsa-quotation id="'.$post->ID.'"]');
+        }
+        $this->set_template('shortcode',['path' => 'admin','shortcode' => $shortcode]);
     }
 
 
