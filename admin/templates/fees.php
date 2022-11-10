@@ -59,7 +59,7 @@
                 
             </tbody>
         </table>
-        <input type="button" class="button button-secondary thsa_qg_remove_added_item" data-source="fee" value="<?php _e('Remove','thsa_quote_generator'); ?>">
+        <input type="button" class="button button-secondary thsa_qg_remove_added_item" data-source="fee" value="<?php _e('Remove','thsa-quote-generator'); ?>">
         </div>
     </div>
 </div>

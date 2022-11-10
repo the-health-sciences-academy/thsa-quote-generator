@@ -20,13 +20,13 @@
                 endforeach;
             else: ?>
         <tr>
-            <td colspan="4"><?php _e('No items available', 'thsa_quote_generator'); ?></td>
+            <td colspan="4"><?php _e('No items available', 'thsa-quote-generator'); ?></td>
         </tr>
         <?php endif; ?>
         <tfoot>
             <tr>
                 <td></td>
-                <td colspan="2"><?php _e('SubTotal','thsa_quote_generator'); ?></td>
+                <td colspan="2"><?php _e('SubTotal','thsa-quote-generator'); ?></td>
                 <td colspan="1"><?php echo wc_price($params['undiscounted']); ?></td>
             </tr>
             <?php 
@@ -35,7 +35,7 @@
             ?>
             <tr>
                 <td></td>
-                <td colspan="2"><?php _e('Discount','thsa_quote_generator'); ?></td>
+                <td colspan="2"><?php _e('Discount','thsa-quote-generator'); ?></td>
                 <td colspan="1">- <?php echo wc_price($discounts); ?></td>
             </tr>
             <?php endif; 
@@ -58,7 +58,7 @@
             <tr class="thsa_qg_public_total">
                 <td></td>
                 <td colspan="2">
-                    <?php _e('Total','thsa_quote_generator'); ?>
+                    <?php _e('Total','thsa-quote-generator'); ?>
                 </td>
                 <td colspan="1">
                     <?php echo wc_price($params['grand_total']); ?>
@@ -69,10 +69,10 @@
     <?php do_action('thsa_qg_before_total_button'); ?>
     <div class="thsa_qg_row thsa_qg_total_foot">
         <div class="thsa_qg_col-6">
-            <?php _e('Quotation expires on Jan 01, 2011','thsa_quote_generator'); ?>
+            <?php _e('Quotation expires on Jan 01, 2011','thsa-quote-generator'); ?>
         </div>
         <div class="thsa_qg_col-6">
-            <input type="button" value="<?php _e('Proceed to checkout','thsa_quote_generator'); ?>">
+            <input type="button" data-q-id="<?php echo $params['qid']; ?>" class="thsa_qg_proceed_checkout" value="<?php _e('Proceed to checkout','thsa-quote-generator'); ?>">
         </div>
     </div>
     

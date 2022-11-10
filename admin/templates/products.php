@@ -19,7 +19,7 @@
                         </label>
                     </td>
                     <td width="10%">
-                        <input type="button" class="button button-primary button-medium thsa_qg_add_product" value="<?php _e('Add','thsa_quote_generator'); ?>">
+                        <input type="button" class="button button-primary button-medium thsa_qg_add_product" value="<?php _e('Add','thsa-quote-generator'); ?>">
                     </td>
                 </tr>
             </table>
@@ -65,7 +65,7 @@
                     ?>
                 </tbody>
             </table>
-            <input type="button" class="button button-secondary thsa_qg_remove_added_item" data-source="products" value="<?php _e('Remove','thsa_quote_generator'); ?>">
+            <input type="button" class="button button-secondary thsa_qg_remove_added_item" data-source="products" value="<?php _e('Remove','thsa-quote-generator'); ?>">
         </div>
     </div>
 </div>

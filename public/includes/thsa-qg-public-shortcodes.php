@@ -107,7 +107,8 @@ class thsa_qg_public_shortcodes extends thsa_qg_common_class
                         'products' => $products, 
                         'data' => $quote,
                         'grand_total' => $grand_total, 
-                        'undiscounted' => $total
+                        'undiscounted' => $total,
+                        'qid' => $attr['id']
                     ]
                 );
                 return ob_get_clean();
