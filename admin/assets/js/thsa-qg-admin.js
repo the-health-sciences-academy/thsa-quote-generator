@@ -112,7 +112,8 @@ jQuery(document).ready(function(){
         jQuery('.thsa_qg_product_select').val('').change();
     });
 
-    jQuery('.thsa_qg_product_select').change(function(){
+    
+    jQuery('.thsa_qg_add_product').click(function(){
         var type = jQuery('.thsa_qg_filter_option').val();
        
         if(!jQuery(this).val())
@@ -120,13 +121,13 @@ jQuery(document).ready(function(){
 
         switch(type){
             case 'product':
-                thsa_qg_gen_selected_product(this);   
+                thsa_qg_gen_selected_product(jQuery('.thsa_qg_product_select'));   
                 break;
             case 'category':
-                thsa_qg_gen_selected_category(this, 'category');
+                thsa_qg_gen_selected_category(jQuery('.thsa_qg_product_select'), 'category');
                 break;
             case 'tag':
-                thsa_qg_gen_selected_category(this, 'tag');
+                thsa_qg_gen_selected_category(jQuery('.thsa_qg_product_select'), 'tag');
                 break;
         }
 
@@ -148,7 +149,7 @@ jQuery(document).ready(function(){
         switch(source){
             case 'products':
                 parent_wrap = 'thsa_qg_selected_products';
-                colspan = 3;
+                colspan = 4;
                 selectall = 'thsa_qg_select_all';
                 no_product_class = 'thsa_qg_no_product';
                 no_item_text = labels_.no_products_added;
@@ -328,7 +329,6 @@ jQuery(document).ready(function(){
         jQuery(parent_tr).append(td);
         jQuery(parent_tr).append(td_feename);
         jQuery(parent_tr).append(td_amount);
-        
         jQuery(parent).append(parent_tr);
 
         //clear fields
@@ -366,6 +366,18 @@ jQuery(document).ready(function(){
     });
     jQuery('.thsa_qg_plan_term').change(function(){
         thsa_qg_calculate('term');
+    });
+
+    jQuery('body').on('keyup','.thsa_qg_added_product_qty',function(){
+        var get_qty = jQuery(this).val();
+        var get_td = jQuery(this).closest('td');
+        var get_tr = jQuery(get_td).closest('tr');
+        var get_price = jQuery(get_tr).data('price-num');
+        get_price = (get_price)? parseFloat(get_price) : 0;
+        get_qty = (get_qty)? parseFloat(get_qty) : 0;
+        var amount = get_price * get_qty;
+        jQuery(get_tr).find('td:last-child').text(amount);
+        thsa_qg_calculate();
     });
 
 });
@@ -446,6 +458,11 @@ function thsa_generate_field_to(data)
 
     jQuery('tr.thsa_qg_no_product').remove();
 
+
+    var item_price = data.price_number;
+    item_price = (item_price)? parseFloat(item_price) : 0;
+    var amount = item_price * 1;
+
     var body = jQuery('.thsa_qg_selected_products');
         //data
         var parent_tr = thsa_field_generator(
@@ -466,7 +483,7 @@ function thsa_generate_field_to(data)
                     },
                     {
                         attr: 'data-price-num',
-                        value: data.price_number
+                        value: amount
                     }
                 ]
             }
@@ -511,6 +528,7 @@ function thsa_generate_field_to(data)
                 ]
             }
         );
+        
         jQuery(td_option).append(hidden_field);
 
         var td_option_name = thsa_field_generator(
@@ -528,9 +546,56 @@ function thsa_generate_field_to(data)
 
         jQuery(td_option_price).html(data.price_html);
 
+        var td_option_qty = thsa_field_generator(
+            {
+                type: 'td'
+            }
+        );
+
+        var td_option_qty_field = thsa_field_generator(
+            {
+                type: 'input',
+                attributes: [
+                    {
+                        attr: 'name',
+                        value: 'thsa_qg_added_product_qty[]'
+                    },
+                    {
+                        attr: 'class',
+                        value: 'thsa_qg_added_product_qty'
+                    },
+                    {
+                        attr: 'value',
+                        value: 1
+                    },
+                    {
+                        attr: 'type',
+                        value: 'number'
+                    }
+                ]
+            }
+        );
+
+        jQuery(td_option_qty).append(td_option_qty_field);
+
+        var td_option_amount = thsa_field_generator(
+            {
+                type: 'td',
+                text: amount,
+                attributes: [
+                    {
+                        attr: 'class',
+                        value: 'thsa_qg_product_amount'
+                    }
+                ]
+            }
+        );
+
         jQuery(parent_tr).append(td_option);
         jQuery(parent_tr).append(td_option_name);
         jQuery(parent_tr).append(td_option_price);
+        jQuery(parent_tr).append(td_option_qty);
+        jQuery(parent_tr).append(td_option_amount);
         jQuery(body).append(parent_tr);
 
         thsa_qg_calculate('product');
@@ -621,7 +686,8 @@ function thsa_qg_product_total()
 {
     var temp_product_total = 0;
     jQuery('.thsa_qg_selected_products tr').each(function(){
-        var price = jQuery(this).data('price-num');
+        //var price = jQuery(this).data('price-num');
+        var price = jQuery(this).find('td.thsa_qg_product_amount').text();
         price = (price)? parseFloat(price) : 0;
         temp_product_total += price;
     });

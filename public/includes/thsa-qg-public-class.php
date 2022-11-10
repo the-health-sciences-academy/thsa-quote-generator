@@ -29,6 +29,23 @@ class thsa_qg_public_class extends thsa_qg_common_class{
     public function __construct()
     {
         new thsaqgshorcodes\thsa_qg_public_shortcodes();
+        add_action('wp_enqueue_scripts', [$this, 'load_public_assets']);
+    }
+
+
+    /**
+     * 
+     * 
+     * load_public_assets
+     * @since 1.2.02
+     * @param
+     * @return
+     * 
+     * 
+     */
+    public function load_public_assets()
+    {
+        wp_enqueue_style( THSA_QG_PREFIX.'-public-css', THSA_QG_PLUGIN_URL.'public/assets/css/thsa-qg-public.css');
     }
 
 }

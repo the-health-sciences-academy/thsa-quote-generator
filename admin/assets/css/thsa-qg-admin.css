@@ -98,11 +98,16 @@
   .thsa_product_options .widefat.no-border td {
     padding: 10px;
     padding-bottom: 20px;
-    padding-top: 0; }
+    padding-top: 0px;
+    vertical-align: bottom; }
     .thsa_product_options .widefat.no-border td:first-child {
       padding-left: 0; }
     .thsa_product_options .widefat.no-border td:last-child {
       padding-right: 0; }
+    .thsa_product_options .widefat.no-border td .select2-container .select2-selection--single {
+      margin-bottom: 0 !important; }
+.thsa_product_options .thsa_qg_added_product_qty {
+  width: 60px !important; }
 
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {

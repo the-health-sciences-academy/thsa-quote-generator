@@ -18,7 +18,7 @@ class thsa_qg_public_shortcodes extends thsa_qg_common_class
     public function __construct()
     {
         add_shortcode('thsa_qg_customer_name', [$this, 'customer_name']);
-        add_shortcode('thsa_qg_quotation_holder', [$this, 'quotation']);
+        add_shortcode('thsa-quotation', [$this, 'quotation']);
     }
 
     /**
@@ -66,8 +66,54 @@ class thsa_qg_public_shortcodes extends thsa_qg_common_class
         if(isset($attr['id'])){
             $quote = get_post_meta($attr['id'],'thsa_quotation_data',true);
             if($quote){
+                //get products
+                $products = [];
+                $total = 0;
+                if(!empty($quote['products'])){
+                    foreach($quote['products'] as $product){
+                        $product_details = wc_get_product($product[0]);
+
+                        $total = $total + ($product_details->get_price() * $product[1]);
+                        $products[$product[0]] = [
+                            'id' => $product_details->get_id(),
+                            'text' => $product_details->get_title(),
+                            'price_html' => $product_details->get_price_html(),
+                            'price_number' => $product_details->get_price(),
+                            'price_regular_number' => $product_details->get_regular_price(),
+                            'price_sale_number' => $product_details->get_sale_price(),
+                            'qty' => $product[1],
+                            'amount' => $product_details->get_price() * $product[1]
+                        ];
+                    }
+                }
+
+                $discount = ($quote['fixed_amount_discount'])? $quote['fixed_amount_discount'] : 0;
+                $discounted_total = $total - $discount;
+
+                //fees
+                $fees = 0;
+                if(isset($quote['fees'])){
+                    foreach($quote['fees'] as $fee){
+                        $fee_ = ($fee['fee_amount'])? $fee['fee_amount'] : 0;
+                        $fees += $fee_;
+                    }
+                }
+                $quote['fees'];
+                $grand_total = $discounted_total + $fees;
+
                 ob_start();
-                    $this->set_template('shortcodes/quotation', ['path' => 'public']);
+                    $this->set_template('shortcodes/quotation', [
+                        'path' => 'public', 
+                        'products' => $products, 
+                        'data' => $quote,
+                        'grand_total' => $grand_total, 
+                        'undiscounted' => $total
+                    ]
+                );
+                return ob_get_clean();
+            }else{
+                ob_start();
+                    echo __('#Error: No quotation were found','thsa_quote_generator');
                 return ob_get_clean();
             }
         }else{

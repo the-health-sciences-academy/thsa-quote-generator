@@ -71,7 +71,8 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
      */
     public function load_admin_assets()
     {
-     
+
+        $this->load_js();
         wp_register_script( THSA_QG_PREFIX.'-admin-js', THSA_QG_PLUGIN_URL.'admin/assets/js/thsa-qg-admin.js', array('jquery') );
         wp_enqueue_script( THSA_QG_PREFIX.'-admin-js' );
         wp_enqueue_style( THSA_QG_PREFIX.'-admin-css', THSA_QG_PLUGIN_URL.'admin/assets/css/thsa-qg-admin.css');
@@ -272,14 +273,16 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         $products = [];
         if(!empty($data['products'])){
             foreach($data['products'] as $product){
-                $product_details = wc_get_product($product);
-                $products[$product] = [
+                $product_details = wc_get_product($product[0]);
+                $products[$product[0]] = [
                     'id' => $product_details->get_id(),
                     'text' => $product_details->get_id().' - '.$product_details->get_title(),
                     'price_html' => $product_details->get_price_html(),
                     'price_number' => $product_details->get_price(),
                     'price_regular_number' => $product_details->get_regular_price(),
-                    'price_sale_number' => $product_details->get_sale_price()
+                    'price_sale_number' => $product_details->get_sale_price(),
+                    'qty' => $product[1],
+                    'amount' => $product_details->get_price() * $product[1]
                 ];
                 
             }
@@ -711,8 +714,9 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         //sanitize product id
         $saved_products = [];
         if(!empty($_POST['thsa_qg_added_product'])){
-            foreach($_POST['thsa_qg_added_product'] as $product_id){
-                $saved_products[] = sanitize_text_field($product_id);
+            foreach($_POST['thsa_qg_added_product'] as $index => $product_id){
+                $qty = sanitize_text_field($_POST['thsa_qg_added_product_qty'][$index]);
+                $saved_products[] = [sanitize_text_field($product_id), $qty];
             }
             $quote_data['products'] = $saved_products;
         }
