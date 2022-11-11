@@ -17,6 +17,9 @@ defined( 'ABSPATH' ) or die( 'No access area' );
 
 class thsa_qg_public_class extends thsa_qg_common_class{
 
+
+    private $quotation_data = 0;
+
     /**
      * 
      * 
@@ -33,6 +36,9 @@ class thsa_qg_public_class extends thsa_qg_common_class{
         
         //add items to checkout
         add_action('wp', [$this,'load_items']);
+        add_action('woocommerce_cart_calculate_fees',[$this,'add_fees']);
+        add_filter('woocommerce_cart_totals_coupon_label', [$this,'edit_discount_name'] , 999 ,2);  
+        
     }
 
 
@@ -89,14 +95,75 @@ class thsa_qg_public_class extends thsa_qg_common_class{
                     foreach($quote['products'] as $pid){    
                         WC()->cart->add_to_cart( $pid[0], $pid[1]);
                     }
+
+                    //apply coupon
+                    $coupon_code = 'quotation-'.$qid;
+                    if (!$woocommerce->cart->add_discount( sanitize_text_field( $coupon_code )))
+                        $woocommerce->show_messages();
+
+
+              
+                    WC()->session->set('thsa_on_process_quotation', $quote);
                     
                 }
                 
             }
 
+
             
         }
         
+    }
+
+    /**
+     * 
+     * 
+     * add_fee
+     * @since 1.2.0
+     * @param
+     * @return
+     * 
+     * 
+     */
+    public function add_fees()
+    {
+
+        if(WC()->session->get('thsa_on_process_quotation')){
+            //apply fees
+            global $woocommerce; 
+
+            if ( is_admin() && ! defined( 'DOING_AJAX' ) ) 
+                return;
+
+            $data = WC()->session->get('thsa_on_process_quotation');
+            $fees = $data['fees'];
+            foreach($fees as $fee){
+                $woocommerce->cart->add_fee( $fee['fee_name'], $fee['fee_amount'], true, 'standard' );  
+            }
+
+        }
+        
+
+    }
+
+    /**
+     * 
+     * 
+     * edit_discount_name
+     * @since 1.2.0
+     * @param
+     * @return
+     * 
+     */
+    public function edit_discount_name($sprintf, $coupon)
+    {
+
+        if(WC()->session->get('thsa_on_process_quotation')){
+            echo 'Discount';
+        }else{
+            echo $sprintf;
+        }
+
     }
 
 }

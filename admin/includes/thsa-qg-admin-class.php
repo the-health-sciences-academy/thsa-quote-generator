@@ -721,14 +721,46 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
             $quote_data['products'] = $saved_products;
         }
 
+        $expiry = ($_POST['thsa_qg_expiry'])? sanitize_text_field($_POST['thsa_qg_expiry']) : null;
+        if($expiry){
+            $quote_data['expiry'] = $expiry;
+        }
+
         //discounts
-        $quote_data['payment_type'] = (!empty($_POST['thsa_qg_payment_type']))? sanitize_text_field($_POST['thsa_qg_payment_type']) : null;
-        $quote_data['allow_payment_type_edit'] = (!empty($_POST['allow_payment_type_edit']))? sanitize_text_field($_POST['allow_payment_type_edit']) : null;
-        $quote_data['fixed_amount_discount'] = (!empty($_POST['thsa_qg_fix_amount']))? sanitize_text_field($_POST['thsa_qg_fix_amount']) : null; 
-        $quote_data['percent_amount_discount'] = (!empty($_POST['thsa_qg_percent_amount']))? sanitize_text_field($_POST['thsa_qg_percent_amount']) : null;
-        $quote_data['term_number'] = (!empty($_POST['thsa_qg_term_number']))? sanitize_text_field($_POST['thsa_qg_term_number']) : null;
-        $quote_data['term_plan_type'] = (!empty($_POST['thsa_qg_plan_term']))? sanitize_text_field($_POST['thsa_qg_plan_term']) : null;
-        $quote_data['allow_term_edit'] = (!empty($_POST['thsa_allow_term_edit']))? sanitize_text_field($_POST['thsa_allow_term_edit']) : null;
+        $payment_type = (!empty($_POST['thsa_qg_payment_type']))? sanitize_text_field($_POST['thsa_qg_payment_type']) : null;
+        if($payment_type){
+            $quote_data['payment_type'] = $payment_type;
+        }
+
+        $payment_type_edit = (!empty($_POST['allow_payment_type_edit']))? sanitize_text_field($_POST['allow_payment_type_edit']) : null;
+        if($payment_type_edit){
+            $quote_data['allow_payment_type_edit'] = $payment_type_edit;
+        }
+
+        $discount_amount = (!empty($_POST['thsa_qg_fix_amount']))? sanitize_text_field($_POST['thsa_qg_fix_amount']) : null; 
+        if($discount_amount){
+            $quote_data['fixed_amount_discount'] = $discount_amount;
+        }
+
+        $percent_discount = (!empty($_POST['thsa_qg_percent_amount']))? sanitize_text_field($_POST['thsa_qg_percent_amount']) : null;
+        if($percent_discount){
+            $quote_data['percent_amount_discount'] = $percent_discount;
+        }
+
+        $term_number = (!empty($_POST['thsa_qg_term_number']))? sanitize_text_field($_POST['thsa_qg_term_number']) : null;
+        if($term_number){
+            $quote_data['term_number'] = $term_number;
+        }
+
+        $plan_type = (!empty($_POST['thsa_qg_plan_term']))? sanitize_text_field($_POST['thsa_qg_plan_term']) : null;
+        if($plan_type){
+            $quote_data['term_plan_type'] = $plan_type;
+        }
+
+        $term_edit = (!empty($_POST['thsa_allow_term_edit']))? sanitize_text_field($_POST['thsa_allow_term_edit']) : null;
+        if($term_edit){
+            $quote_data['allow_term_edit'] = $term_edit;
+        }
 
         //fees
         $fee_data = [];
@@ -747,7 +779,64 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
             delete_post_meta($post_id, 'thsa_quotation_data');
         }
 
+        //create coupon for quotation
+        $code = 'quotation-'.$post_id;
+        $this->generate_coupon($code, $discount_amount);
 
+    }
+
+    /**
+     * 
+     * 
+     * generate_coupon
+     * @since 1.2.0
+     * @param $code string - name of coupon
+     * @param $amount string - amount of coupon
+     * @param $type string - type of coupon
+     * @return
+     * 
+     * 
+     */
+    public function generate_coupon($code = null, $amount = null, $type = 'fixed_cart')
+    {
+        if(!$code || !$code)
+            return;
+
+        //check of code exist
+        $code_id = wc_get_coupon_id_by_code($code);
+        if($code_id > 0){
+            //update instead
+            update_post_meta( $code_id, 'coupon_amount', $amount );
+            return;
+        }
+            
+
+        $coupon_code = $code; // Code - perhaps generate this from the user ID + the order ID
+        $amount = $amount; // Amount
+        $discount_type = $type; // Type: fixed_cart, percent, fixed_product, percent_product
+
+        $coupon = array(
+            'post_title' => $coupon_code,
+            'post_content' => '',
+            'post_status' => 'publish',
+            'post_author' => 1,
+            'post_type'     => 'shop_coupon'
+        );    
+
+        $new_coupon_id = wp_insert_post( $coupon );
+
+        // Add meta
+        update_post_meta( $new_coupon_id, 'discount_type', $discount_type );
+        update_post_meta( $new_coupon_id, 'coupon_amount', $amount );
+        update_post_meta( $new_coupon_id, 'individual_use', 'no' );
+        update_post_meta( $new_coupon_id, 'product_ids', '' );
+        update_post_meta( $new_coupon_id, 'exclude_product_ids', '' );
+        update_post_meta( $new_coupon_id, 'usage_limit', '1' );
+        update_post_meta( $new_coupon_id, 'expiry_date', '' );
+        update_post_meta( $new_coupon_id, 'apply_before_tax', 'yes' );
+        update_post_meta( $new_coupon_id, 'free_shipping', 'no' );
+
+        return $new_coupon_id;
     }
 
 }
