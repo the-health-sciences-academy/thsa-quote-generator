@@ -23,6 +23,9 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
 
     private $product_tag = 'product_tag';
 
+
+    public $setting_class = null;
+
     /**
      * 
      * 
@@ -43,6 +46,7 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
 
     public function __construct()
     {
+        $this->setting_class = new qgsettings\thsa_qg_admin_settings_class();
 
         //load common js
         add_action('admin_enqueue_scripts', [$this, 'load_admin_assets']);
@@ -58,7 +62,6 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         //save data
         add_action('save_post_thsa-quote-generator', [$this, 'save_quote']);
 
-        new qgsettings\thsa_qg_admin_settings_class();
 
     }
 
@@ -77,6 +80,17 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         wp_enqueue_script( THSA_QG_PREFIX.'-admin-js' );
         wp_enqueue_style( THSA_QG_PREFIX.'-admin-css', THSA_QG_PLUGIN_URL.'admin/assets/css/thsa-qg-admin.css');
 
+        
+        $general_settings = $this->setting_class->get_settings('general');
+
+        $default_round = ['round' => 'off', 'decimal' => 0];
+        if(isset($general_settings)){
+            $default_round = [
+                'round' => $general_settings['round'],
+                'decimal' => $general_settings['decimal']
+            ];
+        }
+
         //load thsa js global variables
         wp_localize_script( THSA_QG_PREFIX.'-admin-js', 'thsaqgvars', 
             [
@@ -86,7 +100,9 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
                 'customer_details'  =>  'thsa_qg_customer_details',
                 'product_options'   =>  'thsa_qg_product_select_options',
                 'product_from_cat'  =>  'thsa_qg_product_from_cat',
-                'labels'            =>  $this->labels()
+                'labels'            =>  $this->labels(),
+                'save_general'      => 'thsa_qg_save_settings',
+                'round_settings'    => json_encode($default_round)
             ]
         );
 
@@ -721,7 +737,7 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
             $quote_data['products'] = $saved_products;
         }
 
-        $expiry = ($_POST['thsa_qg_expiry'])? sanitize_text_field($_POST['thsa_qg_expiry']) : null;
+        $expiry = (!empty($_POST['thsa_qg_expiry']))? sanitize_text_field($_POST['thsa_qg_expiry']) : null;
         if($expiry){
             $quote_data['expiry'] = $expiry;
         }

@@ -4,7 +4,7 @@
     <?php foreach($params['currency'] as $code => $currency): 
         $selected = ($params['current'] == $code)? 'selected' : null;
     ?>
-        <option value="<?php echo $code; ?>" <?php echo $selected; ?>><?php _e($currency,'thsa-quote-generator'); ?></option>
+        <option value="<?php esc_html_e($code); ?>" <?php echo $selected; ?>><?php esc_html_e($currency,'thsa-quote-generator'); ?></option>
     <?php endforeach; ?>
 </select>
 </div>

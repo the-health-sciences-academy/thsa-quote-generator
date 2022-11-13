@@ -12,6 +12,7 @@
 namespace thsa\qg\public;
 use thsa\qg\common\thsa_qg_common_class;
 use thsa\qg\public\shortcodes as thsaqgshorcodes;
+use thsa\qg\admin\settings as qgsettings;
 
 defined( 'ABSPATH' ) or die( 'No access area' );
 
@@ -58,9 +59,16 @@ class thsa_qg_public_class extends thsa_qg_common_class{
         wp_enqueue_script( THSA_QG_PREFIX.'-public-js' );
         wp_enqueue_style( THSA_QG_PREFIX.'-public-css', THSA_QG_PLUGIN_URL.'public/assets/css/thsa-qg-public.css');
 
+        $settings = new qgsettings\thsa_qg_admin_settings_class();
+        $sett = $settings->get_settings('general');
+        
+        $checkout_page_url = site_url().'/checkout?quotation=';
+        if(isset($sett['checkout'])){
+            $checkout_page_url = get_permalink($sett['checkout']).'?quotation=';
+        }
         wp_localize_script( THSA_QG_PREFIX.'-public-js', 'thsaqg_public_vars',
             [
-                'thsa_qg_checkout_url'           =>  site_url().'/checkout?quotation=',
+                'thsa_qg_checkout_url'           =>  $checkout_page_url,
                 'labels'                         =>  $this->labels()
             ]
         );
@@ -80,6 +88,9 @@ class thsa_qg_public_class extends thsa_qg_common_class{
     {
         //get settings here
         if(is_page('checkout')){
+
+            if(!isset($_GET['quotation']))
+                return;
 
             $qid = sanitize_text_field($_GET['quotation']);
             $quote = get_post_meta($qid,'thsa_quotation_data',true);
@@ -159,7 +170,7 @@ class thsa_qg_public_class extends thsa_qg_common_class{
     {
 
         if(WC()->session->get('thsa_on_process_quotation')){
-            echo 'Discount';
+            _e('Discount', 'thsa-quote-generator');
         }else{
             echo $sprintf;
         }

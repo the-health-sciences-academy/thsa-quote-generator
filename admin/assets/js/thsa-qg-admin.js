@@ -40,6 +40,9 @@ jQuery(document).ready(function(){
     jQuery('.thsa_qg_select_woo').selectWoo({
         width: '100%', 
         placeholder: labels_.select});
+    jQuery('.thsa_qg_select_woo_inline').selectWoo({
+        width: '250px', 
+        placeholder: labels_.select});
     jQuery('.thsa_qg_product_select').selectWoo({
         width: '100%',
         placeholder: labels_.select
@@ -149,7 +152,7 @@ jQuery(document).ready(function(){
         switch(source){
             case 'products':
                 parent_wrap = 'thsa_qg_selected_products';
-                colspan = 4;
+                colspan = 5;
                 selectall = 'thsa_qg_select_all';
                 no_product_class = 'thsa_qg_no_product';
                 no_item_text = labels_.no_products_added;
@@ -163,7 +166,7 @@ jQuery(document).ready(function(){
             break;
         }
 
-        if(confirm('Are you sure you want to remove selected item(s)')){
+        if(confirm(labels_.confirm_message)){
             jQuery('.'+parent_wrap+' tr').each(function(){
                 var parent = jQuery(this);
                 var ftd = jQuery(this).find('td:first-child');
@@ -766,10 +769,33 @@ function thsa_qg_term_calculation(get_set_total = 0)
 
 function thsa_qg_round_number(amount = 0)
 {
+  
     if(amount < 0)
         return 0;
 
-    return Math.round(amount);
+    var round_set = thsaqgvars.round_settings;
+    round_set = JSON.parse(round_set);
+    switch(round_set.round){
+        case 'off':
+            amount = Math.round(amount);
+            break;
+        case 'up':
+            amount = Math.ceil(amount);
+            break;
+        case 'down':
+            amount = Math.floor(amount);
+            break;
+        default:
+            amount = Math.round(amount);
+            break;
+    }   
+
+    if(round_set.decimal > 0){
+        amount = amount.toFixed(round_set.decimal);
+    }
+
+    return amount;
+    
 }
 
 function thsa_qg_update_label()
