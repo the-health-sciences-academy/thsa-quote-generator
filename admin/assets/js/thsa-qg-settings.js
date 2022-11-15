@@ -32,7 +32,7 @@ jQuery(document).ready(function(){
             method: "POST",
             url: thsaqgvars.ajaxurl,
             data: { 
-                action: thsaqgvars.save_general, 
+                action: thsaqgvars.save_settings, 
                 type: 'general',
                 checkout: checkout_page,
                 round: round,
@@ -43,15 +43,76 @@ jQuery(document).ready(function(){
                 if(response){
                     response = JSON.parse(response);
                     if(response.status == 'success'){
-                        jQuery('.thsa_qg_response').show();
+                        jQuery('.thsa_qg_response_general').show();
                         jQuery('.thsa_save_gen_ettings').val('Save');
                         jQuery('.thsa_save_gen_ettings').prop('disabled', false);
                         setTimeout(function(){
-                            jQuery('.thsa_qg_response').hide();
+                            jQuery('.thsa_qg_response_general').hide();
                         }, 10000);
                     }
                 }
             }
         );
     });
+
+    jQuery('.thsa_qg_save_email_settings').click(function(){
+
+        jQuery(this).val('Saving...');
+        jQuery(this).prop('disabled', true);
+
+        var from_email = jQuery('.thsa_email_set_email').val();
+        var title = jQuery('.thsa_email_set_title').val();
+        var content = tinymce.get('thsaqgemailcontent').getContent({format: 'raw'});
+
+        jQuery.ajax({
+            method: "POST",
+            url: thsaqgvars.ajaxurl,
+            data: { 
+                action: thsaqgvars.save_settings, 
+                type: 'email',
+                from_email: from_email,
+                title: title,
+                content: content,
+                nonce: thsaqgvars.nonce
+            }
+            }).done(function( response ) {
+                if(response){
+                    response = JSON.parse(response);
+                    if(response.status == 'success'){
+                        jQuery('.thsa_qg_response_email').show();
+                        jQuery('.thsa_qg_save_email_settings').val('Save');
+                        jQuery('.thsa_qg_save_email_settings').prop('disabled', false);
+                        setTimeout(function(){
+                            jQuery('.thsa_qg_response_email').hide();
+                        }, 10000);
+                    }
+                }
+            }
+        );
+        
+    });
+
+    jQuery('.thsa_qg_save_email_preview').click(function(){
+        jQuery('.thsa_qg_email_preview_wrap').show();
+        jQuery.ajax({
+            method: "POST",
+            url: thsaqgvars.ajaxurl,
+            data: { 
+                action: thsaqgvars.preview_email,
+                nonce: thsaqgvars.nonce
+            }
+            }).done(function( response ) {
+                console.log(response);
+                if(response){
+                    response = JSON.parse(response);
+                    if(response.status == 'success'){
+                        jQuery('.thsa_qg_email_prev_content').html(response.message);
+                    }
+                }
+            }
+        );
+    });
+
 });
+
+

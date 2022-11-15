@@ -101,7 +101,7 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
                 'product_options'   =>  'thsa_qg_product_select_options',
                 'product_from_cat'  =>  'thsa_qg_product_from_cat',
                 'labels'            =>  $this->labels(),
-                'save_general'      => 'thsa_qg_save_settings',
+                'save_settings'     => 'thsa_qg_save_settings',
                 'round_settings'    => json_encode($default_round)
             ]
         );

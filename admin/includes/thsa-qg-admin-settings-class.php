@@ -180,12 +180,13 @@ class thsa_qg_admin_settings_class extends thsa_qg_common_class
      */
     public function email_settings()
     {
+        $email = $this->get_settings('email');
         $this->set_template('part-settings/part-email',
             [
                 'path' => 'admin', 
-                'message' => $this->default_email_text, 
-                'email' => $this->defaul_admin_email,
-                'title' => $this->default_email_title,
+                'message' => (isset($email['content']))? $email['content'] : $this->default_email_text, 
+                'email' => (isset($email['from_email']))? $email['from_email'] : $this->defaul_admin_email,
+                'title' => (isset($email['title']))? $email['title'] : $this->default_email_title,
                 'shortcodes' => $this->shortcodes
             ]
         );
@@ -228,29 +229,70 @@ class thsa_qg_admin_settings_class extends thsa_qg_common_class
         }
 
         if(isset($_POST['type'])){
-            $general = [];
-            if(isset($_POST['checkout'])){
-                $general['checkout'] = sanitize_text_field($_POST['checkout']);
-            }
 
-            if(isset($_POST['round'])){
-                $general['round'] = sanitize_text_field($_POST['round']);
-            }
 
-            if(isset($_POST['decimal'])){
-                $general['decimal'] = sanitize_text_field($_POST['decimal']);
-            }
+            switch($_POST['type']){
+                case 'general':
 
-            $settings = get_option('thsa_quotation_settings');
-            if(!empty($general)){
-                //get exists
-                if(isset($settings)){
-                    $settings['general'] = $general;
-                    update_option('thsa_quotation_settings', $settings);
-                }
-            }else{
-                $settings['general'] = null;
-                update_option('thsa_quotation_settings', $settings);
+                    $general = [];
+                    if(isset($_POST['checkout'])){
+                        $general['checkout'] = sanitize_text_field($_POST['checkout']);
+                    }
+
+                    if(isset($_POST['round'])){
+                        $general['round'] = sanitize_text_field($_POST['round']);
+                    }
+
+                    if(isset($_POST['decimal'])){
+                        $general['decimal'] = sanitize_text_field($_POST['decimal']);
+                    }
+
+
+                    $settings = get_option('thsa_quotation_settings');
+                    if(!empty($general)){
+                        //get exists
+                        if(isset($settings)){
+                            $settings['general'] = $general;
+                            update_option('thsa_quotation_settings', $settings);
+                        }
+                    }else{
+                        $settings['general'] = null;
+                        update_option('thsa_quotation_settings', $settings);
+                    }        
+
+                    break;
+                case 'email':
+
+                    $email_data = [];
+                    if(isset($_POST['from_email'])){
+                        $email_data['from_email'] =  sanitize_text_field($_POST['from_email']);
+                    }
+
+                    if(isset($_POST['title'])){
+                        $email_data['title'] =  sanitize_text_field($_POST['title']);
+                    }
+
+                    if(isset($_POST['content'])){
+                        $_POST['content'] = stripslashes($_POST['content']);
+                        $email_data['content'] =  sanitize_text_field(htmlentities($_POST['content']));
+                    }
+
+
+                    $settings = get_option('thsa_quotation_settings');
+                    if(!empty($email_data)){
+                        //get exists
+                        if(isset($settings)){
+                            $settings['email'] = $email_data;
+                            update_option('thsa_quotation_settings', $settings);
+                        }
+                    }else{
+                        $settings['email'] = null;
+                        update_option('thsa_quotation_settings', $settings);
+                    } 
+
+                    break;
+                default:
+                    break;
             }
 
             echo json_encode([
@@ -268,6 +310,9 @@ class thsa_qg_admin_settings_class extends thsa_qg_common_class
         }
         exit();
     }
+
+
+   
 }
 
 ?>
