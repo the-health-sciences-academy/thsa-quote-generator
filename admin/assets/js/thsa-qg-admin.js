@@ -383,6 +383,72 @@ jQuery(document).ready(function(){
         thsa_qg_calculate();
     });
 
+
+    //send email
+    jQuery('.thsa_qg_send_email').click(function(){
+        var get_id = jQuery(this).data('id');
+        //show popup
+        jQuery('.thsa_qg_preview_email').show();
+        if(get_id > 0){
+            jQuery.ajax({
+                method: "POST",
+                url: thsaqgvars.ajaxurl,
+                data: { 
+                    action: thsaqgvars.send_email,
+                    id: get_id,
+                    type: 'preview',
+                    nonce: thsaqgvars.nonce
+                }
+                }).done(function( response ) {
+                    if(response){
+                        var details = JSON.parse(response);
+                        if(details.status == 'success'){
+                            jQuery('.thsa_qg_preview_email_content_get').html(details.message);
+                           
+                        }
+                    }
+                    
+                }
+            );
+        }
+    });
+
+    jQuery('#thsa_qg_close_preview').click(function(){
+        jQuery('.thsa_qg_preview_email').hide();
+        jQuery('.thsa_qg_preview_email_content_get').html('');
+    });
+
+
+    jQuery('#thsa_qg_send_email_last').click(function(){
+        jQuery(this).prop('disabled',true);
+        jQuery(this).val('Sending...');
+        var get_id = jQuery(this).data('id');
+        jQuery.ajax({
+            method: "POST",
+            url: thsaqgvars.ajaxurl,
+            data: { 
+                action: thsaqgvars.send_email,
+                id: get_id,
+                type: 'send',
+                nonce: thsaqgvars.nonce
+            }
+            }).done(function( response ) {
+                if(response){
+                    var details = JSON.parse(response);
+                    if(details.status == 'success'){
+                        alert('Email is sent!');
+                    }else{
+                        alert(details.message);
+                    }
+                }
+
+                jQuery('#thsa_qg_send_email_last').prop('disabled',false);
+                jQuery('#thsa_qg_send_email_last').val('Send');
+                
+            }
+        );
+    });
+
 });
 
 function thsa_qg_load_select()

@@ -62,6 +62,8 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         //save data
         add_action('save_post_thsa-quote-generator', [$this, 'save_quote']);
 
+        add_shortcode('thsa-quotation-email', [$this, 'email_quotation']);
+
 
     }
 
@@ -102,7 +104,8 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
                 'product_from_cat'  =>  'thsa_qg_product_from_cat',
                 'labels'            =>  $this->labels(),
                 'save_settings'     => 'thsa_qg_save_settings',
-                'round_settings'    => json_encode($default_round)
+                'round_settings'    => json_encode($default_round),
+                'send_email'        => 'thsa_qg_send_email'
             ]
         );
 
@@ -130,6 +133,7 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         add_action('wp_ajax_thsa_qg_customer_details', [$this, 'thsa_qg_customer_details']);
         add_action('wp_ajax_thsa_qg_product_select_options', [$this, 'thsa_qg_product_select_options']);
         add_action('wp_ajax_thsa_qg_product_from_cat', [$this, 'thsa_qg_product_from_cat']);
+        add_action('wp_ajax_thsa_qg_send_email', [$this, 'thsa_qg_send_email']);
     }
 
 
@@ -346,9 +350,11 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
      * @return
      * 
      */
-    public function customer_action()
+    public function customer_action($post)
     {
-        $this->set_template('action',['path' => 'admin']);
+        $data = get_post_meta($post->ID,'thsa_quotation_data',true);
+        $data = isset($data['customer'])? true : null;
+        $this->set_template('action',['path' => 'admin', 'has' => $data, 'id' => $post->ID]);
     }
 
     /**
@@ -384,7 +390,7 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         if(isset($data['customer'])){
             $shortcode = htmlentities('[thsa-quotation id="'.$post->ID.'"]');
         }
-        $this->set_template('shortcode',['path' => 'admin','shortcode' => $shortcode]);
+        $this->set_template('shortcode',['path' => 'admin','shortcode' => $shortcode, 'id' => $post->ID]);
     }
 
 
@@ -853,6 +859,195 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         update_post_meta( $new_coupon_id, 'free_shipping', 'no' );
 
         return $new_coupon_id;
+    }
+
+
+    /**
+     * 
+     * email_quotation
+     * @since 1.2.0
+     * @param
+     * @return
+     * 
+     */
+    public function email_quotation($attr)
+    {
+        $quote = get_post_meta($attr['q_id'],'thsa_quotation_data',true);
+        if($quote){
+            //get products
+            $products = [];
+            $total = 0;
+            if(!empty($quote['products'])){
+                foreach($quote['products'] as $product){
+                    $product_details = wc_get_product($product[0]);
+
+                    $total = $total + ($product_details->get_price() * $product[1]);
+                    $products[$product[0]] = [
+                        'id' => $product_details->get_id(),
+                        'text' => $product_details->get_title(),
+                        'price_html' => $product_details->get_price_html(),
+                        'price_number' => $product_details->get_price(),
+                        'price_regular_number' => $product_details->get_regular_price(),
+                        'price_sale_number' => $product_details->get_sale_price(),
+                        'qty' => $product[1],
+                        'amount' => $product_details->get_price() * $product[1]
+                    ];
+                }
+            }
+
+            $discount = ($quote['fixed_amount_discount'])? $quote['fixed_amount_discount'] : 0;
+            $discounted_total = $total - $discount;
+
+            //fees
+            $fees = 0;
+            if(isset($quote['fees'])){
+                foreach($quote['fees'] as $fee){
+                    $fee_ = ($fee['fee_amount'])? $fee['fee_amount'] : 0;
+                    $fees += $fee_;
+                }
+            }
+            $quote['fees'];
+            $grand_total = $discounted_total + $fees;
+
+            $settings = new qgsettings\thsa_qg_admin_settings_class();
+            $sett = $settings->get_settings('general');
+            $checkout = (isset($sett['checkout']))? $sett['checkout'] : 0;
+
+            ob_start();
+                $this->set_template('shortcodes/quotation', [
+                    'path' => 'public', 
+                    'products' => $products, 
+                    'data' => $quote,
+                    'grand_total' => $grand_total, 
+                    'undiscounted' => $total,
+                    'qid' => $attr['q_id'],
+                    'from_email' => true,
+                    'checkout' => $checkout
+                ]
+            );
+            return ob_get_clean();
+        }else{
+            ob_start();
+                echo __('#Error: No quotation were found','thsa_quote_generator');
+            return ob_get_clean();
+        }
+    }
+
+    
+    /**
+     * 
+     * 
+     * thsa_qg_send_email
+     * @since 1.2.0
+     * @param
+     * @return
+     * 
+     * 
+     */
+    public function thsa_qg_send_email()
+    {
+        if ( ! wp_verify_nonce( $_POST['nonce'], 'thsa-quotation-generator' ) ) {
+            echo json_encode([
+                'status' => 'failed',
+                'message' => 'Error 105: Invalid Nonce'
+            ]);
+            exit();
+        }
+
+        $id = sanitize_text_field($_POST['id']);
+        $type = sanitize_text_field($_POST['type']);
+        $get_settings = $this->setting_class->get_settings('email');
+        $email = null;
+
+        if(isset($get_settings)){
+            //process shortcodes
+            $quote_user = get_post_meta($id, 'thsa_quotation_data', true);
+            $customer_details = [];
+            if(isset($quote_user['customer'])){
+
+                if(is_array($quote_user['customer'])){
+                    $customer_details = [
+                        'fullname' => $quote_user['customer']['firstname'].' '.$quote_user['customer']['lastname'],
+                        'email' => $quote_user['customer']['email']
+                    ];
+                }else{
+                    if(is_numeric($quote_user['customer'])){
+                        $user = get_userdata($quote_user['customer']);
+                        $customer_details = [
+                            'fullname' => $user->first_name.' '.$user->last_name,
+                            'email' => $user->user_email
+                        ];
+                    }else{
+                        echo json_encode([
+                            'status' => 'failed',
+                            'message' => __('Error 108: No customer is found','thsa-quote-generator')
+                        ]);
+                        exit();
+                    }
+                }
+                if(!empty($customer_details)){
+                    $get_settings['content'] = str_replace('[thsa_qg_customer_name]', $customer_details['fullname'], $get_settings['content']);
+                }
+
+                //render the quotation
+                if(strpos($get_settings['content'],'[thsa_qg_quotation_holder]') !== false && $type != 'send'){
+                    $quotation__ = do_shortcode('[thsa-quotation-email q_id='.$id.']');
+                    $get_settings['content'] = str_replace('[thsa_qg_quotation_holder]', htmlentities($quotation__), $get_settings['content']);
+                }else{
+                    $quotation__ = do_shortcode('[thsa-quotation-email q_id='.$id.']');
+                    $get_settings['content'] = html_entity_decode(stripslashes($get_settings['content']));
+                    $get_settings['content'] = str_replace('[thsa_qg_quotation_holder]', $quotation__, $get_settings['content']);
+                }
+                
+                
+
+            }
+
+            if($type == 'send'){
+                //send email
+                if(isset($customer_details['email'])){
+          
+
+                    $to = $customer_details['email'];
+                    $subject = $get_settings['title'];
+                    $body = $get_settings['content'];
+                    $headers = array('Content-Type: text/html; charset=UTF-8','From: My Site Name <orayapps@gmail.com>');
+
+                    wp_mail( $to, $subject, $body, $headers );
+
+                    echo json_encode([
+                        'status' => 'success',
+                        'message' => ''
+                    ]);
+                    exit();
+                }else{
+                    echo json_encode([
+                        'status' => 'failed',
+                        'message' => __('Error 013: No email has been sent -'.$customer_details['fullname'], 'thsa-quote-generator')
+                    ]);
+                    exit();
+                }
+                
+
+                
+            }else{
+                echo json_encode([
+                    'status' => 'success',
+                    'message' => html_entity_decode($get_settings['content'])
+                ]);
+                exit();
+            }
+
+            
+        }else{
+            $get_text = $this->setting_class->default_email_text;
+            echo json_encode([
+                'status' => 'success',
+                'message' => $get_text
+            ]);
+            exit();
+        }
+
     }
 
 }

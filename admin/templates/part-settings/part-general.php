@@ -5,6 +5,7 @@
             <select class="thsa_qg_settings_pages thsa_qg_select_woo_inline">
                 <option></option>
                 <?php if(isset($params['pages'])): 
+                    $selected = null;
                     foreach($params['pages'] as $page):    
 
                         if(isset($params['settings']['checkout'])){

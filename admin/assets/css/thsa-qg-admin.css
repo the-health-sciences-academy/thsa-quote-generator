@@ -118,4 +118,38 @@ input[type=number] {
   -moz-appearance: textfield;
   text-align: right; }
 
+.thsa_qg_preview_email {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 999;
+  display: none; }
+  .thsa_qg_preview_email .thsa_qg_preview_email_content {
+    position: relative;
+    max-width: 900px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    -webkit-box-shadow: 0px 0px 13px -5px rgba(0, 0, 0, 0.75);
+    -moz-box-shadow: 0px 0px 13px -5px rgba(0, 0, 0, 0.75);
+    box-shadow: 0px 0px 13px -5px rgba(0, 0, 0, 0.75);
+    padding: 20px;
+    height: 80%; }
+  .thsa_qg_preview_email .thsa_qg_preview_email_content_get {
+    display: block;
+    position: relative;
+    height: calc(100% - 50px);
+    overflow-y: auto;
+    margin-bottom: 20px; }
+  .thsa_qg_preview_email .thsa_qg_preview_email_content_footer {
+    height: 100px; }
+  .thsa_qg_preview_email .thsa_qg_loader {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); }
+
 /*# sourceMappingURL=thsa-qg-admin.css.map */

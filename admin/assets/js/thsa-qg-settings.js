@@ -17,7 +17,7 @@ jQuery(document).ready(function(){
     });
 
     jQuery('.thsa_save_gen_ettings').click(function(){
-        jQuery(this).val('Saving...');
+        jQuery(this).val(labels_.saving);
         jQuery(this).prop('disabled', true);
 
         var checkout_page = jQuery('.thsa_qg_settings_pages').val();

@@ -63,6 +63,12 @@ class thsa_qg_public_shortcodes extends thsa_qg_common_class
         if(empty($attr))
             $content = __('#Error: No quotation ID were found','thsa_quote_generator');
 
+
+        if(isset($_GET['q_id'])){
+            $attr = [];
+            $attr['id'] = sanitize_text_field($_GET['q_id']);
+        }
+
         if(isset($attr['id'])){
             $quote = get_post_meta($attr['id'],'thsa_quotation_data',true);
             if($quote){

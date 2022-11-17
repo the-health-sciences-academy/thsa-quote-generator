@@ -87,7 +87,8 @@ class thsa_qg_common_class
 			'no_products_added' => __('No products added', 'thsa-quote-generator'),
 			'no_fees_added' => __('No fees added','thsa-quote-generator'),
 			'processing' => __('Processing please wait...','thsa-quote-generator'),
-			'confirm_message' => __('Are you sure you want to remove selected item(s)','thsa-quote-generator')
+			'confirm_message' => __('Are you sure you want to remove selected item(s)','thsa-quote-generator'),
+			'saving' => __('Saving...','thsa-quote-generator')
 		];
 		return json_encode($labels);
 	}

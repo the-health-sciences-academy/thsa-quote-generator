@@ -72,7 +72,11 @@
             <?php _e('Quotation expires on Jan 01, 2011','thsa-quote-generator'); ?>
         </div>
         <div class="thsa_qg_col-6">
+            <?php if(isset($params['from_email'])): ?>
+            <a href="<?php echo get_permalink($params['checkout']); ?>?quotation=<?php esc_html_e($params['qid'],'thsa-quote-generator'); ?>"><?php esc_html_e('PROCEED TO CHECKOUT'); ?></a>
+            <?php else: ?>
             <input type="button" data-q-id="<?php echo $params['qid']; ?>" class="thsa_qg_proceed_checkout" value="<?php _e('Proceed to checkout','thsa-quote-generator'); ?>">
+            <?php endif; ?>
         </div>
     </div>
     
