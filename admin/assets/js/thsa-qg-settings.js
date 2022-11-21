@@ -113,6 +113,49 @@ jQuery(document).ready(function(){
         );
     });
 
+    jQuery('.thsa_qg_settings_save_coupon').click(function(){
+        jQuery(this).val('Saving...');
+        jQuery(this).prop('disabled', true);
+
+        var individual_usage = (jQuery('.thsa_qg_settings_individual_use').is(':checked'))? 'yes' : null;
+        var coupon_ids = (jQuery('.thsa_qg_settings_coupon_pids').val())? jQuery('.thsa_qg_settings_coupon_pids').val() : null;
+        var exclude_ids = (jQuery('.thsa_qg_settings_coupon_exclude_pids').val())? jQuery('.thsa_qg_settings_coupon_exclude_pids').val() : null;
+        var usage_limit = (jQuery('.thsa_qg_settings_usage_limit').val())? jQuery('.thsa_qg_settings_usage_limit').val() : null;
+        var expiry_date = (jQuery('.thsa_qg_settings_expiry_date').val())? jQuery('.thsa_qg_settings_expiry_date').val() : null;
+        var before_tax = (jQuery('.thsa_qg_settings_apply_before_tax').is(':checked'))? 'yes' : null;
+        var free_shipping = (jQuery('.thsa_qg_settings_free_shipping').is(':checked'))? 'yes' : null;
+
+        jQuery.ajax({
+            method: "POST",
+            url: thsaqgvars.ajaxurl,
+            data: { 
+                action: thsaqgvars.save_settings, 
+                type: 'coupon',
+                individual_usage: individual_usage,
+                coupon_ids: (coupon_ids)? coupon_ids.join(',') : null,
+                exclude_ids: (exclude_ids)? exclude_ids.join(',') : null,
+                usage_limit: usage_limit,
+                expiry_date: expiry_date,
+                before_tax: before_tax,
+                free_shipping: free_shipping,
+                nonce: thsaqgvars.nonce
+            }
+            }).done(function( response ) {
+                if(response){
+                    response = JSON.parse(response);
+                    if(response.status == 'success'){
+                        jQuery('.thsa_qg_coupon_message').show();
+                        jQuery('.thsa_qg_settings_save_coupon').val('Save');
+                        jQuery('.thsa_qg_settings_save_coupon').prop('disabled', false);
+                        setTimeout(function(){
+                            jQuery('.thsa_qg_coupon_message').hide();
+                        }, 10000);
+                    }
+                }
+            }
+        );
+    });
+
 });
 
 

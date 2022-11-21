@@ -367,9 +367,11 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
      * 
      * 
      */
-    public function customer_expiry()
+    public function customer_expiry($post)
     {
-        $this->set_template('expiry',['path' => 'admin']);
+        $data = get_post_meta($post->ID,'thsa_quotation_data',true);
+        $date = (isset($data['expiry']))? $data['expiry'] : null;
+        $this->set_template('expiry',['path' => 'admin', 'date' => $date]);
     }
 
 
@@ -707,6 +709,10 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
      * 
      */
     public function save_quote($post_id){
+
+        if ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ) {
+            return;
+        }
         
         $quote_data = [];
 

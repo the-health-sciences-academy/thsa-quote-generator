@@ -65,6 +65,7 @@ class thsa_qg_admin_settings_class extends thsa_qg_common_class
         $this->default_email_title = get_bloginfo('site_title').__(' - Quotation','thsa_quote_generator');
 
         add_action('wp_ajax_thsa_qg_save_settings', [$this, 'thsa_qg_save_settings']);
+        
     }
 
     /**
@@ -211,6 +212,45 @@ class thsa_qg_admin_settings_class extends thsa_qg_common_class
 
     /**
      * 
+     * 
+     * coupon_settings
+     * @since 1.2.0
+     * @param
+     * @return
+     * 
+     */
+    public function coupon_settings()
+    {
+        $args = [
+            'posts_per_page' => -1,
+            'post_type' => 'product',
+            'order' => 'ASC',
+            'orderby' => 'post_title',
+            'post_status' => 'publish'
+        ];
+        $products = get_posts($args);
+        $products_ = [];
+        if(!empty($products)){
+            foreach($products as $prod){
+                $products_[] = [
+                    'id' => $prod->ID,
+                    'title'=> $prod->post_title
+                ];
+            }
+        }
+
+        $settings = get_option('thsa_quotation_settings');
+        $this->set_template('part-settings/part-coupon',
+        [
+            'path' => 'admin',
+            'products' => $products_,
+            'settings' => $settings['coupon']
+        ]   
+        );
+    }
+
+    /**
+     * 
      * thsa_qg_save_settings
      * @since 1.2.0
      * @param
@@ -233,7 +273,6 @@ class thsa_qg_admin_settings_class extends thsa_qg_common_class
 
             switch($_POST['type']){
                 case 'general':
-
                     $general = [];
                     if(isset($_POST['checkout'])){
                         $general['checkout'] = sanitize_text_field($_POST['checkout']);
@@ -247,6 +286,8 @@ class thsa_qg_admin_settings_class extends thsa_qg_common_class
                         $general['decimal'] = sanitize_text_field($_POST['decimal']);
                     }
 
+                    
+
 
                     $settings = get_option('thsa_quotation_settings');
                     if(!empty($general)){
@@ -259,6 +300,41 @@ class thsa_qg_admin_settings_class extends thsa_qg_common_class
                         $settings['general'] = null;
                         update_option('thsa_quotation_settings', $settings);
                     }        
+
+                    break;
+                case 'coupon':
+                    $coupon = [];
+
+                    if(isset($_POST['individual_usage'])){
+                        $coupon['individual_usage'] = sanitize_text_field($_POST['individual_usage']);
+                    }
+                    if(isset($_POST['coupon_ids'])){
+                        $coupon['coupon_ids'] = sanitize_text_field($_POST['coupon_ids']);
+                    }
+                    if(isset($_POST['exclude_ids'])){
+                        $coupon['exclude_ids'] = sanitize_text_field($_POST['exclude_ids']);
+                    }
+                    if(isset($_POST['usage_limit'])){
+                        $coupon['usage_limit'] = sanitize_text_field($_POST['usage_limit']);
+                    }
+                    if(isset($_POST['expiry_date'])){
+                        $coupon['expiry_date'] = sanitize_text_field($_POST['expiry_date']);
+                    }
+                    if(isset($_POST['before_tax'])){
+                        $coupon['before_tax'] = sanitize_text_field($_POST['before_tax']);
+                    }
+                    if(isset($_POST['free_shipping'])){
+                        $coupon['free_shipping'] = sanitize_text_field($_POST['free_shipping']);
+                    }
+
+                    $settings = get_option('thsa_quotation_settings');
+                    if(!empty($coupon)){
+                        $settings['coupon'] = $coupon;
+                    }else{
+                        $settings['coupon'] = null;
+                    }
+                    update_option('thsa_quotation_settings', $settings);
+                    
 
                     break;
                 case 'email':

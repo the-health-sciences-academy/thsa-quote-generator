@@ -43,6 +43,9 @@ jQuery(document).ready(function(){
     jQuery('.thsa_qg_select_woo_inline').selectWoo({
         width: '250px', 
         placeholder: labels_.select});
+     jQuery('.thsa_qg_select_woo_inline_half').selectWoo({
+        width: '50%', 
+        placeholder: labels_.select});
     jQuery('.thsa_qg_product_select').selectWoo({
         width: '100%',
         placeholder: labels_.select

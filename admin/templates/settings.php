@@ -11,6 +11,11 @@
                             'status' => 'active'
                         ],
                         [
+                            'text' => 'Coupon',
+                            'target' => 'thsa_set_coupon_con',
+                            'status' => ''
+                        ],
+                        [
                             'text' => 'Email',
                             'target' => 'thsa_set_email_con',
                             'status' => ''
@@ -32,6 +37,11 @@
                         'class' => 'thsa_set_gen_con',
                         'content' => [$this, 'general_settings'],
                         'status' => 'active'
+                    ],
+                    [
+                        'class' => 'thsa_set_coupon_con',
+                        'content' => [$this, 'coupon_settings'],
+                        'status' => null
                     ],
                     [
                         'class' => 'thsa_set_email_con',
