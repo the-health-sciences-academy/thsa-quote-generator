@@ -118,7 +118,7 @@ jQuery(document).ready(function(){
         jQuery(this).prop('disabled', true);
 
         var individual_usage = (jQuery('.thsa_qg_settings_individual_use').is(':checked'))? 'yes' : null;
-        var coupon_ids = (jQuery('.thsa_qg_settings_coupon_pids').val())? jQuery('.thsa_qg_settings_coupon_pids').val() : null;
+        var product_ids = (jQuery('.thsa_qg_settings_coupon_pids').val())? jQuery('.thsa_qg_settings_coupon_pids').val() : null;
         var exclude_ids = (jQuery('.thsa_qg_settings_coupon_exclude_pids').val())? jQuery('.thsa_qg_settings_coupon_exclude_pids').val() : null;
         var usage_limit = (jQuery('.thsa_qg_settings_usage_limit').val())? jQuery('.thsa_qg_settings_usage_limit').val() : null;
         var expiry_date = (jQuery('.thsa_qg_settings_expiry_date').val())? jQuery('.thsa_qg_settings_expiry_date').val() : null;
@@ -132,7 +132,7 @@ jQuery(document).ready(function(){
                 action: thsaqgvars.save_settings, 
                 type: 'coupon',
                 individual_usage: individual_usage,
-                coupon_ids: (coupon_ids)? coupon_ids.join(',') : null,
+                product_ids: (product_ids)? product_ids.join(',') : null,
                 exclude_ids: (exclude_ids)? exclude_ids.join(',') : null,
                 usage_limit: usage_limit,
                 expiry_date: expiry_date,

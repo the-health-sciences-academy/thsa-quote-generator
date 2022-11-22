@@ -811,7 +811,123 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         $code = 'quotation-'.$post_id;
         $this->generate_coupon($code, $discount_amount);
 
+        if($quote_data['payment_type'] == 'plan'){
+            //$this->generate_plan();
+        }
+
     }
+
+    /**
+     * 
+     * 
+     * generate_plan
+     * @since 1.2.0
+     * @param
+     * @return
+     * 
+     * 
+     */
+    public function generate_plan($product_name, $currency, $monthly_amount, $initial_payment, $no_of_months, $product_ids_arr,$fee_data)
+    {
+
+		$objProduct = new WC_Product_Subscription();
+		$objProduct->set_name($product_name);
+		$objProduct->set_status('publish');		
+		$objProduct->set_price($monthly_amount); 
+		$objProduct->set_regular_price($monthly_amount);
+		$new_product_id = $objProduct->save(); //Saving the data to create new product, it will return product ID.
+		
+		$qg_term = get_term_by('slug', 'quotation', 'product_cat');
+		wp_set_object_terms($new_product_id, $qg_term->term_id, 'product_cat');
+
+		//update_post_meta( $new_product_id, '_regular_currency_prices', '{"EUR":"'. $monthly_amount.'","USD":"'. $monthly_amount.'"}' );
+		//update_post_meta( $new_product_id, '_product_base_currency', $currency );
+
+		update_post_meta( $new_product_id, '_subscription_price', $monthly_amount );
+		update_post_meta( $new_product_id, '_subscription_length', $no_of_months[0] );
+		update_post_meta( $new_product_id, '_subscription_period', $no_of_months[1] );
+		update_post_meta( $new_product_id, '_subscription_period_interval', '1' );
+	
+
+		
+		$total_fee_to_add = 0;
+		if($fee_data){
+			foreach ($fee_data as $index => $fee_row) {
+				if($fee_row['qg_fee_recurring'] == 'No'){
+					$total_fee_to_add += $fee_row['qg_fee_amount'];
+				}
+			}
+		}
+
+		if($initial_payment > 0){
+			$initial_payment += $total_fee_to_add;
+			update_post_meta( $new_product_id, '_subscription_trial_period', 'month' );
+			update_post_meta( $new_product_id, '_subscription_trial_length', '1' );
+			update_post_meta( $new_product_id, '_subscription_sign_up_fee', $initial_payment );
+			update_post_meta( $new_product_id, '_subscription_signup_fee_currency_prices', '{"EUR":"'. $initial_payment .'","USD":"'. $initial_payment.'"}' );
+		}else{
+
+			if($total_fee_to_add > 0){
+				$total_fee_to_add += $monthly_amount;
+				update_post_meta( $new_product_id, '_subscription_trial_period', 'month' );
+				update_post_meta( $new_product_id, '_subscription_trial_length', 1 );
+				update_post_meta( $new_product_id, '_subscription_sign_up_fee', $total_fee_to_add );
+				update_post_meta( $new_product_id, '_subscription_signup_fee_currency_prices', '{"EUR":"'. $total_fee_to_add .'","USD":"'. $total_fee_to_add.'"}' );
+			}else{
+				update_post_meta( $new_product_id, '_subscription_trial_period', '' );
+				update_post_meta( $new_product_id, '_subscription_trial_length', 0 );
+				update_post_meta( $new_product_id, '_subscription_sign_up_fee', 0 );
+				update_post_meta( $new_product_id, '_subscription_signup_fee_currency_prices', '{"EUR":"0","USD":"0"}' );
+			}
+			
+		}
+		
+		
+
+		//DEFAULT/Static parameters
+		//update_post_meta( $new_product_id, '_tax_status', 'taxable' );//If needed
+		update_post_meta( $new_product_id, '_manage_stock', 'no' );
+		update_post_meta( $new_product_id, '_sold_individually', 'yes' );
+		update_post_meta( $new_product_id, '_virtual', 'yes' );
+		update_post_meta( $new_product_id, '_downloadable', 'no' );
+		update_post_meta( $new_product_id, '_download_limit', "-1" );
+		update_post_meta( $new_product_id, '_download_expiry', "-1" );
+		update_post_meta( $new_product_id, '_stock', NULL );
+		update_post_meta( $new_product_id, '_stock_status', 'instock' );
+		update_post_meta( $new_product_id, 'woo_limit_one_select_dropdown', "1" );
+		update_post_meta( $new_product_id, 'woo_limit_one_time_dropdown', 'all' );
+		update_post_meta( $new_product_id, '_dependency_type', '3' );
+		update_post_meta( $new_product_id, '_dependency_selection_type', 'new_product_ids' );
+		//update_post_meta( $new_product_id, '_subscription_limit', 'active' );
+		update_post_meta( $new_product_id, '_subscription_limit', 'no' );
+		update_post_meta( $new_product_id, '_subscription_one_time_shipping', 'no' );
+
+		//THIS IS FOR THE CHAINED PRODUCTS META
+		//WE need to loop through all of the products inside the QG and add them here
+		$chained_product_detail = array();
+
+		foreach($product_ids_arr as $index => $product_id){
+			$product = wc_get_product($product_id);
+			$id = $product->get_id();
+			$name = $product->get_name();
+
+			$chained_product_detail[$id] = array('unit' => '1', 'priced_individually' => 'no', 'product_name' => $product_name);
+		}
+
+		//Serialize the detail arr
+		//$chained_product_detail = serialize($chained_product_detail);
+		//Serialize the product ids arr
+		//$product_ids_arr = serialize($product_ids_arr);
+
+		update_post_meta( $new_product_id, '_chained_product_detail', $chained_product_detail ); //value here is just an example
+		update_post_meta( $new_product_id, '_chained_new_product_ids', $product_ids_arr );//value here is just an example
+
+		update_post_meta( $new_product_id, '_groups_groups', '67');
+
+		return $new_product_id;
+    }
+
+
 
     /**
      * 
@@ -834,15 +950,12 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         $code_id = wc_get_coupon_id_by_code($code);
         if($code_id > 0){
             //update instead
-            update_post_meta( $code_id, 'coupon_amount', $amount );
+            $this->update_coupon_meta($code_id, $type, $amount);
             return;
         }
             
 
         $coupon_code = $code; // Code - perhaps generate this from the user ID + the order ID
-        $amount = $amount; // Amount
-        $discount_type = $type; // Type: fixed_cart, percent, fixed_product, percent_product
-
         $coupon = array(
             'post_title' => $coupon_code,
             'post_content' => '',
@@ -852,19 +965,69 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         );    
 
         $new_coupon_id = wp_insert_post( $coupon );
+        $this->update_coupon_meta($new_coupon_id, $type, $amount);
+        return $new_coupon_id;
+    }
+
+    /**
+     * 
+     * 
+     * update_coupon_meta
+     * @since 1.2.0
+     * @param
+     * @return
+     * 
+     * 
+     */
+    public function update_coupon_meta($new_coupon_id, $discount_type, $amount)
+    {
+        //get settings
+        $get_settings = get_option('thsa_quotation_settings');
+        $individual_use = 'yes';
+        $product_ids = '';
+        $exclude_product_ids = '';
+        $usage_limit = 1;
+        $usage_limit_per_user = 1;
+        $expiry_date = '';
+        $apply_before_tax = 'yes';
+        $free_shipping = '';
+        if(isset($get_settings['coupon'])){
+            if(isset($get_settings['coupon']['individual_usage'])){
+                $individual_use = $get_settings['coupon']['individual_usage'];
+            }
+            if(isset($get_settings['coupon']['product_ids'])){
+                $product_ids = $get_settings['coupon']['product_ids'];
+            }
+            if(isset($get_settings['coupon']['exclude_ids'])){
+                $exclude_product_ids = $get_settings['coupon']['exclude_ids'];
+            }
+            if(isset($get_settings['coupon']['usage_limit'])){
+                $usage_limit = $get_settings['coupon']['usage_limit'];
+            }
+            if(isset($get_settings['coupon']['expiry_date'])){
+                $expiry_date = $get_settings['coupon']['expiry_date'];
+            }
+            if(isset($get_settings['coupon']['before_tax'])){
+                $apply_before_tax = $get_settings['coupon']['before_tax'];
+            }
+            if(isset($get_settings['coupon']['free_shipping'])){
+                $free_shipping = $get_settings['coupon']['free_shipping'];
+            }
+
+        }
 
         // Add meta
         update_post_meta( $new_coupon_id, 'discount_type', $discount_type );
         update_post_meta( $new_coupon_id, 'coupon_amount', $amount );
-        update_post_meta( $new_coupon_id, 'individual_use', 'no' );
-        update_post_meta( $new_coupon_id, 'product_ids', '' );
-        update_post_meta( $new_coupon_id, 'exclude_product_ids', '' );
-        update_post_meta( $new_coupon_id, 'usage_limit', '1' );
-        update_post_meta( $new_coupon_id, 'expiry_date', '' );
-        update_post_meta( $new_coupon_id, 'apply_before_tax', 'yes' );
-        update_post_meta( $new_coupon_id, 'free_shipping', 'no' );
+        update_post_meta( $new_coupon_id, 'individual_use', $individual_use );
+        update_post_meta( $new_coupon_id, 'product_ids', $product_ids );
+        update_post_meta( $new_coupon_id, 'exclude_product_ids', $exclude_product_ids );
+        update_post_meta( $new_coupon_id, 'usage_limit', $usage_limit );
+        update_post_meta( $new_coupon_id, 'usage_limit_per_user', $usage_limit_per_user );
+        update_post_meta( $new_coupon_id, 'expiry_date', $expiry_date );
+        update_post_meta( $new_coupon_id, 'apply_before_tax', $apply_before_tax );
+        update_post_meta( $new_coupon_id, 'free_shipping', $free_shipping );
 
-        return $new_coupon_id;
     }
 
 

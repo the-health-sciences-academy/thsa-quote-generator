@@ -210,6 +210,26 @@ class thsa_qg_admin_settings_class extends thsa_qg_common_class
         );
     }
 
+
+    /**
+     * 
+     * 
+     * subscription_settings
+     * @since 1.2.0
+     * @param
+     * @return
+     * 
+     * 
+     */
+    public function subscription_settings()
+    {
+        $this->set_template('part-settings/part-subscription',
+        [
+            'path' => 'admin'
+        ]   
+        );
+    }
+
     /**
      * 
      * 
@@ -308,8 +328,8 @@ class thsa_qg_admin_settings_class extends thsa_qg_common_class
                     if(isset($_POST['individual_usage'])){
                         $coupon['individual_usage'] = sanitize_text_field($_POST['individual_usage']);
                     }
-                    if(isset($_POST['coupon_ids'])){
-                        $coupon['coupon_ids'] = sanitize_text_field($_POST['coupon_ids']);
+                    if(isset($_POST['product_ids'])){
+                        $coupon['product_ids'] = sanitize_text_field($_POST['product_ids']);
                     }
                     if(isset($_POST['exclude_ids'])){
                         $coupon['exclude_ids'] = sanitize_text_field($_POST['exclude_ids']);
