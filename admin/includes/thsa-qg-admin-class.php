@@ -312,9 +312,32 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
 
         $this->set_template('customer-details',['path' => 'admin', 'post' => $post, 'data' => $customer, 'tab' =>  $tab]);
         $this->set_template('products',['path' => 'admin', 'products' => $products]);
-        $this->set_template('discounts',['path' => 'admin','data' => $data]);
+        $this->set_template('discounts',['path' => 'admin','data' => $data, 'taxes' => $this->get_taxes()]);
         $this->set_template('fees',['path' => 'admin', 'data' => $data]);
         $this->set_template('summary',['path' => 'admin', 'data' => $data]);
+    }
+
+    /**
+     * 
+     * get_taxes
+     * @since 1.2.0
+     * @param 
+     * @return array
+     * 
+     * 
+     */
+    public function get_taxes()
+    {
+        $tax_classes           = \WC_Tax::get_tax_classes();
+        $tax_class_options     = array();
+        $tax_class_options[''] = __( 'Standard', 'woocommerce' );
+
+        if ( ! empty( $tax_classes ) ) {
+            foreach ( $tax_classes as $class ) {
+                $tax_class_options[ sanitize_title( $class ) ] = $class;
+            }
+        }
+        return $tax_class_options;
     }
 
     /**
@@ -811,9 +834,9 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         $code = 'quotation-'.$post_id;
         $this->generate_coupon($code, $discount_amount);
 
-        if($quote_data['payment_type'] == 'plan'){
+        //if($quote_data['payment_type'] == 'plan'){
             //$this->generate_plan();
-        }
+       // }
 
     }
 

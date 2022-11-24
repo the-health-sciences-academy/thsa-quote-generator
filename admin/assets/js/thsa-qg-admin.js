@@ -359,10 +359,12 @@ jQuery(document).ready(function(){
         var getstatus = jQuery(this).val();
         if(getstatus == 'upfront'){
             jQuery('.thsa_qg_plan_summary').hide();
+            jQuery('.thsa_qg_plan_manage_button').hide();
         }else{
             jQuery('.thsa_qg_term_number').val('');
             jQuery('.thsa_qg_plan_term').val('day');
             jQuery('.thsa_qg_plan_summary').show();
+            jQuery('.thsa_qg_plan_manage_button').show();
         }
         thsa_qg_calculate();
     });
@@ -450,6 +452,153 @@ jQuery(document).ready(function(){
                 
             }
         );
+    });
+
+    //add dl file
+    jQuery('.thsa_qg_add_dl_file').click(function(){
+        //thsa_qg_dl_file_con
+        /*
+
+        <tr>
+                                        <td><input type="text" class="widefat" placeholder="<?php esc_html_e('File Name','thsa-quote-generator'); ?>"></td>
+                                        <td><input type="text" class="widefat thsa_upload_url_text" placeholder="<?php esc_html_e('File','thsa-quote-generator'); ?>" readonly></td>
+                                        <td width="5%"><input type="button" class="button button-primary widefat" value="<?php esc_html_e('Upload','thsa-quote-generator'); ?>"></td>
+                                        <td width="2%"><span class="dashicons dashicons-dismiss thsa_remove_file_download"></span></td>
+                                    </tr>
+         
+          
+         */
+        var tr = thsa_field_generator(
+            {
+                type: 'tr'
+            }
+        );
+        var td1 = thsa_field_generator(
+            {
+                type: 'td'
+            }
+        );
+        var name = thsa_field_generator(
+            {
+                type: 'input',
+                attributes: [
+                    {
+                        attr: 'type',
+                        value: 'text'
+                    },
+                    {
+                        attr: 'class',
+                        value: 'widefat'
+                    },
+                    {
+                        attr: 'placeholder',
+                        value: labels_.file_name
+                    }
+                ]
+            }
+        );
+        jQuery(td1).append(name);
+        var td2 = thsa_field_generator(
+            {
+                type: 'td'
+            }
+        )
+        var file = thsa_field_generator(
+            {
+                type: 'input',
+                attributes: [
+                    {
+                        attr: 'type',
+                        value: 'text'
+                    },
+                    {
+                        attr: 'class',
+                        value: 'widefat thsa_upload_url_text'
+                    },
+                    {
+                        attr: 'placeholder',
+                        value: labels_.file
+                    },
+                    {
+                        attr: 'readonly',
+                        value: 'true'
+                    }
+                ]
+            }
+        );
+        jQuery(td2).append(file);
+
+        var td3 = thsa_field_generator(
+            {
+                type: 'td',
+                attributes: [
+                    {
+                        attr: 'width',
+                        value: '5%'
+                    }
+                ]
+            }
+        );
+        var button = thsa_field_generator(
+            {
+                type: 'input',
+                attributes: [
+                    {
+                        attr: 'type',
+                        value: 'button'
+                    },
+                    {
+                        attr: 'class',
+                        value: 'button button-primary widefat'
+                    },
+                    {
+                        attr: 'value',
+                        value: labels_.upload_
+                    }
+                ]
+            }
+        );
+        jQuery(td3).append(button);
+
+        var td4 = thsa_field_generator(
+            {
+                type: 'td',
+                attributes: [
+                    {
+                        attr: 'width',
+                        value: '2%'   
+                    }
+                ]
+            }
+        );
+
+        var span = thsa_field_generator(
+            {
+                type: 'span',
+                attributes: [
+                    {
+                        attr: 'class',
+                        value: 'dashicons dashicons-dismiss thsa_remove_file_download'
+                    }
+                ]
+            }
+        );
+
+        jQuery(td4).append(span);
+        jQuery(tr).append(td1);
+        jQuery(tr).append(td2);
+        jQuery(tr).append(td3);
+        jQuery(tr).append(td4);
+        jQuery('.thsa_qg_dl_file_con').append(tr);
+
+    });
+
+    jQuery('.thsa_qg_dl_option').click(function(){
+        if(jQuery(this).is(':checked')){
+            jQuery('.thsa_qg_event_action_downloadable').show();
+        }else{
+            jQuery('.thsa_qg_event_action_downloadable').hide();
+        }
     });
 
 });

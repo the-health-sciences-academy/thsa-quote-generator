@@ -1,28 +1,3 @@
-<div class="thsa_qg_email_settings">
-    <p>
-        <label>Period Interval<br/>
-            <input type="number" class="" placeholder="1">
-        </label>
-    </p>
-    <p>
-        <label>Tax Status<br/>
-            <select class="thsa_qg_set_field">
-                <option value="taxable">Taxable</option>
-                <option value="shipping">Shipping</option>
-                <option value="none">None</option>
-            </select>
-        </label>
-    </p>
-    <p>
-        <label>Sold Individually<br/>
-            <select class="thsa_qg_set_field">
-                <option value="yes">Yes</option>
-                <option value="no">No</option>
-            </select>
-        </label>
-    </p>
-
-</div>
 
 //DEFAULT/Static parameters
 		//update_post_meta( $new_product_id, '_tax_status', 'taxable' );//If needed

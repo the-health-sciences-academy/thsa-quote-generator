@@ -8,12 +8,20 @@
                     <p><?php esc_html_e('Total Savings:','thsa-quote-generator'); ?> <span class="thsa_qg_total_savings_label">0</span></p>
                     <p><?php esc_html_e('Total Fee:','thsa-quote-generator'); ?> <span class="thsa_qg_total_fee_label">0</span></p>
                 </div>
-                <div class="thsa_qg_summary_box_numbers thsa_qg_plan_summary" <?php echo ($params['data']['payment_type'] == 'plan')? "style=\"display:block\"" : null;  ?>>
+                <?php 
+                    $status = null;
+                    if(isset($params['data']['payment_type'])){
+                        if($params['data']['payment_type'] == 'plan'){
+                            $status = "style=\"display:block\"";
+                        }
+                    }
+                ?>
+                <div class="thsa_qg_summary_box_numbers thsa_qg_plan_summary" <?php esc_html_e($status);  ?>>
                     <p><?php esc_html_e('Terms:','thsa-quote-generator)'); ?> <span class="thsa_qg_term_label"></span></p>
                     <p><?php esc_html_e('To Pay:','thsa-quote-generator)'); ?> <span class="thsa_qg_topay_label"></span></p>
                 </div>  
                 <div class="thsa_qg_total_field_wrap">
-                        Total Today
+                        <?php esc_html_e('Total Today','thsa-quote-generator'); ?>
                         <input type="number" class="thsa_qg_total_field widefat" placeholder="0">
                     </div>
             </div>

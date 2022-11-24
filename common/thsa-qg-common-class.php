@@ -88,7 +88,11 @@ class thsa_qg_common_class
 			'no_fees_added' => __('No fees added','thsa-quote-generator'),
 			'processing' => __('Processing please wait...','thsa-quote-generator'),
 			'confirm_message' => __('Are you sure you want to remove selected item(s)','thsa-quote-generator'),
-			'saving' => __('Saving...','thsa-quote-generator')
+			'saving' => __('Saving...','thsa-quote-generator'),
+			'file_name' => __('File Name', 'thsa-quote-generator'),
+			'file'	=> __('File', 'thsa-quote-generator'),
+			'upload_' => __('Upload', 'thsa-quote-generator'),
+			'add_file' => __('Add File', 'thsa-quote-generator')
 		];
 		return json_encode($labels);
 	}
