@@ -12,7 +12,8 @@
                             <option value="plan" <?php echo ($payment_type == 'plan')? 'selected' : null; ?>><?php esc_html_e('Payment Plan', 'thsa-quote-generator'); ?></option>
                         </select>
                     </td>
-                    <td class="thsa_qg_plan_manage_button">
+                    <?php $display__ = ($payment_type == 'plan')? 'active' : null; ?>
+                    <td class="thsa_qg_plan_manage_button <?php esc_html_e($display__); ?>">
                         <input type="button" class="button button-secondary thsa_qg_manage_plan_settings" value="<?php esc_html_e('Manage Subscription Settings','thsa-quote-generator'); ?>">
                     </td>
                     <td>
@@ -28,10 +29,13 @@
             </table>
         </div>
 
-        <div class="thsa_qg_plan_settings">
+        <div class="thsa_qg_plan_settings <?php esc_html_e($display__); ?>">
+                            <?php 
+                                //print_r($params['data']);
+                            ?>
 
                         <p>
-                            <label><input type="checkbox" name="thsa_qg_sub_is_virtual" value="Y"> <?php esc_html_e('Virtual','thsa-quote-generator'); ?></label>&nbsp;&nbsp;&nbsp;&nbsp;<label><input type="checkbox" name="thsa_qg_sub_is_dl" class="thsa_qg_dl_option" value="Y"> <?php esc_html_e('Downloadable','thsa-quote-generator'); ?>
+                            <label><input type="checkbox" name="thsa_qg_sub_is_virtual" value="Y" <?php echo ($params['data']['is_virtual'] == 'yes')? esc_html__('checked') : null; ?>> <?php esc_html_e('Virtual','thsa-quote-generator'); ?></label>&nbsp;&nbsp;&nbsp;&nbsp;<label><input type="checkbox" name="thsa_qg_sub_is_dl" class="thsa_qg_dl_option" value="Y" <?php echo ($params['data']['is_download'] == 'yes')? esc_html__('checked') : null; ?>> <?php esc_html_e('Downloadable','thsa-quote-generator'); ?>
                             </label>
                         </p>
                         <div>
@@ -39,16 +43,38 @@
                                 <tr>
                                     <td>
                                     <label><?php esc_html_e('Free Trial','thsa-quote-generator'); ?><br/>
-                                        <input type="number" name="thsa_qg_sub_free_trial" class="thsa_qg_set_field" placeholder="0">
+                                        <input type="number" name="thsa_qg_sub_free_trial" class="thsa_qg_set_field" placeholder="0" value="<?php echo (isset($params['data']['free_trial_interval']))? esc_html__($params['data']['free_trial_interval']) : null; ?>">
                                     </label>
                                     </td>
                                     <td>
                                     <label><?php esc_html_e(' ','thsa-quote-generator'); ?><br/>
+                                        <?php 
+                                            $days_status = null;
+                                            if(isset($params['data']['free_trial_interval_duration'])){
+                                                if($params['data']['free_trial_interval_duration'] == 'days')
+                                                    $days_status = 'selected';
+                                            }
+                                            $weeks_status = null;
+                                            if(isset($params['data']['free_trial_interval_duration'])){
+                                                if($params['data']['free_trial_interval_duration'] == 'weeks')
+                                                    $weeks_status = 'selected';
+                                            }
+                                            $months_status = null;
+                                            if(isset($params['data']['free_trial_interval_duration'])){
+                                                if($params['data']['free_trial_interval_duration'] == 'months')
+                                                    $months_status = 'selected';
+                                            }
+                                            $years_status = null;
+                                            if(isset($params['data']['free_trial_interval_duration'])){
+                                                if($params['data']['free_trial_interval_duration'] == 'years')
+                                                    $years_status = 'selected';
+                                            }
+                                        ?>
                                         <select name="thsa_qg_sub_free_trial_duration">
-                                            <option value="days"><?php esc_html_e('Days', 'thsa-quote-generator'); ?></option>
-                                            <option value="weeks"><?php esc_html_e('Weeks', 'thsa-quote-generator'); ?></option>
-                                            <option value="months"><?php esc_html_e('Months', 'thsa-quote-generator'); ?></option>
-                                            <option value="years"><?php esc_html_e('Years', 'thsa-quote-generator'); ?></option>
+                                            <option value="days" <?php esc_html_e($days_status); ?>><?php esc_html_e('Days', 'thsa-quote-generator'); ?></option>
+                                            <option value="weeks" <?php esc_html_e($weeks_status); ?>><?php esc_html_e('Weeks', 'thsa-quote-generator'); ?></option>
+                                            <option value="months" <?php esc_html_e($months_status); ?>><?php esc_html_e('Months', 'thsa-quote-generator'); ?></option>
+                                            <option value="years" <?php esc_html_e($years_status); ?>><?php esc_html_e('Years', 'thsa-quote-generator'); ?></option>
                                         </select>
                                     </label>
                                     </td>
@@ -57,10 +83,29 @@
                         </div>
                         <p>
                             <label><?php esc_html_e('Tax Status','thsa-quote-generator'); ?><br/>
+                                <?php 
+                                    $taxable_status = null;
+                                    if(isset($params['data']['is_taxable'])){
+                                        if($params['data']['is_taxable'] == 'taxable')
+                                            $taxable_status = 'selected';
+                                    }
+
+                                    $shipping_status = null;
+                                    if(isset($params['data']['is_taxable'])){
+                                        if($params['data']['is_taxable'] == 'shipping')
+                                            $shipping_status = 'selected';
+                                    }
+
+                                    $none_status = null;
+                                    if(isset($params['data']['is_taxable'])){
+                                        if($params['data']['is_taxable'] == 'none')
+                                            $none_status = 'selected';
+                                    }
+                                ?>
                                 <select class="thsa_qg_set_field" name="thsa_qg_sub_tax_status">
-                                    <option value="taxable"><?php esc_html_e('Taxable', 'thsa-quote-generator'); ?></option>
-                                    <option value="shipping"><?php esc_html_e('Shipping', 'thsa-quote-generator'); ?></option>
-                                    <option value="none"><?php esc_html_e('None', 'thsa-quote-generator'); ?></option>
+                                    <option value="taxable" <?php esc_html_e($taxable_status); ?>><?php esc_html_e('Taxable', 'thsa-quote-generator'); ?></option>
+                                    <option value="shipping" <?php esc_html_e($shipping_status); ?>><?php esc_html_e('Shipping', 'thsa-quote-generator'); ?></option>
+                                    <option value="none" <?php esc_html_e($none_status); ?>><?php esc_html_e('None', 'thsa-quote-generator'); ?></option>
                                 </select>
                             </label>
                         </p>
@@ -69,9 +114,18 @@
                             <label><?php esc_html_e('Tax Classes','thsa-quote-generator'); ?><br/>
                                 <select class="thsa_qg_set_field" name="thsa_qg_sub_tax_class">
                                     <?php if(isset($params['taxes'])): 
-                                        foreach($params['taxes'] as $class):    
+                                        foreach($params['taxes'] as $class): 
+                                            
+                                            $value = strtolower(str_replace(' ','-',$class));
+
+                                            $class_status = null;
+                                            if(isset($params['data']['tax_class'])){
+                                                $val_ = strtolower(str_replace(' ','-',$params['data']['tax_class']));
+                                                if($val_ == $value)
+                                                    $class_status = 'selected';
+                                            }
                                     ?>
-                                        <option value="<?php esc_html_e(strtolower(str_replace(' ','-',$class))); ?>"><?php esc_html_e($class, 'thsa-quote-generator'); ?></option>
+                                        <option value="<?php esc_html_e($value); ?>" <?php esc_html_e($class_status); ?>><?php esc_html_e($class, 'thsa-quote-generator'); ?></option>
                                     <?php 
                                         endforeach;
                                     endif; ?>
@@ -79,7 +133,7 @@
                             </label>
                         </p>
 
-                        <div class="thsa_qg_event_action thsa_qg_event_action_downloadable">
+                        <div class="thsa_qg_event_action thsa_qg_event_action_downloadable <?php echo ($params['data']['is_download'] == 'yes')? esc_html__('active') : null; ?>">
 
                            
                             <table class="thsa_qg_downloadable_files wp-list-table widefat striped table-view-list" border="0">
@@ -89,18 +143,35 @@
                                     </tr>
                                 </thead>
                                 <tbody class="thsa_qg_dl_file_con">
+                                    <?php 
+                                        if(isset($params['data']['dl_files'])):
+                                            foreach($params['data']['dl_files'] as $id => $dl_files):
+                                    ?>
+                                                <tr>
+                                                    <td><input type="text" class="widefat" name="thsa_qg_file_name[]" placeholder="<?php esc_html_e('File Name','thsa-quote-generator'); ?>" value="<?php esc_html_e($dl_files['name']); ?>"></td>
+                                                    <td><input type="text" name="thsa_qg_file_url[]" class="widefat thsa_upload_url_text" placeholder="<?php esc_html_e('File','thsa-quote-generator'); ?>" readonly value="<?php esc_html_e($dl_files['file']); ?>"></td>
+                                                    <td width="5%"><input type="button" class="button button-secondary widefat thsa_qg_upload_file" value="<?php esc_html_e('Select','thsa-quote-generator'); ?>"></td>
+                                                    <td width="2%"><span class="dashicons dashicons-dismiss thsa_remove_file_download"></span></td>
+                                                </tr>    
+                                    <?php
+                                            endforeach;
+                                        else:
+                                    ?>
                                     <tr>
                                         <td><input type="text" class="widefat" name="thsa_qg_file_name[]" placeholder="<?php esc_html_e('File Name','thsa-quote-generator'); ?>"></td>
                                         <td><input type="text" name="thsa_qg_file_url[]" class="widefat thsa_upload_url_text" placeholder="<?php esc_html_e('File','thsa-quote-generator'); ?>" readonly></td>
-                                        <td width="5%"><input type="button" class="button button-primary widefat thsa_qg_upload_file" value="<?php esc_html_e('Upload','thsa-quote-generator'); ?>"></td>
+                                        <td width="5%"><input type="button" class="button button-secondary widefat thsa_qg_upload_file" value="<?php esc_html_e('Select','thsa-quote-generator'); ?>"></td>
                                         <td width="2%"><span class="dashicons dashicons-dismiss thsa_remove_file_download"></span></td>
                                     </tr>
+                                    <?php 
+                                        endif;
+                                    ?>
                                 </tbody>
                                 
                                 <tfoot>
                                     <tr>
                                         <td colspan="4">
-                                            <input type="button" class="button button-secondary thsa_qg_add_dl_file" value="<?php esc_html_e('Add File','thsa-quote-generator'); ?>">
+                                            <input type="button" class="button button-primary thsa_qg_add_dl_file" value="<?php esc_html_e('Add File','thsa-quote-generator'); ?>">
                                         </td>
                                     </tr>
                                 </tfoot>
@@ -109,13 +180,13 @@
 
                             <p>
                                 <label><?php esc_html_e('Download Limit','thsa-quote-generator'); ?><br/>
-                                    <input type="number" class="thsa_qg_set_field" name="thsa_qg_sub_dl_limit" placeholder="<?php esc_html_e('Never','thsa-quote-generator'); ?>">
+                                    <input type="number" class="thsa_qg_set_field" name="thsa_qg_sub_dl_limit" placeholder="<?php esc_html_e('Never','thsa-quote-generator'); ?>" value="<?php echo (isset($params['data']['dl_limit']))? esc_html__($params['data']['dl_limit']) : null; ?>">
                                 </label>
                                 <i><?php esc_html_e('Leave blank for unlimited re-downloads.','thsa-quote-generator'); ?></i>
                             </p>
                             <p>
                                 <label><?php esc_html_e('Download Expiry','thsa-quote-generator'); ?><br/>
-                                    <input type="number" class="thsa_qg_set_field" name="thsa_qg_sub_dl_expiry" placeholder="Never">
+                                    <input type="number" class="thsa_qg_set_field" name="thsa_qg_sub_dl_expiry" placeholder="Never" value="<?php echo (isset($params['data']['dl_limit_expiry']))? esc_html__($params['data']['dl_limit_expiry']) : null; ?>">
                                 </label>
                                 <i><?php esc_html_e('Enter the number of days before a download link expires, or leave blank.','thsa-quote-generator'); ?></i>
                             </p>

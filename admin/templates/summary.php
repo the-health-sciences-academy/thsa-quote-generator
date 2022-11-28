@@ -12,11 +12,11 @@
                     $status = null;
                     if(isset($params['data']['payment_type'])){
                         if($params['data']['payment_type'] == 'plan'){
-                            $status = "style=\"display:block\"";
+                            $status = "active";
                         }
                     }
                 ?>
-                <div class="thsa_qg_summary_box_numbers thsa_qg_plan_summary" <?php esc_html_e($status);  ?>>
+                <div class="thsa_qg_summary_box_numbers thsa_qg_plan_summary <?php esc_html_e($status);  ?>">
                     <p><?php esc_html_e('Terms:','thsa-quote-generator)'); ?> <span class="thsa_qg_term_label"></span></p>
                     <p><?php esc_html_e('To Pay:','thsa-quote-generator)'); ?> <span class="thsa_qg_topay_label"></span></p>
                 </div>  

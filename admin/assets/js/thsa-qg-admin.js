@@ -358,15 +358,15 @@ jQuery(document).ready(function(){
     jQuery('.thsa_qg_payment_type').change(function(){
         var getstatus = jQuery(this).val();
         if(getstatus == 'upfront'){
-            jQuery('.thsa_qg_plan_summary').hide();
-            jQuery('.thsa_qg_plan_manage_button').hide();
+            jQuery('.thsa_qg_plan_summary').removeClass('active');
+            jQuery('.thsa_qg_plan_manage_button').removeClass('active');
         }else{
             jQuery('.thsa_qg_term_number').val('');
             jQuery('.thsa_qg_plan_term').val('day');
-            jQuery('.thsa_qg_plan_summary').show();
-            jQuery('.thsa_qg_plan_manage_button').show();
+            jQuery('.thsa_qg_plan_summary').addClass('active');
+            jQuery('.thsa_qg_plan_manage_button').addClass('active');
         }
-        jQuery('.thsa_qg_plan_settings').hide();
+        jQuery('.thsa_qg_plan_settings').removeClass('active');
         thsa_qg_calculate();
     });
 
@@ -604,9 +604,9 @@ jQuery(document).ready(function(){
 
     jQuery('.thsa_qg_dl_option').click(function(){
         if(jQuery(this).is(':checked')){
-            jQuery('.thsa_qg_event_action_downloadable').show();
+            jQuery('.thsa_qg_event_action_downloadable').addClass('active');
         }else{
-            jQuery('.thsa_qg_event_action_downloadable').hide();
+            jQuery('.thsa_qg_event_action_downloadable').removeClass('active');
         }
     });
 
@@ -628,7 +628,7 @@ jQuery(document).ready(function(){
     }
 
     jQuery('.thsa_qg_manage_plan_settings').click(function(){
-        jQuery('.thsa_qg_plan_settings').show();
+        jQuery('.thsa_qg_plan_settings').addClass('active');
     });
 
     jQuery('body').on('click','.thsa_remove_file_download', function(){

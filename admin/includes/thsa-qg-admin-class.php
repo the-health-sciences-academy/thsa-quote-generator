@@ -74,7 +74,23 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
                 print_r(get_post_meta(386));
                 die();
             }
+
+            if(isset($_GET['test_debug'])){
+                $args = [
+                    'numberposts' => 1,
+                    'name' => 'test-subscription',
+                    'post_status' => 'publish',
+                    'fields' => 'ids',
+                    'post_type' => 'product'
+                ];
+                $get_sub = get_posts($args);
+                print_r($get_sub);
+                die();
+            }
+           
         });
+
+    
 
 
     }
@@ -820,9 +836,13 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
             $is_dl = (!empty($_POST['thsa_qg_sub_is_dl']))? 'yes' : 'no';
             if($is_dl){
                 $quote_data['is_download'] = $is_dl;
-                if(!empty($_POST['thsa_qg_file_name'])){
+                if($is_dl == 'yes'){
                     $dl_files = [];
                     foreach($_POST['thsa_qg_file_name'] as $index => $file){
+                        
+                        if(!isset($file))
+                            continue;
+
                         $id = md5($file);
                         $dl_files[$id] = [
                             'id' => $id,
@@ -962,6 +982,7 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
 
         //check if exist
         $args = [
+            'post_type' => 'product',
             'numberposts' => 1,
             'name' => 'quotation-'.$post_id,
             'post_status' => 'publish',
@@ -975,12 +996,12 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
             $objProduct->set_status('publish');		
             $objProduct->set_price($monthly); 
             $objProduct->set_regular_price($monthly);
-            $sub_id = $objProduct->save(); //Saving the data to create new product, it will return product ID.
+            $sub_id = $objProduct->save();
             
             $qg_term = get_term_by('slug', 'quotation', 'product_cat');
             wp_set_object_terms($sub_id, $qg_term->term_id, 'product_cat');
         }else{
-            $sub_id = $get_sub[0]->ID;
+            $sub_id = $get_sub[0];
         }
 
         update_post_meta( $sub_id, '_sold_individually', 'yes');
@@ -1008,284 +1029,7 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
             update_post_meta( $sub_id, '_download_expiry', $data['dl_limit_expiry']);
         }
         
-        
-        
-        
-
-
-        return;
-
-        //check if exist
-
-		
-	
-
-		
-		/*$total_fee_to_add = 0;
-		if($fee_data){
-			foreach ($fee_data as $index => $fee_row) {
-				if($fee_row['qg_fee_recurring'] == 'No'){
-					$total_fee_to_add += $fee_row['qg_fee_amount'];
-				}
-			}
-		}
-
-		if($initial_payment > 0){
-			$initial_payment += $total_fee_to_add;
-			update_post_meta( $new_product_id, '_subscription_trial_period', 'month' );
-			update_post_meta( $new_product_id, '_subscription_trial_length', '1' );
-			update_post_meta( $new_product_id, '_subscription_sign_up_fee', $initial_payment );
-			update_post_meta( $new_product_id, '_subscription_signup_fee_currency_prices', '{"EUR":"'. $initial_payment .'","USD":"'. $initial_payment.'"}' );
-		}else{
-
-			if($total_fee_to_add > 0){
-				$total_fee_to_add += $monthly_amount;
-				update_post_meta( $new_product_id, '_subscription_trial_period', 'month' );
-				update_post_meta( $new_product_id, '_subscription_trial_length', 1 );
-				update_post_meta( $new_product_id, '_subscription_sign_up_fee', $total_fee_to_add );
-				update_post_meta( $new_product_id, '_subscription_signup_fee_currency_prices', '{"EUR":"'. $total_fee_to_add .'","USD":"'. $total_fee_to_add.'"}' );
-			}else{
-				update_post_meta( $new_product_id, '_subscription_trial_period', '' );
-				update_post_meta( $new_product_id, '_subscription_trial_length', 0 );
-				update_post_meta( $new_product_id, '_subscription_sign_up_fee', 0 );
-				update_post_meta( $new_product_id, '_subscription_signup_fee_currency_prices', '{"EUR":"0","USD":"0"}' );
-			}
-			
-		}*/
-		
-		
-
-		//DEFAULT/Static parameters
-		//update_post_meta( $new_product_id, '_tax_status', 'taxable' );//If needed
-		/*update_post_meta( $new_product_id, '_manage_stock', 'no' );
-		update_post_meta( $new_product_id, '_sold_individually', 'yes' );
-		update_post_meta( $new_product_id, '_virtual', 'yes' );
-		update_post_meta( $new_product_id, '_downloadable', 'no' );
-		update_post_meta( $new_product_id, '_download_limit', "-1" );
-		update_post_meta( $new_product_id, '_download_expiry', "-1" );
-		update_post_meta( $new_product_id, '_stock', NULL );
-		update_post_meta( $new_product_id, '_stock_status', 'instock' );
-		update_post_meta( $new_product_id, 'woo_limit_one_select_dropdown', "1" );
-		update_post_meta( $new_product_id, 'woo_limit_one_time_dropdown', 'all' );
-		update_post_meta( $new_product_id, '_dependency_type', '3' );
-		update_post_meta( $new_product_id, '_dependency_selection_type', 'new_product_ids' );
-		//update_post_meta( $new_product_id, '_subscription_limit', 'active' );
-		update_post_meta( $new_product_id, '_subscription_limit', 'no' );
-		update_post_meta( $new_product_id, '_subscription_one_time_shipping', 'no' );*/
-
-
-        /*
-        //update_post_meta( $new_product_id, '_tax_status', 'taxable' );//If needed
-		update_post_meta( $new_product_id, '_manage_stock', 'no' );
-		update_post_meta( $new_product_id, '_sold_individually', 'yes' );
-		update_post_meta( $new_product_id, '_virtual', 'yes' );
-		update_post_meta( $new_product_id, '_downloadable', 'no' );
-		update_post_meta( $new_product_id, '_download_limit', "-1" );
-		update_post_meta( $new_product_id, '_download_expiry', "-1" );
-		update_post_meta( $new_product_id, '_stock', NULL );
-		update_post_meta( $new_product_id, '_stock_status', 'instock' );
-		update_post_meta( $new_product_id, 'woo_limit_one_select_dropdown', "1" );
-		update_post_meta( $new_product_id, 'woo_limit_one_time_dropdown', 'all' );
-		update_post_meta( $new_product_id, '_dependency_type', '3' );
-		update_post_meta( $new_product_id, '_dependency_selection_type', 'new_product_ids' );
-		//update_post_meta( $new_product_id, '_subscription_limit', 'active' );
-		update_post_meta( $new_product_id, '_subscription_limit', 'no' );
-		update_post_meta( $new_product_id, '_subscription_one_time_shipping', 'no' );
-
-
-        Array
-(
-    [_edit_lock] => Array
-        (
-            [0] => 1669300707:1
-        )
-
-    [_edit_last] => Array
-        (
-            [0] => 1
-        )
-
-    [_regular_price] => Array
-        (
-            [0] => 1000
-        )
-
-    [total_sales] => Array
-        (
-            [0] => 0
-        )
-
-    [_tax_status] => Array
-        (
-            [0] => taxable
-        )
-
-    [_tax_class] => Array
-        (
-            [0] => 
-        )
-
-    [_manage_stock] => Array
-        (
-            [0] => no
-        )
-
-    [_backorders] => Array
-        (
-            [0] => no
-        )
-
-    [_sold_individually] => Array
-        (
-            [0] => yes
-        )
-
-    [_virtual] => Array
-        (
-            [0] => yes
-        )
-
-    [_downloadable] => Array
-        (
-            [0] => yes
-        )
-
-    [_download_limit] => Array
-        (
-            [0] => -1
-        )
-
-    [_download_expiry] => Array
-        (
-            [0] => -1
-        )
-
-    [_stock] => Array
-        (
-            [0] => 
-        )
-
-    [_stock_status] => Array
-        (
-            [0] => instock
-        )
-
-    [_wc_average_rating] => Array
-        (
-            [0] => 0
-        )
-
-    [_wc_review_count] => Array
-        (
-            [0] => 0
-        )
-
-    [_downloadable_files] => Array
-        (
-            [0] => a:1:{s:36:"e8ad2168-858b-4965-95df-efe5a6545e8e";a:4:{s:2:"id";s:36:"e8ad2168-858b-4965-95df-efe5a6545e8e";s:4:"name";s:6:"Test 1";s:4:"file";s:66:"http://localhost/thsaapp/wp-content/uploads/2022/10/hoodie-2-1.jpg";s:7:"enabled";b:1;}}
-        )
-
-    [_product_version] => Array
-        (
-            [0] => 7.0.0
-        )
-
-    [_price] => Array
-        (
-            [0] => 1000
-        )
-
-    [_subscription_payment_sync_date] => Array
-        (
-            [0] => 0
-        )
-
-    [_subscription_price] => Array
-        (
-            [0] => 1000
-        )
-
-    [_sale_price] => Array
-        (
-            [0] => 
-        )
-
-    [_sale_price_dates_from] => Array
-        (
-            [0] => 
-        )
-
-    [_sale_price_dates_to] => Array
-        (
-            [0] => 
-        )
-
-    [_subscription_trial_length] => Array
-        (
-            [0] => 5
-        )
-
-    [_subscription_sign_up_fee] => Array
-        (
-            [0] => 100
-        )
-
-    [_subscription_period] => Array
-        (
-            [0] => month
-        )
-
-    [_subscription_period_interval] => Array
-        (
-            [0] => 1
-        )
-
-    [_subscription_length] => Array
-        (
-            [0] => 12
-        )
-
-    [_subscription_trial_period] => Array
-        (
-            [0] => day
-        )
-
-    [_subscription_limit] => Array
-        (
-            [0] => no
-        )
-
-    [_subscription_one_time_shipping] => Array
-        (
-            [0] => no
-        )
-
-)
-         */
-
-		//THIS IS FOR THE CHAINED PRODUCTS META
-		//WE need to loop through all of the products inside the QG and add them here
-		$chained_product_detail = array();
-
-		foreach($product_ids_arr as $index => $product_id){
-			$product = wc_get_product($product_id);
-			$id = $product->get_id();
-			$name = $product->get_name();
-
-			$chained_product_detail[$id] = array('unit' => '1', 'priced_individually' => 'no', 'product_name' => $product_name);
-		}
-
-		//Serialize the detail arr
-		//$chained_product_detail = serialize($chained_product_detail);
-		//Serialize the product ids arr
-		//$product_ids_arr = serialize($product_ids_arr);
-
-		update_post_meta( $new_product_id, '_chained_product_detail', $chained_product_detail ); //value here is just an example
-		update_post_meta( $new_product_id, '_chained_new_product_ids', $product_ids_arr );//value here is just an example
-
-		update_post_meta( $new_product_id, '_groups_groups', '67');
-
-		return $new_product_id;
+		return $sub_id;
     }
 
 

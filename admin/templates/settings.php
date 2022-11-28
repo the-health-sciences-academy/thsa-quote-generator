@@ -11,11 +11,6 @@
                             'status' => 'active'
                         ],
                         [
-                            'text' => 'Subscription',
-                            'target' => 'thsa_set_subscription_con',
-                            'status' => ''
-                        ],
-                        [
                             'text' => 'Coupon',
                             'target' => 'thsa_set_coupon_con',
                             'status' => ''
@@ -42,11 +37,6 @@
                         'class' => 'thsa_set_gen_con',
                         'content' => [$this, 'general_settings'],
                         'status' => 'active'
-                    ],
-                    [
-                        'class' => 'thsa_set_subscription_con',
-                        'content' => [$this, 'subscription_settings'],
-                        'status' => null
                     ],
                     [
                         'class' => 'thsa_set_coupon_con',
