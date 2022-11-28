@@ -62,7 +62,19 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         //save data
         add_action('save_post_thsa-quote-generator', [$this, 'save_quote']);
 
-        add_shortcode('thsa-quotation-email', [$this, 'email_quotation']);
+        add_shortcode( 'thsa-quotation-email' , [$this, 'email_quotation'] );
+
+        add_action ( 'admin_enqueue_scripts', function () {
+            if (is_admin ())
+                wp_enqueue_media ();
+        } );
+
+        add_action('admin_init', function(){
+            if(isset($_GET['post_debug'])){
+                print_r(get_post_meta(386));
+                die();
+            }
+        });
 
 
     }
@@ -798,20 +810,94 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
             $quote_data['percent_amount_discount'] = $percent_discount;
         }
 
-        $term_number = (!empty($_POST['thsa_qg_term_number']))? sanitize_text_field($_POST['thsa_qg_term_number']) : null;
-        if($term_number){
-            $quote_data['term_number'] = $term_number;
+        if($quote_data['payment_type'] == 'plan'){
+
+            $is_virtual = (!empty($_POST['thsa_qg_sub_is_virtual']))? 'yes' : 'no';
+            if($is_virtual){
+                $quote_data['is_virtual'] = $is_virtual;
+            }
+
+            $is_dl = (!empty($_POST['thsa_qg_sub_is_dl']))? 'yes' : 'no';
+            if($is_dl){
+                $quote_data['is_download'] = $is_dl;
+                if(!empty($_POST['thsa_qg_file_name'])){
+                    $dl_files = [];
+                    foreach($_POST['thsa_qg_file_name'] as $index => $file){
+                        $id = md5($file);
+                        $dl_files[$id] = [
+                            'id' => $id,
+                            'name' => sanitize_text_field($file),
+                            'file' => sanitize_url($_POST['thsa_qg_file_url'][$index])
+                        ];
+                    }
+                    $quote_data['dl_files'] = $dl_files;
+                }else{
+                    $quote_data['dl_files'] = null;
+                }
+
+                $dl_limit = (!empty($_POST['thsa_qg_sub_dl_limit']))? sanitize_text_field($_POST['thsa_qg_sub_dl_limit']) : -1;
+                if($dl_limit){
+                    $quote_data['dl_limit'] = $dl_limit;
+                }
+
+                $dl_limit_expiry = (!empty($_POST['thsa_qg_sub_dl_expiry']))? sanitize_text_field($_POST['thsa_qg_sub_dl_expiry']) : -1;
+                if($dl_limit_expiry){
+                    $quote_data['dl_limit_expiry'] = $dl_limit_expiry;
+                }
+
+            }
+
+            $term_number = (!empty($_POST['thsa_qg_term_number']))? sanitize_text_field($_POST['thsa_qg_term_number']) : null;
+            if($term_number){
+                $quote_data['term_number'] = $term_number;
+            }
+
+            $term_every = (!empty($_POST['thsa_qg_term_every']))? sanitize_text_field($_POST['thsa_qg_term_every']) : null;
+            if($term_every){
+                $quote_data['term_plan_every'] = $term_every;
+            }
+
+            $plan_type = (!empty($_POST['thsa_qg_plan_term']))? sanitize_text_field($_POST['thsa_qg_plan_term']) : null;
+            if($plan_type){
+                $quote_data['term_plan_type'] = $plan_type;
+            }
+
+            $term_edit = (!empty($_POST['thsa_allow_term_edit']))? sanitize_text_field($_POST['thsa_allow_term_edit']) : null;
+            if($term_edit){
+                $quote_data['allow_term_edit'] = $term_edit;
+            }
+
+            $every_term = (!empty($_POST['thsa_qg_term_every']))? sanitize_text_field($_POST['thsa_qg_term_every']) : 1;
+            if($every_term){
+                $quote_data['term_every'] = $every_term;
+            }
+
+            $free_trial = (!empty($_POST['thsa_qg_sub_free_trial']))? sanitize_text_field($_POST['thsa_qg_sub_free_trial']) : null;
+            if($free_trial){
+                $quote_data['free_trial_interval'] = $free_trial;
+            }
+
+            $free_trial_duration = (!empty($_POST['thsa_qg_sub_free_trial_duration']))? sanitize_text_field($_POST['thsa_qg_sub_free_trial_duration']) : null;
+            if($free_trial_duration){
+                $quote_data['free_trial_interval_duration'] = $free_trial_duration;
+            }
+
+            $is_tax = (!empty($_POST['thsa_qg_sub_tax_status']))? sanitize_text_field($_POST['thsa_qg_sub_tax_status']) : null;
+            if($is_tax){
+                $quote_data['is_taxable'] = $is_tax;
+            }
+
+            $tax_class = (!empty($_POST['thsa_qg_sub_tax_class']))? sanitize_text_field($_POST['thsa_qg_sub_tax_class']) : null;
+            if($tax_class){
+                $quote_data['tax_class'] = $tax_class;
+            }
+
+            $this->generate_plan($post_id, $quote_data);
         }
 
-        $plan_type = (!empty($_POST['thsa_qg_plan_term']))? sanitize_text_field($_POST['thsa_qg_plan_term']) : null;
-        if($plan_type){
-            $quote_data['term_plan_type'] = $plan_type;
-        }
+        
 
-        $term_edit = (!empty($_POST['thsa_allow_term_edit']))? sanitize_text_field($_POST['thsa_allow_term_edit']) : null;
-        if($term_edit){
-            $quote_data['allow_term_edit'] = $term_edit;
-        }
+       
 
         //fees
         $fee_data = [];
@@ -834,10 +920,6 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         $code = 'quotation-'.$post_id;
         $this->generate_coupon($code, $discount_amount);
 
-        //if($quote_data['payment_type'] == 'plan'){
-            //$this->generate_plan();
-       // }
-
     }
 
     /**
@@ -850,30 +932,96 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
      * 
      * 
      */
-    public function generate_plan($product_name, $currency, $monthly_amount, $initial_payment, $no_of_months, $product_ids_arr,$fee_data)
+    public function generate_plan($post_id = 0, $data = null)
     {
+        if(!$data || !$post_id)
+            return;
 
-		$objProduct = new WC_Product_Subscription();
-		$objProduct->set_name($product_name);
-		$objProduct->set_status('publish');		
-		$objProduct->set_price($monthly_amount); 
-		$objProduct->set_regular_price($monthly_amount);
-		$new_product_id = $objProduct->save(); //Saving the data to create new product, it will return product ID.
+        if(!isset($data['products']))
+            return;
+
+        
+        //calculate amount
+        $tem_total = 0;
+        foreach($data['products'] as $product){
+            if(!isset($product[0])){
+                continue;
+            }
+            $prod = wc_get_product($product[0]);
+            $tem_total += $prod->get_price();
+        }
+
+        //deduct the discount
+        $tem_total -= ($data['fixed_amount_discount'])? $data['fixed_amount_discount'] : 0;
+
+        //calculate monthly
+        $monthly = 0;
+        if(isset($data['term_number'])){
+            $monthly = $tem_total / $data['term_number'];
+        }
+
+        //check if exist
+        $args = [
+            'numberposts' => 1,
+            'name' => 'quotation-'.$post_id,
+            'post_status' => 'publish',
+            'fields' => 'ids'
+        ];
+        $get_sub = get_posts($args);
+
+        if(empty($get_sub)){
+            $objProduct = new \WC_Product_Subscription();
+            $objProduct->set_name('quotation-'.$post_id);
+            $objProduct->set_status('publish');		
+            $objProduct->set_price($monthly); 
+            $objProduct->set_regular_price($monthly);
+            $sub_id = $objProduct->save(); //Saving the data to create new product, it will return product ID.
+            
+            $qg_term = get_term_by('slug', 'quotation', 'product_cat');
+            wp_set_object_terms($sub_id, $qg_term->term_id, 'product_cat');
+        }else{
+            $sub_id = $get_sub[0]->ID;
+        }
+
+        update_post_meta( $sub_id, '_sold_individually', 'yes');
+        update_post_meta( $sub_id, '_subscription_sign_up_fee', 0);
+		update_post_meta( $sub_id, '_subscription_price', $monthly );
+        update_post_meta( $sub_id, '_price', $monthly );
+        update_post_meta( $sub_id, '_regular_price', $monthly );
+		update_post_meta( $sub_id, '_subscription_length', $data['term_number'] );
+		update_post_meta( $sub_id, '_subscription_period', $data['term_plan_type'] );
+		update_post_meta( $sub_id, '_subscription_period_interval', $data['term_every'] );
+
+        update_post_meta( $sub_id, '_subscription_trial_period', $data['free_trial_interval_duration'] );
+		update_post_meta( $sub_id, '_subscription_trial_length', $data['free_trial_interval'] );
+
+        update_post_meta( $sub_id, '_virtual', $data['is_virtual']);
+        update_post_meta( $sub_id, '_downloadable', $data['is_download']);
+        update_post_meta( $sub_id, '_tax_status', $data['is_taxable']);
+        update_post_meta( $sub_id, '_tax_class', $data['tax_class']);
+        update_post_meta( $sub_id, '_stock', NULL );
+		update_post_meta( $sub_id, '_stock_status', 'instock' );
+
+        if($data['is_download'] == 'yes'){
+            update_post_meta( $sub_id, '_downloadable_files', $data['dl_files']);
+            update_post_meta( $sub_id, '_download_limit', $data['dl_limit']);
+            update_post_meta( $sub_id, '_download_expiry', $data['dl_limit_expiry']);
+        }
+        
+        
+        
+        
+
+
+        return;
+
+        //check if exist
+
 		
-		$qg_term = get_term_by('slug', 'quotation', 'product_cat');
-		wp_set_object_terms($new_product_id, $qg_term->term_id, 'product_cat');
-
-		//update_post_meta( $new_product_id, '_regular_currency_prices', '{"EUR":"'. $monthly_amount.'","USD":"'. $monthly_amount.'"}' );
-		//update_post_meta( $new_product_id, '_product_base_currency', $currency );
-
-		update_post_meta( $new_product_id, '_subscription_price', $monthly_amount );
-		update_post_meta( $new_product_id, '_subscription_length', $no_of_months[0] );
-		update_post_meta( $new_product_id, '_subscription_period', $no_of_months[1] );
-		update_post_meta( $new_product_id, '_subscription_period_interval', '1' );
 	
 
 		
-		$total_fee_to_add = 0;
+		/*$total_fee_to_add = 0;
 		if($fee_data){
 			foreach ($fee_data as $index => $fee_row) {
 				if($fee_row['qg_fee_recurring'] == 'No'){
@@ -903,12 +1051,31 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
 				update_post_meta( $new_product_id, '_subscription_signup_fee_currency_prices', '{"EUR":"0","USD":"0"}' );
 			}
 			
-		}
+		}*/
 		
 		
 
 		//DEFAULT/Static parameters
 		//update_post_meta( $new_product_id, '_tax_status', 'taxable' );//If needed
+		/*update_post_meta( $new_product_id, '_manage_stock', 'no' );
+		update_post_meta( $new_product_id, '_sold_individually', 'yes' );
+		update_post_meta( $new_product_id, '_virtual', 'yes' );
+		update_post_meta( $new_product_id, '_downloadable', 'no' );
+		update_post_meta( $new_product_id, '_download_limit', "-1" );
+		update_post_meta( $new_product_id, '_download_expiry', "-1" );
+		update_post_meta( $new_product_id, '_stock', NULL );
+		update_post_meta( $new_product_id, '_stock_status', 'instock' );
+		update_post_meta( $new_product_id, 'woo_limit_one_select_dropdown', "1" );
+		update_post_meta( $new_product_id, 'woo_limit_one_time_dropdown', 'all' );
+		update_post_meta( $new_product_id, '_dependency_type', '3' );
+		update_post_meta( $new_product_id, '_dependency_selection_type', 'new_product_ids' );
+		//update_post_meta( $new_product_id, '_subscription_limit', 'active' );
+		update_post_meta( $new_product_id, '_subscription_limit', 'no' );
+		update_post_meta( $new_product_id, '_subscription_one_time_shipping', 'no' );*/
+
+
+        /*
+        //update_post_meta( $new_product_id, '_tax_status', 'taxable' );//If needed
 		update_post_meta( $new_product_id, '_manage_stock', 'no' );
 		update_post_meta( $new_product_id, '_sold_individually', 'yes' );
 		update_post_meta( $new_product_id, '_virtual', 'yes' );
@@ -924,6 +1091,177 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
 		//update_post_meta( $new_product_id, '_subscription_limit', 'active' );
 		update_post_meta( $new_product_id, '_subscription_limit', 'no' );
 		update_post_meta( $new_product_id, '_subscription_one_time_shipping', 'no' );
+
+
+        Array
+(
+    [_edit_lock] => Array
+        (
+            [0] => 1669300707:1
+        )
+
+    [_edit_last] => Array
+        (
+            [0] => 1
+        )
+
+    [_regular_price] => Array
+        (
+            [0] => 1000
+        )
+
+    [total_sales] => Array
+        (
+            [0] => 0
+        )
+
+    [_tax_status] => Array
+        (
+            [0] => taxable
+        )
+
+    [_tax_class] => Array
+        (
+            [0] => 
+        )
+
+    [_manage_stock] => Array
+        (
+            [0] => no
+        )
+
+    [_backorders] => Array
+        (
+            [0] => no
+        )
+
+    [_sold_individually] => Array
+        (
+            [0] => yes
+        )
+
+    [_virtual] => Array
+        (
+            [0] => yes
+        )
+
+    [_downloadable] => Array
+        (
+            [0] => yes
+        )
+
+    [_download_limit] => Array
+        (
+            [0] => -1
+        )
+
+    [_download_expiry] => Array
+        (
+            [0] => -1
+        )
+
+    [_stock] => Array
+        (
+            [0] => 
+        )
+
+    [_stock_status] => Array
+        (
+            [0] => instock
+        )
+
+    [_wc_average_rating] => Array
+        (
+            [0] => 0
+        )
+
+    [_wc_review_count] => Array
+        (
+            [0] => 0
+        )
+
+    [_downloadable_files] => Array
+        (
+            [0] => a:1:{s:36:"e8ad2168-858b-4965-95df-efe5a6545e8e";a:4:{s:2:"id";s:36:"e8ad2168-858b-4965-95df-efe5a6545e8e";s:4:"name";s:6:"Test 1";s:4:"file";s:66:"http://localhost/thsaapp/wp-content/uploads/2022/10/hoodie-2-1.jpg";s:7:"enabled";b:1;}}
+        )
+
+    [_product_version] => Array
+        (
+            [0] => 7.0.0
+        )
+
+    [_price] => Array
+        (
+            [0] => 1000
+        )
+
+    [_subscription_payment_sync_date] => Array
+        (
+            [0] => 0
+        )
+
+    [_subscription_price] => Array
+        (
+            [0] => 1000
+        )
+
+    [_sale_price] => Array
+        (
+            [0] => 
+        )
+
+    [_sale_price_dates_from] => Array
+        (
+            [0] => 
+        )
+
+    [_sale_price_dates_to] => Array
+        (
+            [0] => 
+        )
+
+    [_subscription_trial_length] => Array
+        (
+            [0] => 5
+        )
+
+    [_subscription_sign_up_fee] => Array
+        (
+            [0] => 100
+        )
+
+    [_subscription_period] => Array
+        (
+            [0] => month
+        )
+
+    [_subscription_period_interval] => Array
+        (
+            [0] => 1
+        )
+
+    [_subscription_length] => Array
+        (
+            [0] => 12
+        )
+
+    [_subscription_trial_period] => Array
+        (
+            [0] => day
+        )
+
+    [_subscription_limit] => Array
+        (
+            [0] => no
+        )
+
+    [_subscription_one_time_shipping] => Array
+        (
+            [0] => no
+        )
+
+)
+         */
 
 		//THIS IS FOR THE CHAINED PRODUCTS META
 		//WE need to loop through all of the products inside the QG and add them here

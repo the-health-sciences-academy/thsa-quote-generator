@@ -13,7 +13,7 @@
                         </select>
                     </td>
                     <td class="thsa_qg_plan_manage_button">
-                        <input type="button" class="button button-secondary" value="<?php esc_html_e('Manage Subscription Settings','thsa-quote-generator'); ?>">
+                        <input type="button" class="button button-secondary thsa_qg_manage_plan_settings" value="<?php esc_html_e('Manage Subscription Settings','thsa-quote-generator'); ?>">
                     </td>
                     <td>
                         <?php 
@@ -31,17 +31,33 @@
         <div class="thsa_qg_plan_settings">
 
                         <p>
-                            <label><input type="checkbox"> <?php esc_html_e('Virtual','thsa-quote-generator'); ?></label>&nbsp;&nbsp;&nbsp;&nbsp;<label><input type="checkbox" class="thsa_qg_dl_option"> <?php esc_html_e('Downloadable','thsa-quote-generator'); ?>
+                            <label><input type="checkbox" name="thsa_qg_sub_is_virtual" value="Y"> <?php esc_html_e('Virtual','thsa-quote-generator'); ?></label>&nbsp;&nbsp;&nbsp;&nbsp;<label><input type="checkbox" name="thsa_qg_sub_is_dl" class="thsa_qg_dl_option" value="Y"> <?php esc_html_e('Downloadable','thsa-quote-generator'); ?>
                             </label>
                         </p>
-                        <p>
-                            <label><?php esc_html_e('Period Interval','thsa-quote-generator'); ?><br/>
-                                <input type="number" class="thsa_qg_set_field" placeholder="1">
-                            </label>
-                        </p>
+                        <div>
+                            <table border="0" cellspacing="0">
+                                <tr>
+                                    <td>
+                                    <label><?php esc_html_e('Free Trial','thsa-quote-generator'); ?><br/>
+                                        <input type="number" name="thsa_qg_sub_free_trial" class="thsa_qg_set_field" placeholder="0">
+                                    </label>
+                                    </td>
+                                    <td>
+                                    <label><?php esc_html_e(' ','thsa-quote-generator'); ?><br/>
+                                        <select name="thsa_qg_sub_free_trial_duration">
+                                            <option value="days"><?php esc_html_e('Days', 'thsa-quote-generator'); ?></option>
+                                            <option value="weeks"><?php esc_html_e('Weeks', 'thsa-quote-generator'); ?></option>
+                                            <option value="months"><?php esc_html_e('Months', 'thsa-quote-generator'); ?></option>
+                                            <option value="years"><?php esc_html_e('Years', 'thsa-quote-generator'); ?></option>
+                                        </select>
+                                    </label>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
                         <p>
                             <label><?php esc_html_e('Tax Status','thsa-quote-generator'); ?><br/>
-                                <select class="thsa_qg_set_field">
+                                <select class="thsa_qg_set_field" name="thsa_qg_sub_tax_status">
                                     <option value="taxable"><?php esc_html_e('Taxable', 'thsa-quote-generator'); ?></option>
                                     <option value="shipping"><?php esc_html_e('Shipping', 'thsa-quote-generator'); ?></option>
                                     <option value="none"><?php esc_html_e('None', 'thsa-quote-generator'); ?></option>
@@ -51,7 +67,7 @@
 
                         <p>
                             <label><?php esc_html_e('Tax Classes','thsa-quote-generator'); ?><br/>
-                                <select class="thsa_qg_set_field">
+                                <select class="thsa_qg_set_field" name="thsa_qg_sub_tax_class">
                                     <?php if(isset($params['taxes'])): 
                                         foreach($params['taxes'] as $class):    
                                     ?>
@@ -74,9 +90,9 @@
                                 </thead>
                                 <tbody class="thsa_qg_dl_file_con">
                                     <tr>
-                                        <td><input type="text" class="widefat" placeholder="<?php esc_html_e('File Name','thsa-quote-generator'); ?>"></td>
-                                        <td><input type="text" class="widefat thsa_upload_url_text" placeholder="<?php esc_html_e('File','thsa-quote-generator'); ?>" readonly></td>
-                                        <td width="5%"><input type="button" class="button button-primary widefat" value="<?php esc_html_e('Upload','thsa-quote-generator'); ?>"></td>
+                                        <td><input type="text" class="widefat" name="thsa_qg_file_name[]" placeholder="<?php esc_html_e('File Name','thsa-quote-generator'); ?>"></td>
+                                        <td><input type="text" name="thsa_qg_file_url[]" class="widefat thsa_upload_url_text" placeholder="<?php esc_html_e('File','thsa-quote-generator'); ?>" readonly></td>
+                                        <td width="5%"><input type="button" class="button button-primary widefat thsa_qg_upload_file" value="<?php esc_html_e('Upload','thsa-quote-generator'); ?>"></td>
                                         <td width="2%"><span class="dashicons dashicons-dismiss thsa_remove_file_download"></span></td>
                                     </tr>
                                 </tbody>
@@ -84,7 +100,7 @@
                                 <tfoot>
                                     <tr>
                                         <td colspan="4">
-                                            <input type="button" class="button button-secondary thsa_qg_add_dl_file" value="Add File">
+                                            <input type="button" class="button button-secondary thsa_qg_add_dl_file" value="<?php esc_html_e('Add File','thsa-quote-generator'); ?>">
                                         </td>
                                     </tr>
                                 </tfoot>
@@ -93,206 +109,17 @@
 
                             <p>
                                 <label><?php esc_html_e('Download Limit','thsa-quote-generator'); ?><br/>
-                                    <input type="number" class="thsa_qg_set_field" placeholder="Never">
+                                    <input type="number" class="thsa_qg_set_field" name="thsa_qg_sub_dl_limit" placeholder="<?php esc_html_e('Never','thsa-quote-generator'); ?>">
                                 </label>
-                                <i>Leave blank for unlimited re-downloads.</i>
+                                <i><?php esc_html_e('Leave blank for unlimited re-downloads.','thsa-quote-generator'); ?></i>
                             </p>
                             <p>
                                 <label><?php esc_html_e('Download Expiry','thsa-quote-generator'); ?><br/>
-                                    <input type="number" class="thsa_qg_set_field" placeholder="Never">
+                                    <input type="number" class="thsa_qg_set_field" name="thsa_qg_sub_dl_expiry" placeholder="Never">
                                 </label>
-                                <i>Enter the number of days before a download link expires, or leave blank.</i>
+                                <i><?php esc_html_e('Enter the number of days before a download link expires, or leave blank.','thsa-quote-generator'); ?></i>
                             </p>
                         </div>
-
-                        
-
-                        //update_post_meta( $new_product_id, '_tax_status', 'taxable' );//If needed
-		update_post_meta( $new_product_id, '_manage_stock', 'no' );
-		update_post_meta( $new_product_id, '_sold_individually', 'yes' );
-		update_post_meta( $new_product_id, '_virtual', 'yes' );
-		update_post_meta( $new_product_id, '_downloadable', 'no' );
-		update_post_meta( $new_product_id, '_download_limit', "-1" );
-		update_post_meta( $new_product_id, '_download_expiry', "-1" );
-		update_post_meta( $new_product_id, '_stock', NULL );
-		update_post_meta( $new_product_id, '_stock_status', 'instock' );
-		update_post_meta( $new_product_id, 'woo_limit_one_select_dropdown', "1" );
-		update_post_meta( $new_product_id, 'woo_limit_one_time_dropdown', 'all' );
-		update_post_meta( $new_product_id, '_dependency_type', '3' );
-		update_post_meta( $new_product_id, '_dependency_selection_type', 'new_product_ids' );
-		//update_post_meta( $new_product_id, '_subscription_limit', 'active' );
-		update_post_meta( $new_product_id, '_subscription_limit', 'no' );
-		update_post_meta( $new_product_id, '_subscription_one_time_shipping', 'no' );
-
-
-        Array
-(
-    [_edit_lock] => Array
-        (
-            [0] => 1669300707:1
-        )
-
-    [_edit_last] => Array
-        (
-            [0] => 1
-        )
-
-    [_regular_price] => Array
-        (
-            [0] => 1000
-        )
-
-    [total_sales] => Array
-        (
-            [0] => 0
-        )
-
-    [_tax_status] => Array
-        (
-            [0] => taxable
-        )
-
-    [_tax_class] => Array
-        (
-            [0] => 
-        )
-
-    [_manage_stock] => Array
-        (
-            [0] => no
-        )
-
-    [_backorders] => Array
-        (
-            [0] => no
-        )
-
-    [_sold_individually] => Array
-        (
-            [0] => yes
-        )
-
-    [_virtual] => Array
-        (
-            [0] => yes
-        )
-
-    [_downloadable] => Array
-        (
-            [0] => yes
-        )
-
-    [_download_limit] => Array
-        (
-            [0] => -1
-        )
-
-    [_download_expiry] => Array
-        (
-            [0] => -1
-        )
-
-    [_stock] => Array
-        (
-            [0] => 
-        )
-
-    [_stock_status] => Array
-        (
-            [0] => instock
-        )
-
-    [_wc_average_rating] => Array
-        (
-            [0] => 0
-        )
-
-    [_wc_review_count] => Array
-        (
-            [0] => 0
-        )
-
-    [_downloadable_files] => Array
-        (
-            [0] => a:1:{s:36:"e8ad2168-858b-4965-95df-efe5a6545e8e";a:4:{s:2:"id";s:36:"e8ad2168-858b-4965-95df-efe5a6545e8e";s:4:"name";s:6:"Test 1";s:4:"file";s:66:"http://localhost/thsaapp/wp-content/uploads/2022/10/hoodie-2-1.jpg";s:7:"enabled";b:1;}}
-        )
-
-    [_product_version] => Array
-        (
-            [0] => 7.0.0
-        )
-
-    [_price] => Array
-        (
-            [0] => 1000
-        )
-
-    [_subscription_payment_sync_date] => Array
-        (
-            [0] => 0
-        )
-
-    [_subscription_price] => Array
-        (
-            [0] => 1000
-        )
-
-    [_sale_price] => Array
-        (
-            [0] => 
-        )
-
-    [_sale_price_dates_from] => Array
-        (
-            [0] => 
-        )
-
-    [_sale_price_dates_to] => Array
-        (
-            [0] => 
-        )
-
-    [_subscription_trial_length] => Array
-        (
-            [0] => 5
-        )
-
-    [_subscription_sign_up_fee] => Array
-        (
-            [0] => 100
-        )
-
-    [_subscription_period] => Array
-        (
-            [0] => month
-        )
-
-    [_subscription_period_interval] => Array
-        (
-            [0] => 1
-        )
-
-    [_subscription_length] => Array
-        (
-            [0] => 12
-        )
-
-    [_subscription_trial_period] => Array
-        (
-            [0] => day
-        )
-
-    [_subscription_limit] => Array
-        (
-            [0] => no
-        )
-
-    [_subscription_one_time_shipping] => Array
-        (
-            [0] => no
-        )
-
-)
         </div>
 
         <div class="thsa_qg_table_con">
@@ -313,16 +140,28 @@
                             }
                         ?>" placeholder="Percentage discount"><span class="thsa_qg_tail_text">%</span></label>
                     </td>
+
                     <td valign="middle">
                         <table class="thsa_qg_wide thsa_qg_plan_fields" border="0" <?php echo ($payment_type == 'plan')? "style=\"display:block;\"" : null; ?>>
                             <tr>
+                                <td>
+                                    <select name="thsa_qg_term_every">
+                                        <option value="1"><?php esc_html_e('every', 'thsa-quote-generator'); ?></option>
+                                        <option value="2"><?php esc_html_e('every 2nd', 'thsa-quote-generator'); ?></option>
+                                        <option value="3"><?php esc_html_e('every 3rd', 'thsa-quote-generator'); ?></option>
+                                        <option value="4"><?php esc_html_e('every 4th', 'thsa-quote-generator'); ?></option>
+                                        <option value="5"><?php esc_html_e('every 5th', 'thsa-quote-generator'); ?></option>
+                                        <option value="6"><?php esc_html_e('every 6th', 'thsa-quote-generator'); ?></option>
+                                    </select>
+                                </td>
                                 <td>
                                     <input type="number" name="thsa_qg_term_number" class="thsa_qg_term_number" value="<?php
                                         if(isset($params['data']['term_number'])){
                                             esc_html_e($params['data']['term_number'],'thsa-quote-generator');
                                         }
-                                    ?>" placeholder="Term">
+                                    ?>" placeholder="<?php esc_html_e('Term','thsa-quote-generator'); ?>">
                                 </td>
+                                
                                 <td>
                                     <?php 
                                         $plan_type = (isset($params['data']['term_plan_type']))? $params['data']['term_plan_type'] : null;

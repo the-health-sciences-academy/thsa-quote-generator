@@ -366,6 +366,7 @@ jQuery(document).ready(function(){
             jQuery('.thsa_qg_plan_summary').show();
             jQuery('.thsa_qg_plan_manage_button').show();
         }
+        jQuery('.thsa_qg_plan_settings').hide();
         thsa_qg_calculate();
     });
 
@@ -493,6 +494,10 @@ jQuery(document).ready(function(){
                     {
                         attr: 'placeholder',
                         value: labels_.file_name
+                    },
+                    {
+                        attr: 'name',
+                        value: 'thsa_qg_file_name[]'
                     }
                 ]
             }
@@ -522,6 +527,10 @@ jQuery(document).ready(function(){
                     {
                         attr: 'readonly',
                         value: 'true'
+                    },
+                    {
+                        attr: 'name',
+                        value: 'thsa_qg_file_url[]'
                     }
                 ]
             }
@@ -549,7 +558,7 @@ jQuery(document).ready(function(){
                     },
                     {
                         attr: 'class',
-                        value: 'button button-primary widefat'
+                        value: 'button button-primary widefat thsa_qg_upload_file'
                     },
                     {
                         attr: 'value',
@@ -598,6 +607,36 @@ jQuery(document).ready(function(){
             jQuery('.thsa_qg_event_action_downloadable').show();
         }else{
             jQuery('.thsa_qg_event_action_downloadable').hide();
+        }
+    });
+
+
+
+    if (jQuery('.thsa_qg_upload_file').length > 0) {
+        if ( typeof wp !== 'undefined' && wp.media && wp.media.editor) {
+            jQuery('body').on('click', '.thsa_qg_upload_file',function(e) {
+                e.preventDefault();
+                var button = jQuery(this);
+                wp.media.editor.send.attachment = function(props, attachment) {
+                    var tr = jQuery(button).closest('tr');
+                    jQuery(tr).find('.thsa_upload_url_text').val(attachment.url);
+                };
+                wp.media.editor.open(button);
+                return false;
+            });
+        }
+    }
+
+    jQuery('.thsa_qg_manage_plan_settings').click(function(){
+        jQuery('.thsa_qg_plan_settings').show();
+    });
+
+    jQuery('body').on('click','.thsa_remove_file_download', function(){
+        var tr = jQuery(this).closest('tr');
+        var td = jQuery(tr).find('td:nth(0)');
+        var get_name = jQuery(td).find('input').val();
+        if(confirm(labels_.confirm +' '+ get_name +'?')){
+            jQuery(tr).remove();   
         }
     });
 

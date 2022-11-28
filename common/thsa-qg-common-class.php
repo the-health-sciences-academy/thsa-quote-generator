@@ -92,7 +92,8 @@ class thsa_qg_common_class
 			'file_name' => __('File Name', 'thsa-quote-generator'),
 			'file'	=> __('File', 'thsa-quote-generator'),
 			'upload_' => __('Upload', 'thsa-quote-generator'),
-			'add_file' => __('Add File', 'thsa-quote-generator')
+			'add_file' => __('Add File', 'thsa-quote-generator'),
+			'confirm' => __('Are you sure you want to remove', 'thsa-quote-generator')
 		];
 		return json_encode($labels);
 	}

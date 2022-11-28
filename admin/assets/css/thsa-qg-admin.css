@@ -77,6 +77,9 @@
     cursor: pointer; }
   .thsa_qg_wrapper .thsa_qg_event_action {
     display: none; }
+  .thsa_qg_wrapper .thsa_qg_plan_settings {
+    display: none;
+    margin-bottom: 20px; }
 
 .thsa_admin_qg_tab {
   margin: 0;
