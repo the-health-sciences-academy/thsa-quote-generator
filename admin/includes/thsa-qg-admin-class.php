@@ -21,11 +21,9 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
 
     private $product_category = 'product_cat';
 
-    private $product_tag = 'product_tag';
-
     public $setting_class = null;
 
-    private $quote_slug_tag = 'thsa-quotation';
+    
 
     /**
      * 

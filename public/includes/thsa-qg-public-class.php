@@ -38,7 +38,12 @@ class thsa_qg_public_class extends thsa_qg_common_class{
         //add items to checkout
         add_action('wp', [$this,'load_items']);
         add_action('woocommerce_cart_calculate_fees',[$this,'add_fees']);
-        add_filter('woocommerce_cart_totals_coupon_label', [$this,'edit_discount_name'] , 999 ,2);  
+        add_filter('woocommerce_cart_totals_coupon_label', [$this,'edit_discount_name'] , 999 ,2); 
+        
+        add_action( 'woocommerce_before_calculate_totals', [$this, 'plan_item_prices'], 1000, 1);
+        
+        add_filter( 'woocommerce_cart_item_price', [$this, 'plan_item_prices_display'], 10, 4 );
+        add_filter( 'woocommerce_cart_item_subtotal' , [$this, 'plan_item_prices_display'], 50, 4);
         
     }
 
@@ -102,10 +107,19 @@ class thsa_qg_public_class extends thsa_qg_common_class{
                     global $woocommerce;
                     $woocommerce->cart->empty_cart();
 
-                    //add products to cart
-                    foreach($quote['products'] as $pid){    
-                        WC()->cart->add_to_cart( $pid[0], $pid[1]);
+                    if($quote['payment_type'] == 'upfront'){
+                        //add products to cart
+                        foreach($quote['products'] as $pid){    
+                            WC()->cart->add_to_cart( $pid[0], $pid[1]);
+                        }
+                    }else{
+                        $plan_id = $quote['plan_product_id'];
+                        WC()->cart->add_to_cart( $plan_id, 1);
+                        foreach($quote['products'] as $pid){    
+                            WC()->cart->add_to_cart( $pid[0], $pid[1]);
+                        }
                     }
+                    
 
                     $coupon_code = 'quotation-'.$qid;
 
@@ -181,7 +195,7 @@ class thsa_qg_public_class extends thsa_qg_common_class{
      * @return
      * 
      */
-    public function edit_discount_name($sprintf, $coupon)
+    public function edit_discount_name( $sprintf, $coupon )
     {
 
         if(WC()->session->get('thsa_on_process_quotation')){
@@ -191,6 +205,76 @@ class thsa_qg_public_class extends thsa_qg_common_class{
         }
 
     }
+
+    /**
+     * 
+     * 
+     * plan_item_prices
+     * @since 1.2.0
+     * @param obj
+     * @return
+     * 
+     */
+    public function plan_item_prices( $cart ){
+        // This is necessary for WC 3.0+
+        if ( is_admin() && ! defined( 'DOING_AJAX' ) )
+            return;
+
+        // Avoiding hook repetition (when using price calculations for example | optional)
+        if ( did_action( 'woocommerce_before_calculate_totals' ) >= 2 )
+            return;
+        
+        if(WC()->session->get('thsa_on_process_quotation')){
+            // Loop through cart items
+            foreach ( $cart->get_cart() as $cart_item ) {
+                
+                $get_tags = (array) wp_get_object_terms( $cart_item['product_id'], $this->product_tag );
+                $get_tags = (array) $get_tags[0];
+                $it_has = ( in_array($this->quote_slug_tag, $get_tags) )? true : false;
+                if(!$it_has){
+                    $cart_item['data']->set_price( 0 );
+                }
+                
+            }
+        }
+    }
+    
+    /**
+     *
+     * 
+     * plan_item_prices_display
+     * @since 1.2.0
+     * @param string //html to display
+     * @param obj //cart item data
+     * @param string //cart item key
+     * @param bool //if override
+     * @return string
+     * 
+     * 
+     */
+
+     public function plan_item_prices_display( $price_html, $cart_item, $cart_item_key, $override = false )
+     {
+        if( WC()->session->get('thsa_on_process_quotation') ) {
+
+            $get_tags = (array) wp_get_object_terms( $cart_item['product_id'], $this->product_tag );
+
+            if(isset($get_tags[0])){
+                $get_tags = (array) $get_tags[0];
+                $it_has = ( in_array($this->quote_slug_tag, $get_tags) )? true : false;
+            }else{
+                $it_has = false;
+            }
+            
+
+            if(!$it_has){
+                return 'included';
+            }
+
+        }
+        return $price_html;
+     }
+
 
 }
 

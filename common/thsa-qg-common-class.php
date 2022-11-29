@@ -15,6 +15,10 @@ namespace thsa\qg\common;
 class thsa_qg_common_class
 {
 
+	public $product_tag = 'product_tag';
+
+    public $quote_slug_tag = 'thsa-quotation';
+
     /**
      * 
      * 
