@@ -11,7 +11,7 @@
 namespace thsa\qg\admin;
 use thsa\qg\common\thsa_qg_common_class;
 use thsa\qg\admin\settings as qgsettings;
-use thsa\qg\admin\shortcodes  as qgshortcodes;
+//use thsa\qg\admin\shortcodes  as qgshortcodes;
 
 defined( 'ABSPATH' ) or die( 'No access area' );
 
@@ -23,8 +23,9 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
 
     private $product_tag = 'product_tag';
 
-
     public $setting_class = null;
+
+    private $quote_slug_tag = 'thsa-quotation';
 
     /**
      * 
@@ -69,6 +70,9 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
                 wp_enqueue_media ();
         } );
 
+
+        add_action('admin_init', [$this, 'generate_tag'] );
+
         add_action('admin_init', function(){
             if(isset($_GET['post_debug'])){
                 print_r(get_post_meta(386));
@@ -76,15 +80,9 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
             }
 
             if(isset($_GET['test_debug'])){
-                $args = [
-                    'numberposts' => 1,
-                    'name' => 'test-subscription',
-                    'post_status' => 'publish',
-                    'fields' => 'ids',
-                    'post_type' => 'product'
-                ];
-                $get_sub = get_posts($args);
-                print_r($get_sub);
+                
+                $data = (array) wp_get_object_terms( 392, 'product_tag' );
+                print_r((array) $data[0]);
                 die();
             }
            
@@ -271,6 +269,32 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
             'high'
         );
 
+    }
+
+    /**
+     * 
+     * 
+     * generate_tag
+     * @since 1.2.0
+     * @param
+     * @return
+     * 
+     * 
+     */
+    public function generate_tag()
+    {
+        $qg_term = get_term_by( 'slug', $this->quote_slug_tag, $this->product_tag );
+        if(!$qg_term){
+            wp_insert_term(
+                __('Quotation', 'thsa-quote-generator'), // the term 
+                $this->product_tag,
+                array(
+                  'description'=> __('THSA quotation generated tag', 'thsa-quote-generator'),
+                  'slug' => $this->quote_slug_tag
+                )
+            );
+        }
+        
     }
 
     /**
@@ -912,11 +936,13 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
                 $quote_data['tax_class'] = $tax_class;
             }
 
-            $this->generate_plan($post_id, $quote_data);
+            $plan_id = $this->generate_plan($post_id, $quote_data);
         }
 
         
-
+        if(isset($plan_id)){
+            $quote_data['plan_product_id'] = $plan_id;
+        }
        
 
         //fees
@@ -937,8 +963,10 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         }
 
         //create coupon for quotation
-        $code = 'quotation-'.$post_id;
-        $this->generate_coupon($code, $discount_amount);
+        if($quote_data['payment_type'] == 'upfront'){
+            $code = 'quotation-'.$post_id;
+            $this->generate_coupon($code, $discount_amount);
+        }
 
     }
 
@@ -997,11 +1025,18 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
             $objProduct->set_price($monthly); 
             $objProduct->set_regular_price($monthly);
             $sub_id = $objProduct->save();
-            
-            $qg_term = get_term_by('slug', 'quotation', 'product_cat');
-            wp_set_object_terms($sub_id, $qg_term->term_id, 'product_cat');
+
         }else{
             $sub_id = $get_sub[0];
+        }
+
+        $get_tags = (array) wp_get_object_terms( $sub_id, $this->product_tag );
+        $get_tags = (array) $get_tags[0];
+        $it_has = ( in_array($this->quote_slug_tag, $get_tags) )? true : false;
+
+        if( !$it_has ){
+            $qg_term = get_term_by( 'slug', $this->quote_slug_tag, $this->product_tag );
+            wp_set_object_terms( $sub_id, $qg_term->term_id, $this->product_tag );
         }
 
         update_post_meta( $sub_id, '_sold_individually', 'yes');
@@ -1049,6 +1084,10 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
     public function generate_coupon($code = null, $amount = null, $type = 'fixed_cart')
     {
         if(!$code || !$code)
+            return;
+
+
+        if(!$amount)
             return;
 
         //check of code exist

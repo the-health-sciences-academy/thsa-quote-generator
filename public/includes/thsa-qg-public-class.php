@@ -107,11 +107,26 @@ class thsa_qg_public_class extends thsa_qg_common_class{
                         WC()->cart->add_to_cart( $pid[0], $pid[1]);
                     }
 
-                    //apply coupon
                     $coupon_code = 'quotation-'.$qid;
-                    if (!$woocommerce->cart->add_discount( sanitize_text_field( $coupon_code )))
-                        $woocommerce->show_messages();
 
+                    $args = [
+                        'post_type' => 'shop_coupon',
+                        'name' => $coupon_code,
+                        'post_status' => 'publish',
+                        'field' => 'ids'
+                    ];
+                    $check_c = get_posts($args);
+                    if(!empty($check_c)){
+
+                        //apply coupon
+                        $coupon = new \WC_Coupon($coupon_code);
+                        $cc = new \WC_Discounts($coupon);
+                        $coup = $cc->is_coupon_valid( $coupon );
+
+                        if($coup){
+                            $woocommerce->cart->add_discount( sanitize_text_field( $coupon_code ) );
+                        }
+                    }
 
               
                     WC()->session->set('thsa_on_process_quotation', $quote);

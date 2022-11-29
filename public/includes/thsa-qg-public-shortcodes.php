@@ -71,6 +71,25 @@ class thsa_qg_public_shortcodes extends thsa_qg_common_class
 
         if(isset($attr['id'])){
             $quote = get_post_meta($attr['id'],'thsa_quotation_data',true);
+            //print_r($quote);
+            
+            $plan_product = [];
+            if($quote['payment_type'] == 'plan'){
+                if(isset($quote['plan_product_id'])){
+                    $plan_prod = wc_get_product( $quote['plan_product_id'] );
+                    $plan_product[] = [
+                        'id' => $plan_prod->get_id(),
+                        'text' => strtoupper($plan_prod->get_title()),
+                        'price_html' => '--',
+                        'price_number' => $plan_prod->get_price_html(),
+                        'price_regular_number' => $plan_prod->get_regular_price(),
+                        'price_sale_number' => $plan_prod->get_sale_price(),
+                        'qty' => '--',
+                        'amount' => '--'
+                    ];
+                }
+            }
+
             if($quote){
                 //get products
                 $products = [];
@@ -88,24 +107,46 @@ class thsa_qg_public_shortcodes extends thsa_qg_common_class
                             'price_regular_number' => $product_details->get_regular_price(),
                             'price_sale_number' => $product_details->get_sale_price(),
                             'qty' => $product[1],
-                            'amount' => $product_details->get_price() * $product[1]
+                            'amount' => ($quote['payment_type'] == 'upfront')? wc_price($product_details->get_price() * $product[1]) : __('included', 'thsa-quote-generator')
                         ];
                     }
                 }
 
-                $discount = ($quote['fixed_amount_discount'])? $quote['fixed_amount_discount'] : 0;
-                $discounted_total = $total - $discount;
+                if($quote['payment_type'] == 'plan'){
+                    $products = $plan_product + $products;
+                    $discounted_total = $plan_prod->get_price();
+                }else{
+                    $discount = ($quote['fixed_amount_discount'])? $quote['fixed_amount_discount'] : 0;
+                    $discounted_total = $total - $discount;
+                }
+                    
 
                 //fees
                 $fees = 0;
+                $fee_labels = [];
                 if(isset($quote['fees'])){
                     foreach($quote['fees'] as $fee){
                         $fee_ = ($fee['fee_amount'])? $fee['fee_amount'] : 0;
                         $fees += $fee_;
+                        $fee_labels[] = [
+                            'name' => $fee['fee_name'],
+                            'amount' => $fee['fee_amount']
+                        ];
                     }
                 }
                 $quote['fees'];
                 $grand_total = $discounted_total + $fees;
+
+                //summary area
+                $summary = [
+                    'Subtotal' => wc_price($total),
+                    'Discount' => '-' . wc_price($quote['fixed_amount_discount']),
+                    'Terms' => (isset($plan_product[0]))? $plan_product[0]['price_number'] : null,
+                    'Fees'  => $fee_labels,
+                    'Total Today' => wc_price($grand_total)
+                ];
+
+                $summary = apply_filters('thsa_qg_quote_summary_before',  $summary);
 
                 ob_start();
                     $this->set_template('shortcodes/quotation', [
@@ -114,7 +155,8 @@ class thsa_qg_public_shortcodes extends thsa_qg_common_class
                         'data' => $quote,
                         'grand_total' => $grand_total, 
                         'undiscounted' => $total,
-                        'qid' => $attr['id']
+                        'qid' => $attr['id'],
+                        'labels' => $summary
                     ]
                 );
                 return ob_get_clean();

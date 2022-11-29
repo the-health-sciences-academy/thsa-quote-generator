@@ -51,30 +51,30 @@
                                         <?php 
                                             $days_status = null;
                                             if(isset($params['data']['free_trial_interval_duration'])){
-                                                if($params['data']['free_trial_interval_duration'] == 'days')
+                                                if($params['data']['free_trial_interval_duration'] == 'day')
                                                     $days_status = 'selected';
                                             }
                                             $weeks_status = null;
                                             if(isset($params['data']['free_trial_interval_duration'])){
-                                                if($params['data']['free_trial_interval_duration'] == 'weeks')
+                                                if($params['data']['free_trial_interval_duration'] == 'week')
                                                     $weeks_status = 'selected';
                                             }
                                             $months_status = null;
                                             if(isset($params['data']['free_trial_interval_duration'])){
-                                                if($params['data']['free_trial_interval_duration'] == 'months')
+                                                if($params['data']['free_trial_interval_duration'] == 'month')
                                                     $months_status = 'selected';
                                             }
                                             $years_status = null;
                                             if(isset($params['data']['free_trial_interval_duration'])){
-                                                if($params['data']['free_trial_interval_duration'] == 'years')
+                                                if($params['data']['free_trial_interval_duration'] == 'year')
                                                     $years_status = 'selected';
                                             }
                                         ?>
                                         <select name="thsa_qg_sub_free_trial_duration">
-                                            <option value="days" <?php esc_html_e($days_status); ?>><?php esc_html_e('Days', 'thsa-quote-generator'); ?></option>
-                                            <option value="weeks" <?php esc_html_e($weeks_status); ?>><?php esc_html_e('Weeks', 'thsa-quote-generator'); ?></option>
-                                            <option value="months" <?php esc_html_e($months_status); ?>><?php esc_html_e('Months', 'thsa-quote-generator'); ?></option>
-                                            <option value="years" <?php esc_html_e($years_status); ?>><?php esc_html_e('Years', 'thsa-quote-generator'); ?></option>
+                                            <option value="day" <?php esc_html_e($days_status); ?>><?php esc_html_e('Days', 'thsa-quote-generator'); ?></option>
+                                            <option value="week" <?php esc_html_e($weeks_status); ?>><?php esc_html_e('Weeks', 'thsa-quote-generator'); ?></option>
+                                            <option value="month" <?php esc_html_e($months_status); ?>><?php esc_html_e('Months', 'thsa-quote-generator'); ?></option>
+                                            <option value="year" <?php esc_html_e($years_status); ?>><?php esc_html_e('Years', 'thsa-quote-generator'); ?></option>
                                         </select>
                                     </label>
                                     </td>
