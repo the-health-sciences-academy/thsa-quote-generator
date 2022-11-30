@@ -23,6 +23,9 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
 
     public $setting_class = null;
 
+
+    public $quotation_ids = [];
+
     
 
     /**
@@ -68,28 +71,40 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
                 wp_enqueue_media ();
         } );
 
-
+        //generate quotation tag
         add_action('admin_init', [$this, 'generate_tag'] );
 
-        add_action('admin_init', function(){
-            if(isset($_GET['post_debug'])){
-                print_r(get_post_meta(386));
-                die();
-            }
-
-            if(isset($_GET['test_debug'])){
-                
-                $data = (array) wp_get_object_terms( 392, 'product_tag' );
-                print_r((array) $data[0]);
-                die();
-            }
-           
-        });
-
-    
-
+        //remove quotation posts from products
+        add_action( 'pre_get_posts' , [ $this,'exclude_quotation'] );
 
     }
+
+    /**
+     * 
+     * 
+     * exclude_quotation
+     * @since 1.2.0
+     * @param
+     * @return
+     * 
+     * 
+     */
+    public function exclude_quotation( $query )
+    {
+        if( !is_admin() )
+            return $query;
+
+        global $pagenow;
+     
+        if( 'edit.php' == $pagenow && ( get_query_var('post_type') && 'product' == get_query_var('post_type') ) ){
+            if(!empty($this->quotation_ids)){
+                $query->set( 'post__not_in', $this->quotation_ids ); 
+            }
+        }
+        return $query;
+    }
+
+
 
     /**
      * 
@@ -292,6 +307,22 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
                 )
             );
         }
+
+        $args = [
+            'posts_per_page' => -1,
+            'post_type' => 'product',
+            'tax_query' => [
+                [
+                    'taxonomy' => $this->product_tag,
+                    'field' => 'slug',
+                    'terms' => $this->quote_slug_tag
+                ]
+            ],
+            'post_status' => 'publish',
+            'fields' => 'ids'
+        ];
+        $quotes = get_posts( $args );
+        $this->quotation_ids = $quotes;
         
     }
 
@@ -848,93 +879,95 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
             $quote_data['percent_amount_discount'] = $percent_discount;
         }
 
-        if($quote_data['payment_type'] == 'plan'){
+        if(isset($quote_data['payment_type'])){
+            if($quote_data['payment_type'] == 'plan'){
 
-            $is_virtual = (!empty($_POST['thsa_qg_sub_is_virtual']))? 'yes' : 'no';
-            if($is_virtual){
-                $quote_data['is_virtual'] = $is_virtual;
-            }
+                $is_virtual = (!empty($_POST['thsa_qg_sub_is_virtual']))? 'yes' : 'no';
+                if($is_virtual){
+                    $quote_data['is_virtual'] = $is_virtual;
+                }
 
-            $is_dl = (!empty($_POST['thsa_qg_sub_is_dl']))? 'yes' : 'no';
-            if($is_dl){
-                $quote_data['is_download'] = $is_dl;
-                if($is_dl == 'yes'){
-                    $dl_files = [];
-                    foreach($_POST['thsa_qg_file_name'] as $index => $file){
-                        
-                        if(!isset($file))
-                            continue;
+                $is_dl = (!empty($_POST['thsa_qg_sub_is_dl']))? 'yes' : 'no';
+                if($is_dl){
+                    $quote_data['is_download'] = $is_dl;
+                    if($is_dl == 'yes'){
+                        $dl_files = [];
+                        foreach($_POST['thsa_qg_file_name'] as $index => $file){
+                            
+                            if(!isset($file))
+                                continue;
 
-                        $id = md5($file);
-                        $dl_files[$id] = [
-                            'id' => $id,
-                            'name' => sanitize_text_field($file),
-                            'file' => sanitize_url($_POST['thsa_qg_file_url'][$index])
-                        ];
+                            $id = md5($file);
+                            $dl_files[$id] = [
+                                'id' => $id,
+                                'name' => sanitize_text_field($file),
+                                'file' => sanitize_url($_POST['thsa_qg_file_url'][$index])
+                            ];
+                        }
+                        $quote_data['dl_files'] = $dl_files;
+                    }else{
+                        $quote_data['dl_files'] = null;
                     }
-                    $quote_data['dl_files'] = $dl_files;
-                }else{
-                    $quote_data['dl_files'] = null;
+
+                    $dl_limit = (!empty($_POST['thsa_qg_sub_dl_limit']))? sanitize_text_field($_POST['thsa_qg_sub_dl_limit']) : -1;
+                    if($dl_limit){
+                        $quote_data['dl_limit'] = $dl_limit;
+                    }
+
+                    $dl_limit_expiry = (!empty($_POST['thsa_qg_sub_dl_expiry']))? sanitize_text_field($_POST['thsa_qg_sub_dl_expiry']) : -1;
+                    if($dl_limit_expiry){
+                        $quote_data['dl_limit_expiry'] = $dl_limit_expiry;
+                    }
+
                 }
 
-                $dl_limit = (!empty($_POST['thsa_qg_sub_dl_limit']))? sanitize_text_field($_POST['thsa_qg_sub_dl_limit']) : -1;
-                if($dl_limit){
-                    $quote_data['dl_limit'] = $dl_limit;
+                $term_number = (!empty($_POST['thsa_qg_term_number']))? sanitize_text_field($_POST['thsa_qg_term_number']) : null;
+                if($term_number){
+                    $quote_data['term_number'] = $term_number;
                 }
 
-                $dl_limit_expiry = (!empty($_POST['thsa_qg_sub_dl_expiry']))? sanitize_text_field($_POST['thsa_qg_sub_dl_expiry']) : -1;
-                if($dl_limit_expiry){
-                    $quote_data['dl_limit_expiry'] = $dl_limit_expiry;
+                $term_every = (!empty($_POST['thsa_qg_term_every']))? sanitize_text_field($_POST['thsa_qg_term_every']) : null;
+                if($term_every){
+                    $quote_data['term_plan_every'] = $term_every;
                 }
 
-            }
+                $plan_type = (!empty($_POST['thsa_qg_plan_term']))? sanitize_text_field($_POST['thsa_qg_plan_term']) : null;
+                if($plan_type){
+                    $quote_data['term_plan_type'] = $plan_type;
+                }
 
-            $term_number = (!empty($_POST['thsa_qg_term_number']))? sanitize_text_field($_POST['thsa_qg_term_number']) : null;
-            if($term_number){
-                $quote_data['term_number'] = $term_number;
-            }
+                $term_edit = (!empty($_POST['thsa_allow_term_edit']))? sanitize_text_field($_POST['thsa_allow_term_edit']) : null;
+                if($term_edit){
+                    $quote_data['allow_term_edit'] = $term_edit;
+                }
 
-            $term_every = (!empty($_POST['thsa_qg_term_every']))? sanitize_text_field($_POST['thsa_qg_term_every']) : null;
-            if($term_every){
-                $quote_data['term_plan_every'] = $term_every;
-            }
+                $every_term = (!empty($_POST['thsa_qg_term_every']))? sanitize_text_field($_POST['thsa_qg_term_every']) : 1;
+                if($every_term){
+                    $quote_data['term_every'] = $every_term;
+                }
 
-            $plan_type = (!empty($_POST['thsa_qg_plan_term']))? sanitize_text_field($_POST['thsa_qg_plan_term']) : null;
-            if($plan_type){
-                $quote_data['term_plan_type'] = $plan_type;
-            }
+                $free_trial = (!empty($_POST['thsa_qg_sub_free_trial']))? sanitize_text_field($_POST['thsa_qg_sub_free_trial']) : null;
+                if($free_trial){
+                    $quote_data['free_trial_interval'] = $free_trial;
+                }
 
-            $term_edit = (!empty($_POST['thsa_allow_term_edit']))? sanitize_text_field($_POST['thsa_allow_term_edit']) : null;
-            if($term_edit){
-                $quote_data['allow_term_edit'] = $term_edit;
-            }
+                $free_trial_duration = (!empty($_POST['thsa_qg_sub_free_trial_duration']))? sanitize_text_field($_POST['thsa_qg_sub_free_trial_duration']) : null;
+                if($free_trial_duration){
+                    $quote_data['free_trial_interval_duration'] = $free_trial_duration;
+                }
 
-            $every_term = (!empty($_POST['thsa_qg_term_every']))? sanitize_text_field($_POST['thsa_qg_term_every']) : 1;
-            if($every_term){
-                $quote_data['term_every'] = $every_term;
-            }
+                $is_tax = (!empty($_POST['thsa_qg_sub_tax_status']))? sanitize_text_field($_POST['thsa_qg_sub_tax_status']) : null;
+                if($is_tax){
+                    $quote_data['is_taxable'] = $is_tax;
+                }
 
-            $free_trial = (!empty($_POST['thsa_qg_sub_free_trial']))? sanitize_text_field($_POST['thsa_qg_sub_free_trial']) : null;
-            if($free_trial){
-                $quote_data['free_trial_interval'] = $free_trial;
-            }
+                $tax_class = (!empty($_POST['thsa_qg_sub_tax_class']))? sanitize_text_field($_POST['thsa_qg_sub_tax_class']) : null;
+                if($tax_class){
+                    $quote_data['tax_class'] = $tax_class;
+                }
 
-            $free_trial_duration = (!empty($_POST['thsa_qg_sub_free_trial_duration']))? sanitize_text_field($_POST['thsa_qg_sub_free_trial_duration']) : null;
-            if($free_trial_duration){
-                $quote_data['free_trial_interval_duration'] = $free_trial_duration;
+                $plan_id = $this->generate_plan($post_id, $quote_data);
             }
-
-            $is_tax = (!empty($_POST['thsa_qg_sub_tax_status']))? sanitize_text_field($_POST['thsa_qg_sub_tax_status']) : null;
-            if($is_tax){
-                $quote_data['is_taxable'] = $is_tax;
-            }
-
-            $tax_class = (!empty($_POST['thsa_qg_sub_tax_class']))? sanitize_text_field($_POST['thsa_qg_sub_tax_class']) : null;
-            if($tax_class){
-                $quote_data['tax_class'] = $tax_class;
-            }
-
-            $plan_id = $this->generate_plan($post_id, $quote_data);
         }
 
         
@@ -961,9 +994,11 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         }
 
         //create coupon for quotation
-        if($quote_data['payment_type'] == 'upfront'){
-            $code = 'quotation-'.$post_id;
-            $this->generate_coupon($code, $discount_amount);
+        if( isset($quote_data['payment_type']) ){
+            if($quote_data['payment_type'] == 'upfront'){
+                $code = 'quotation-'.$post_id;
+                $this->generate_coupon($code, $discount_amount);
+            }
         }
 
     }
