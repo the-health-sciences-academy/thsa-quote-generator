@@ -1,4 +1,9 @@
 <div class="thsa_qg_wrapper">
+<div class="thsa_qg_message">
+    <span class="dashicons dashicons-warning"></span>
+        <?php esc_html_e('NOTE: After changing the currency we strongly recommend to review the calculation'); ?>
+    
+</div>
 <select class="widefat thsa_qg_currency thsa_qg_select_woo" name="thsa_qg_currency">
     <option></option>
     <?php foreach($params['currency'] as $code => $currency): 

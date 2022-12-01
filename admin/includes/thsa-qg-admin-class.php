@@ -11,7 +11,7 @@
 namespace thsa\qg\admin;
 use thsa\qg\common\thsa_qg_common_class;
 use thsa\qg\admin\settings as qgsettings;
-//use thsa\qg\admin\shortcodes  as qgshortcodes;
+use thsa\qg\admin\support\plugins  as support_plugins;
 
 defined( 'ABSPATH' ) or die( 'No access area' );
 
@@ -19,7 +19,9 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
 
     private $product_post_type = 'product';
 
+
     private $product_category = 'product_cat';
+
 
     public $setting_class = null;
 
@@ -27,6 +29,7 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
     public $quotation_ids = [];
 
     
+    public $support_class = null;
 
     /**
      * 
@@ -49,6 +52,7 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
     public function __construct()
     {
         $this->setting_class = new qgsettings\thsa_qg_admin_settings_class();
+        $this->support_class = new support_plugins\thsa_qg_admin_support_plugins();
 
         //load common js
         add_action('admin_enqueue_scripts', [$this, 'load_admin_assets']);
@@ -78,6 +82,14 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         add_action( 'pre_get_posts' , [ $this,'exclude_quotation'] );
 
     }
+
+
+    /**
+     * 
+     * change_currency
+     * 
+     * 
+     */
 
     /**
      * 
@@ -144,7 +156,8 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
                 'labels'            =>  $this->labels(),
                 'save_settings'     => 'thsa_qg_save_settings',
                 'round_settings'    => json_encode($default_round),
-                'send_email'        => 'thsa_qg_send_email'
+                'send_email'        => 'thsa_qg_send_email',
+                'admin_edit_url'    => admin_url(sprintf(basename($_SERVER['REQUEST_URI'])))
             ]
         );
 
@@ -441,6 +454,10 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
             $current = get_woocommerce_currency();
         }
         $currencies = get_woocommerce_currencies();
+
+        if(get_option('thsa_qg_temp_currency')){
+            $current = get_option('thsa_qg_temp_currency');
+        }
         
         $this->set_template('currency',['path' => 'admin', 'currency' => $currencies, 'current' => $current]);
     }

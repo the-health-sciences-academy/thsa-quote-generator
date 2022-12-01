@@ -458,17 +458,6 @@ jQuery(document).ready(function(){
     //add dl file
     jQuery('.thsa_qg_add_dl_file').click(function(){
         //thsa_qg_dl_file_con
-        /*
-
-        <tr>
-                                        <td><input type="text" class="widefat" placeholder="<?php esc_html_e('File Name','thsa-quote-generator'); ?>"></td>
-                                        <td><input type="text" class="widefat thsa_upload_url_text" placeholder="<?php esc_html_e('File','thsa-quote-generator'); ?>" readonly></td>
-                                        <td width="5%"><input type="button" class="button button-primary widefat" value="<?php esc_html_e('Upload','thsa-quote-generator'); ?>"></td>
-                                        <td width="2%"><span class="dashicons dashicons-dismiss thsa_remove_file_download"></span></td>
-                                    </tr>
-         
-          
-         */
         var tr = thsa_field_generator(
             {
                 type: 'tr'
@@ -637,6 +626,17 @@ jQuery(document).ready(function(){
         var get_name = jQuery(td).find('input').val();
         if(confirm(labels_.confirm +' '+ get_name +'?')){
             jQuery(tr).remove();   
+        }
+    });
+
+    //change currency
+    jQuery('.thsa_qg_currency').on('select2:select',function(){
+        jQuery(this).prop('disabled', true);
+        var get_cur = jQuery(this).val();
+        if( get_cur ){
+            var has_fvar = thsaqgvars.admin_edit_url.indexOf('?');
+            var par = (has_fvar >= 0)? '&' : '?';
+            window.location = thsaqgvars.admin_edit_url+par+'temp_currency='+get_cur;
         }
     });
 
