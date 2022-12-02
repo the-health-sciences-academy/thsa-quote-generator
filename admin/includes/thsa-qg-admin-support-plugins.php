@@ -17,80 +17,53 @@ defined( 'ABSPATH' ) or die( 'No access area' );
 class thsa_qg_admin_support_plugins extends thsa_qg_common_class
 {
     
-    public function __construct()
-    {
-        add_action('admin_init', [$this, 'set_temp_currency'] );
-    }
-
     /**
      * 
-     * 
-     * set_temp_currency
+     * setttings
      * @since 1.2.0
-     * @param
-     * @return
+     * @param string - assigned plugin name
+     * @return array
+     * 
+     * 
      * 
      */
-    public function set_temp_currency()
+    public function settings( $plugin = null )
     {
-        if(isset($_GET['temp_currency'])){
-            
-            $tem_cur = sanitize_text_field($_GET['temp_currency']);
-            $screen = get_current_screen();
-            if ( isset($screen->parent_base) ) {
-                if($screen->parent_base == 'edit' ){
-                    $get_id = $_POST['post'];
-                    if(get_post_type($get_id) != 'thsa-quote-generator'){
-                        delete_option('thsa_qg_temp_currency');
-                        return;
-                    } 
-                }else{
-                    delete_option('thsa_qg_temp_currency');
-                    return;
-                }
-                
-            }else{
-                $post_type = isset( $_GET['post_type'] )? $_GET['post_type'] : null;
-                if($post_type != 'thsa-quote-generator'){
-                    delete_option('thsa_qg_temp_currency');
-                    return;
-                }
-               
-            }
-            update_option('thsa_qg_temp_currency', $tem_cur);
+        if(!$plugin)
+            return;
 
-        }else{
-            
-            delete_option('thsa_qg_temp_currency');
-        
+        switch($plugin)
+        {
+            case 'aelia':
+                return  $this->aelia_currency_switcher();
+                break;
         }
-
-        /**
-         * 
-         * Plugin Name: aelia currency switcher
-         * @since 1.2.0
-         * 
-         */
-        if ( is_plugin_active( 'woocommerce-aelia-currencyswitcher/woocommerce-aelia-currencyswitcher.php' ) ) {
-            add_filter('wc_aelia_cs_selected_currency', [$this, 'change_currency'], 10, 1);
-        } 
     }
 
     /**
      * 
      * 
-     * change_currency
+     * aelia_currency_switcher
+     * plugin: aelia currency switcher
      * @since 1.2.0
      * @param
      * @return
      * 
-     * 
      */
-    public function change_currency( $selected_currency )
-    {   
-        $get_temp_currency = get_option('thsa_qg_temp_currency');
-        $selected_currency = ($get_temp_currency != '')? $get_temp_currency : $selected_currency;
-        return $selected_currency;
+    public function aelia_currency_switcher()
+    {
+        if ( is_plugin_active( 'woocommerce-aelia-currencyswitcher/woocommerce-aelia-currencyswitcher.php' ) ) {
+            //do stuffs for aelia
+            $settings = get_option('wc_aelia_currency_switcher');
+            return apply_filters('thsa_qg_aelia_settings', 
+                [
+                    'enabled_currencies' => $settings['enabled_currencies'],
+                    'exchange_rates' => $settings['exchange_rates']
+                ]
+            );
+        }else{
+            return;
+        }
     }
 
 }

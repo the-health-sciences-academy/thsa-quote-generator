@@ -37,8 +37,7 @@ jQuery(document).ready(function(){
         }
     });
 
-    jQuery('.thsa_qg_select_woo').selectWoo({
-        width: '100%', 
+    jQuery('.thsa_qg_select_woo').selectWoo({ 
         placeholder: labels_.select});
     jQuery('.thsa_qg_select_woo_inline').selectWoo({
         width: '250px', 
@@ -629,16 +628,6 @@ jQuery(document).ready(function(){
         }
     });
 
-    //change currency
-    jQuery('.thsa_qg_currency').on('select2:select',function(){
-        jQuery(this).prop('disabled', true);
-        var get_cur = jQuery(this).val();
-        if( get_cur ){
-            var has_fvar = thsaqgvars.admin_edit_url.indexOf('?');
-            var par = (has_fvar >= 0)? '&' : '?';
-            window.location = thsaqgvars.admin_edit_url+par+'temp_currency='+get_cur;
-        }
-    });
 
 });
 
@@ -653,11 +642,13 @@ function thsa_qg_load_select()
             url: thsaqgvars.ajaxurl,
             data: function (params) {
                 var get_filter = jQuery('.thsa_qg_filter_option').val();
+                var get_currency = jQuery('.thsa_qg_currency').val();
                 var query = {
                     search: params.term,
                     action: thsaqgvars.product_options,
                     nonce: thsaqgvars.nonce,
-                    filter: get_filter
+                    filter: get_filter,
+                    currency: get_currency
                 }
                 return query;
             },

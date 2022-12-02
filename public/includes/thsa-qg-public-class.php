@@ -44,6 +44,19 @@ class thsa_qg_public_class extends thsa_qg_common_class{
         
         add_filter( 'woocommerce_cart_item_price', [$this, 'plan_item_prices_display'], 10, 4 );
         add_filter( 'woocommerce_cart_item_subtotal' , [$this, 'plan_item_prices_display'], 50, 4);
+
+
+        //debug
+        add_action('wp', function(){
+            if(isset($_GET['debug'])){
+                print_r(get_option('wc_aelia_currency_switcher'));
+                echo '<br/><br/><br/>';
+                print_r(get_post_meta($_GET['debug']));
+                echo '<br/><br/>';
+                echo wc_get_price_decimal_separator();
+                die(); 
+            }
+        });
         
     }
 

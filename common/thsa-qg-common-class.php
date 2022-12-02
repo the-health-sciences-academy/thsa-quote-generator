@@ -176,5 +176,45 @@ class thsa_qg_common_class
 		
 	}
 
+
+	/**
+	 * 
+	 * 
+	 * price_html
+	 * our own get_price_html version
+	 * @since 1.2.0
+	 * @param array
+	 * @return string
+	 * 
+	 * 
+	 */
+	public function price_html( $data = [] )
+	{	
+		if( empty($data) )
+			return;
+
+		$data =	apply_filters('thsa_qg_get_price_html_before', $data );
+		
+		$price_html = '';
+		$amount = $data['regular'];
+
+		//we need to take the woo formatting
+		$woocommerce_price_thousand_sep = get_option('woocommerce_price_thousand_sep');
+		$woocommerce_price_decimal_sep = get_option('woocommerce_price_decimal_sep');
+		$woocommerce_price_num_decimals = get_option('woocommerce_price_num_decimals');
+		
+		$currency = '<span class="woocommerce-Price-currencySymbol">'.get_woocommerce_currency_symbol( $data['currency'] ).'</span>';
+
+		if(isset($data['sale'])){
+			$price_html .= '<del><span class="amount">'.$currency.number_format( $data['regular'], $woocommerce_price_num_decimals, $woocommerce_price_decimal_sep, $$woocommerce_price_thousand_sep).'</span></del>';
+			$amount = $data['sale'];
+		}
+
+		$price_html .= ' <ins><span class="amount">'.$currency.number_format($amount, $woocommerce_price_num_decimals, $woocommerce_price_decimal_sep, $$woocommerce_price_thousand_sep).'</span></ins>';
+
+		return apply_filters('thsa_qg_get_price_html', $price_html );
+		
+	}	
+
 }
 ?>

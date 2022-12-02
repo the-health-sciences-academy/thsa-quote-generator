@@ -29,7 +29,7 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
     public $quotation_ids = [];
 
     
-    public $support_class = null;
+    public $support_plugin = null;
 
     /**
      * 
@@ -51,8 +51,10 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
 
     public function __construct()
     {
+
         $this->setting_class = new qgsettings\thsa_qg_admin_settings_class();
-        $this->support_class = new support_plugins\thsa_qg_admin_support_plugins();
+        //support other plugins
+        $this->support_plugin = new support_plugins\thsa_qg_admin_support_plugins();
 
         //load common js
         add_action('admin_enqueue_scripts', [$this, 'load_admin_assets']);
@@ -80,6 +82,9 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
 
         //remove quotation posts from products
         add_action( 'pre_get_posts' , [ $this,'exclude_quotation'] );
+
+    
+        
 
     }
 
@@ -156,8 +161,7 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
                 'labels'            =>  $this->labels(),
                 'save_settings'     => 'thsa_qg_save_settings',
                 'round_settings'    => json_encode($default_round),
-                'send_email'        => 'thsa_qg_send_email',
-                'admin_edit_url'    => admin_url(sprintf(basename($_SERVER['REQUEST_URI'])))
+                'send_email'        => 'thsa_qg_send_email'
             ]
         );
 
@@ -250,21 +254,13 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
 
     public function meta_box()
     {
+
         add_meta_box(
             'thsa_qg_client_meta',
             __('Quotation Builder', 'thsa_quote_generator'),
             [$this, 'quote_meta_section'],
             'thsa-quote-generator',
             'normal',
-            'high'
-        );
-
-        add_meta_box(
-            'thsa_qg_currency',
-            __('Currency', 'thsa_quote_generator'),
-            [$this, 'currency_options'],
-            'thsa-quote-generator',
-            'side',
             'high'
         );
 
@@ -388,6 +384,9 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         if(!empty($data['products'])){
             foreach($data['products'] as $product){
                 $product_details = wc_get_product($product[0]);
+
+
+
                 $products[$product[0]] = [
                     'id' => $product_details->get_id(),
                     'text' => $product_details->get_id().' - '.$product_details->get_title(),
@@ -402,8 +401,16 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
             }
         }
 
-       
-
+  
+        if(!empty($data['currency'])){
+            //do nothing
+            $current = $data['currency'];
+        }else{
+            $current = get_woocommerce_currency();
+        }
+        $currencies = get_woocommerce_currencies();
+        
+        $this->set_template('currency',['path' => 'admin', 'currency' => $currencies, 'current' => $current]);
         $this->set_template('customer-details',['path' => 'admin', 'post' => $post, 'data' => $customer, 'tab' =>  $tab]);
         $this->set_template('products',['path' => 'admin', 'products' => $products]);
         $this->set_template('discounts',['path' => 'admin','data' => $data, 'taxes' => $this->get_taxes()]);
@@ -433,35 +440,6 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         }
         return $tax_class_options;
     }
-
-    /**
-     * 
-     * 
-     * currency_options
-     * @since 1.2.0
-     * @param
-     * @return
-     * 
-     * 
-     */
-    public function currency_options($post)
-    {
-        $currency = get_post_meta($post->ID,'thsa_quotation_data',true);
-        if(!empty($currency['currency'])){
-            //do nothing
-            $current = $currency['currency'];
-        }else{
-            $current = get_woocommerce_currency();
-        }
-        $currencies = get_woocommerce_currencies();
-
-        if(get_option('thsa_qg_temp_currency')){
-            $current = get_option('thsa_qg_temp_currency');
-        }
-        
-        $this->set_template('currency',['path' => 'admin', 'currency' => $currencies, 'current' => $current]);
-    }
-
 
     /**
      * 
@@ -621,16 +599,17 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         
         $s = sanitize_text_field($_GET['search']);
         $type = sanitize_text_field($_GET['filter']);
+        $currency = sanitize_text_field($_GET['currency']);
 
         switch($type){
             case 'product':
-                echo $this->product_filter($s);
+                echo $this->product_filter($s, $currency);
                 break;
             case 'category':
-                echo $this->category_filter($s);
+                echo $this->category_filter($s, $currency);
                 break;
             case 'tag':
-                echo $this->tag_filter($s);
+                echo $this->tag_filter($s, $currency);
                 break;
         }
 
@@ -649,7 +628,7 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
      * 
      * 
      */
-    public function product_filter($s)
+    public function product_filter($s, $currency)
     {
         $args = [
             'posts_per_page' => -1,
@@ -663,6 +642,15 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         $args = apply_filters('thsa_product_select_arg', $args);
         $products = get_posts($args);
 
+        $rate = null;
+        //aelia
+        $aelia = $this->support_plugin->settings('aelia');
+        if($aelia){
+            if(in_array($currency, $aelia['enabled_currencies'])){
+                $rate = $aelia['exchange_rates'][$currency]['rate'];
+            }
+        }
+
         $data = [];
         if($products){
             foreach($products as $product){
@@ -670,14 +658,64 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
                 //extract details
                 $product_ = wc_get_product($product->ID);
 
+                $price_html = $product_->get_price_html();
+                $price_number = $product_->get_price();
+                $price_regular_number = $product_->get_regular_price();
+                $price_sale_number = $product_->get_sale_price();
+
+             
+                //check if manually added
+                $currency_prices = get_post_meta($product->ID, '_regular_currency_prices', true);
+                $currency_prices = json_decode($currency_prices);
+                $currency_prices = (array) $currency_prices;
+
+                if($currency_prices){
+                        
+                    $currency_sale_prices = get_post_meta($product->ID, '_sale_currency_prices', true);
+                    $currency_sale_prices = json_decode($currency_sale_prices);
+                    $currency_sale_prices = (array) $currency_sale_prices;
+
+                    if( !empty($currency_sale_prices) ){
+
+                        $price_html = $this->price_html(
+                            [
+                                'sale' => $currency_sale_prices[$currency],
+                                'regular' => $currency_prices[$currency],
+                                'currency' => $currency
+                            ]
+                        );
+                        $price_number = $currency_sale_prices[$currency];
+                        $price_regular_number = $currency_prices[$currency];
+                        $price_sale_number = $currency_sale_prices[$currency];
+
+                    }else{
+                        $price_html = $this->price_html(
+                            [
+                                'regular' => $currency_prices[$currency],
+                                'currency' => $currency
+                            ]
+                        );
+
+                        $price_number = $currency_prices[$currency];
+                        $price_regular_number = $currency_prices[$currency];
+                    }
+
+                }else{
+                    //compute rate
+                    
+
+                }          
+      
+
                 $data[] = [
                     'id' => $product->ID,
                     'text' => $product->ID.' - '.$product->post_title,
-                    'price_html' => $product_->get_price_html(),
-                    'price_number' => $product_->get_price(),
-                    'price_regular_number' => $product_->get_regular_price(),
-                    'price_sale_number' => $product_->get_sale_price()
+                    'price_html' => $price_html,
+                    'price_number' => $price_number,
+                    'price_regular_number' => $price_regular_number,
+                    'price_sale_number' => $price_sale_number
                 ];
+
             }
 
             return json_encode($data);

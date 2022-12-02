@@ -30,10 +30,6 @@
         </div>
 
         <div class="thsa_qg_plan_settings <?php esc_html_e($display__); ?>">
-                            <?php 
-                                //print_r($params['data']);
-                            ?>
-
                         <p>
                             <label><input type="checkbox" name="thsa_qg_sub_is_virtual" value="Y" <?php echo ($params['data']['is_virtual'] == 'yes')? esc_html__('checked') : null; ?>> <?php esc_html_e('Virtual','thsa-quote-generator'); ?></label>&nbsp;&nbsp;&nbsp;&nbsp;<label><input type="checkbox" name="thsa_qg_sub_is_dl" class="thsa_qg_dl_option" value="Y" <?php echo ($params['data']['is_download'] == 'yes')? esc_html__('checked') : null; ?>> <?php esc_html_e('Downloadable','thsa-quote-generator'); ?>
                             </label>
