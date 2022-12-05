@@ -144,10 +144,11 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         $default_round = ['round' => 'off', 'decimal' => 0];
         if(isset($general_settings)){
             $default_round = [
-                'round' => $general_settings['round'],
-                'decimal' => $general_settings['decimal']
+                'round' => 'none',
+                'decimal' => $this->setting_class->get_settings('woocommerce_price_num_decimals')
             ];
         }
+        
 
         //load thsa js global variables
         wp_localize_script( THSA_QG_PREFIX.'-admin-js', 'thsaqgvars', 
@@ -386,16 +387,36 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
                 $product_details = wc_get_product($product[0]);
 
 
+                $price_html = $product_details->get_price_html();
+                $price_number = $product_details->get_price();
+                $price_regular_number = $product_details->get_regular_price();
+                $price_sale_number = $product_details->get_sale_price();
+
+
+                //get prices based on what plugin is installed
+                $prices = $this->support_plugin->currency_values(
+                    [
+                        'product_id' => $product_details->get_id(),
+                        'currency' => $data['currency'],
+                        'product_prices' => [
+                            'price_html' => $price_html,
+                            'price_number' => $price_number,
+                            'price_regular_number' => $price_regular_number,
+                            'price_sale_number' => $price_sale_number
+                        ]
+                    ]
+                );
+
 
                 $products[$product[0]] = [
                     'id' => $product_details->get_id(),
                     'text' => $product_details->get_id().' - '.$product_details->get_title(),
-                    'price_html' => $product_details->get_price_html(),
-                    'price_number' => $product_details->get_price(),
-                    'price_regular_number' => $product_details->get_regular_price(),
-                    'price_sale_number' => $product_details->get_sale_price(),
+                    'price_html' => $prices['price_html'],
+                    'price_number' => $prices['price_number'],
+                    'price_regular_number' => $prices['price_regular_number'],
+                    'price_sale_number' => $prices['price_sale_number'],
                     'qty' => $product[1],
-                    'amount' => $product_details->get_price() * $product[1]
+                    'amount' => $this->format_number( ['amount' => $prices['price_number'] * $product[1], 'round' => false ] )
                 ];
                 
             }
@@ -658,62 +679,35 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
                 //extract details
                 $product_ = wc_get_product($product->ID);
 
+                //set for no currency plugin is installed
                 $price_html = $product_->get_price_html();
                 $price_number = $product_->get_price();
                 $price_regular_number = $product_->get_regular_price();
                 $price_sale_number = $product_->get_sale_price();
 
-             
-                //check if manually added
-                $currency_prices = get_post_meta($product->ID, '_regular_currency_prices', true);
-                $currency_prices = json_decode($currency_prices);
-                $currency_prices = (array) $currency_prices;
 
-                if($currency_prices){
-                        
-                    $currency_sale_prices = get_post_meta($product->ID, '_sale_currency_prices', true);
-                    $currency_sale_prices = json_decode($currency_sale_prices);
-                    $currency_sale_prices = (array) $currency_sale_prices;
-
-                    if( !empty($currency_sale_prices) ){
-
-                        $price_html = $this->price_html(
-                            [
-                                'sale' => $currency_sale_prices[$currency],
-                                'regular' => $currency_prices[$currency],
-                                'currency' => $currency
-                            ]
-                        );
-                        $price_number = $currency_sale_prices[$currency];
-                        $price_regular_number = $currency_prices[$currency];
-                        $price_sale_number = $currency_sale_prices[$currency];
-
-                    }else{
-                        $price_html = $this->price_html(
-                            [
-                                'regular' => $currency_prices[$currency],
-                                'currency' => $currency
-                            ]
-                        );
-
-                        $price_number = $currency_prices[$currency];
-                        $price_regular_number = $currency_prices[$currency];
-                    }
-
-                }else{
-                    //compute rate
-                    
-
-                }          
-      
+                //get prices based on what plugin is installed
+                $prices = $this->support_plugin->currency_values(
+                    [
+                        'product_id' => $product->ID,
+                        'currency' => $currency,
+                        'product_prices' => [
+                            'price_html' => $price_html,
+                            'price_number' => $price_number,
+                            'price_regular_number' => $price_regular_number,
+                            'price_sale_number' => $price_sale_number
+                        ]
+                    ]
+                );
+                
 
                 $data[] = [
                     'id' => $product->ID,
                     'text' => $product->ID.' - '.$product->post_title,
-                    'price_html' => $price_html,
-                    'price_number' => $price_number,
-                    'price_regular_number' => $price_regular_number,
-                    'price_sale_number' => $price_sale_number
+                    'price_html' => $prices['price_html'],
+                    'price_number' => $prices['price_number'],
+                    'price_regular_number' => $prices['price_regular_number'],
+                    'price_sale_number' => $prices['price_sale_number']
                 ];
 
             }

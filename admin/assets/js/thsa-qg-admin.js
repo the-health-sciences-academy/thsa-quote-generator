@@ -1034,7 +1034,7 @@ function thsa_qg_round_number(amount = 0)
             amount = Math.floor(amount);
             break;
         default:
-            amount = Math.round(amount);
+            amount = amount;
             break;
     }   
 

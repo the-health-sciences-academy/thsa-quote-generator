@@ -21,6 +21,12 @@
         </p>
         <br/>
         <h3><?php esc_html_e('Amounts', 'thsa-quote-generator') ?></h3>
+
+        //THIS AREA IS UNDER INVESTIGATION<br/>
+        //DO WE NEED THE ROUND SETTINGS?<br/>
+        //DO WE NEED THE DECIMAL?<br/>
+        //OR TAKE THE SETTINGS FROM WOO
+
         <?php 
             $off = null;
             $up = null;

@@ -66,6 +66,174 @@ class thsa_qg_admin_support_plugins extends thsa_qg_common_class
         }
     }
 
+    /**
+     * 
+     * 
+     * currency_values
+     * @since 1.2.0
+     * @param array
+     * @return array
+     * 
+     * 
+     */
+    public function currency_values( $args = [] )
+    {
+        
+        $price_html = $args['product_prices']['price_html'];
+        $price_number = $args['product_prices']['price_number'];
+        $price_regular_number = $args['product_prices']['price_regular_number'];
+        $price_sale_number = $args['product_prices']['price_sale_number'];
+        
+        //for aelia
+        if ( is_plugin_active( 'woocommerce-aelia-currencyswitcher/woocommerce-aelia-currencyswitcher.php' ) ) {
+            //check if manually added
+            $currency_prices = get_post_meta($args['product_id'], '_regular_currency_prices', true);
+            $currency_prices = json_decode($currency_prices);
+            $currency_prices = (array) $currency_prices;
+
+            if(!empty($currency_prices)){
+                    
+                $currency_sale_prices = get_post_meta($args['product_id'], '_sale_currency_prices', true);
+                $currency_sale_prices = json_decode($currency_sale_prices);
+                $currency_sale_prices = (array) $currency_sale_prices;
+
+                if( !empty($currency_sale_prices) ){
+
+                    $price_sale_ = ( !empty($currency_sale_prices[ $args['currency'] ]) )? $currency_sale_prices[ $args['currency'] ] : get_post_meta( $args['product_id'], '_price', true);
+                    $price_ = ( !empty($currency_prices[ $args['currency'] ]) )? $currency_prices[ $args['currency'] ] : get_post_meta( $args['product_id'], '_price', true);
+
+                    $price_html = $this->price_html(
+                        [
+                            'sale' => $price_sale_,
+                            'regular' => $price_,
+                            'currency' => $args['currency']
+                        ]
+                    );
+                    $price_number = $price_sale_;
+                    $price_regular_number = $price_sale_;
+                    $price_sale_number = $price_sale_;
+
+                }else{
+                    $price_ = ( !empty($currency_prices[ $args['currency'] ]) )? $currency_prices[ $args['currency'] ] : get_post_meta( $args['product_id'], '_price', true);
+                    $price_html = $this->price_html(
+                        [
+                            'regular' => $price_,
+                            'currency' => $args['currency']
+                        ]
+                    );
+
+                    $price_number = $price_;
+                    $price_regular_number = $price_;
+                }
+
+                return [
+                    'price_html' => $price_html,
+                    'price_number' => $price_number,
+                    'price_regular_number' => $price_regular_number,
+                    'price_sale_number' => $price_sale_number
+                ];
+
+            }else{
+                //compute rate if product has no manual coversion
+                $settings = $this->aelia_currency_switcher();
+
+                if(isset($settings)){
+
+                    $get_sale_price = get_post_meta( $args['product_id'], '_sale_price', true );
+                    if( !empty($get_sale_price) ){
+
+                        $price_regular_number = get_post_meta( $args['product_id'], '_regular_price', true );
+
+                        if( isset($settings['exchange_rates'][ $args['currency'] ]['rate']) ){
+                            $mark_up = $settings['exchange_rates'][$args['currency']];
+                            $rate = $settings['exchange_rates'][$args['currency']]['rate'];
+                            
+                            if(isset( $mark_up['rate_markup'] ) && $mark_up['rate_markup'] != ''){
+                                
+                                if( strpos($mark_up['rate_markup'],'%') !== false ){
+                                    $temp_markup = str_replace('%','',$mark_up['rate_markup']);
+                                    $temp_rate =  $rate * ($temp_markup / 100 ) + $rate;
+                                }else{
+                                    $temp_rate = $rate + $mark_up['rate_markup'];
+                                }
+                                $price_regular_number = $price_regular_number * $temp_rate;
+                                $get_sale_price = $get_sale_price * $temp_rate;
+
+                            }else{
+                                //no markup
+                                $price_regular_number = $price_regular_number * $rate;
+                                $get_sale_price = $get_sale_price * $rate;
+                            }
+                        }
+
+                        $price_html = $this->price_html(
+                            [
+                                'sale' => $get_sale_price,
+                                'regular' => $price_regular_number,
+                                'currency' => $args['currency']
+                            ]
+                        );
+                        $price_number = $get_sale_price;
+                        $price_sale_number = $get_sale_price;
+                        
+                    }else{
+
+                        $price_regular_number = get_post_meta( $args['product_id'], '_price', true );
+
+                        if( isset($settings['exchange_rates'][ $args['currency'] ]['rate']) ){
+                            $mark_up = $settings['exchange_rates'][ $args['currency'] ];
+                            $rate = $settings['exchange_rates'][ $args['currency'] ]['rate'];
+                            
+                            if(isset( $mark_up['rate_markup'] )){
+                                
+                                if( strpos($mark_up['rate_markup'],'%') !== false ){
+                                    $mark_up = $mark_up['rate_markup'] / 100;
+                                }else{
+                                    $mark_up = $mark_up['rate_markup'];
+                                }
+
+                                $temp_rate = $rate + $mark_up;
+                                $price_regular_number = $price_regular_number * $temp_rate;
+
+                            }else{
+                                //no markup
+                                $price_regular_number = $price_regular_number * $rate;
+                            }
+                        }
+
+                        $price_html = $this->price_html(
+                            [
+                                'regular' => $price_regular_number,
+                                'currency' => $args['currency']
+                            ]
+                        );
+                        $price_number = $price_regular_number;
+
+                    }
+
+                }
+                //calculate rate
+                return [
+                    'price_html' => $price_html,
+                    'price_number' => $this->format_number( ['amount' => $price_number, 'round' => false ] ),
+                    'price_regular_number' => $this->format_number( ['amount' => $price_regular_number, 'round' => false ] ),
+                    'price_sale_number' => $this->format_number( ['amount' => $price_sale_number, 'round' => false ] )
+                ];
+
+            }
+
+        } 
+        
+        //just return what is passed
+        return [
+            'price_html' => $price_html,
+            'price_number' => $this->format_number( ['amount' => $price_number, 'round' => false ] ),
+            'price_regular_number' => $this->format_number( ['amount' => $price_regular_number, 'round' => false ] ),
+            'price_sale_number' => $this->format_number( ['amount' => $price_sale_number, 'round' => false ] )
+        ];
+    }
+
+
 }
 
 
