@@ -236,19 +236,10 @@ class thsa_qg_common_class
 		$woocommerce_price_decimal_sep = get_option('woocommerce_price_decimal_sep');
 		$woocommerce_price_num_decimals = get_option('woocommerce_price_num_decimals');
 
-		if( $args['round'] ){
-			return apply_filters(
-				'thsa_qg_formatted_amount',
-				number_format($args['amount'], $woocommerce_price_num_decimals, $woocommerce_price_decimal_sep, $woocommerce_price_thousand_sep)
-			);
-		}else{
-			return apply_filters(
-				'thsa_qg_formatted_amount',
-				sprintf('%0.2f', intval(($args['amount'] * 100)) / 100 )
-			);
-		}
-
-		
+		return apply_filters(
+			'thsa_qg_formatted_amount',
+			number_format($args['amount'], $woocommerce_price_num_decimals, $woocommerce_price_decimal_sep, $woocommerce_price_thousand_sep)
+		);
 
 	}
 

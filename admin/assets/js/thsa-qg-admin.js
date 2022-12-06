@@ -837,6 +837,10 @@ function thsa_generate_field_to(data)
                     {
                         attr: 'class',
                         value: 'thsa_qg_product_amount'
+                    },
+                    {
+                        attr: 'data-amount',
+                        value: data.price_number
                     }
                 ]
             }
@@ -938,7 +942,7 @@ function thsa_qg_product_total()
     var temp_product_total = 0;
     jQuery('.thsa_qg_selected_products tr').each(function(){
         //var price = jQuery(this).data('price-num');
-        var price = jQuery(this).find('td.thsa_qg_product_amount').text();
+        var price = jQuery(this).find('td.thsa_qg_product_amount').attr('data-amount');
         price = (price)? parseFloat(price) : 0;
         temp_product_total += price;
     });

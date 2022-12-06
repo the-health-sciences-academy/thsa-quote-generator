@@ -45,7 +45,6 @@ class thsa_qg_public_class extends thsa_qg_common_class{
         add_filter( 'woocommerce_cart_item_price', [$this, 'plan_item_prices_display'], 10, 4 );
         add_filter( 'woocommerce_cart_item_subtotal' , [$this, 'plan_item_prices_display'], 50, 4);
 
-
         //debug
         add_action('wp', function(){
             if(isset($_GET['debug'])){
@@ -54,9 +53,16 @@ class thsa_qg_public_class extends thsa_qg_common_class{
                 print_r(get_post_meta($_GET['debug']));
                 echo '<br/><br/>';
                 echo wc_get_price_decimal_separator();
+
+                echo '<br/><br/>';
+                print_r(get_post_meta($_GET['debug'], '_coupon_currency_data', true));
+
+                echo get_woocommerce_currency();
                 die(); 
             }
         });
+
+        add_action('woocommerce_init', [$this, 'switch_currency'], 0);
         
     }
 
@@ -190,8 +196,10 @@ class thsa_qg_public_class extends thsa_qg_common_class{
 
             $data = WC()->session->get('thsa_on_process_quotation');
             $fees = $data['fees'];
-            foreach($fees as $fee){
-                $woocommerce->cart->add_fee( $fee['fee_name'], $fee['fee_amount'], true, 'standard' );  
+            if( !empty($fees) ){
+                foreach($fees as $fee){
+                    $woocommerce->cart->add_fee( $fee['fee_name'], $fee['fee_amount'], true, 'standard' );  
+                }
             }
 
         }
@@ -242,6 +250,9 @@ class thsa_qg_public_class extends thsa_qg_common_class{
             foreach ( $cart->get_cart() as $cart_item ) {
                 
                 $get_tags = (array) wp_get_object_terms( $cart_item['product_id'], $this->product_tag );
+                if( empty($get_tags) )
+                    continue;
+
                 $get_tags = (array) $get_tags[0];
                 $it_has = ( in_array($this->quote_slug_tag, $get_tags) )? true : false;
                 if(!$it_has){
@@ -280,7 +291,7 @@ class thsa_qg_public_class extends thsa_qg_common_class{
             }
             
 
-            if(!$it_has){
+            if($it_has){
                 return 'included';
             }
 
@@ -288,6 +299,102 @@ class thsa_qg_public_class extends thsa_qg_common_class{
         return $price_html;
      }
 
+    
+    /**
+     * 
+     * 
+     * public function switch_currency
+     * @since 1.2.0
+     * @param
+     * @return
+     * 
+     * 
+     */
+    public function switch_currency()
+    {
+        global $post;
+
+        if( isset($_GET['q_id']) ){
+            $id = sanitize_text_field( $_GET['q_id'] );
+            $this->currency( $id );
+            return;
+        }
+
+        if( !isset($post->post_content) )
+            return;
+
+        if (has_shortcode( $post->post_content, 'thsa-quotation' )) {
+            
+            $pattern = get_shortcode_regex();
+
+            if(preg_match_all( '/'. $pattern .'/s', $post->post_content, $matches )){
+                $keys = [];
+                $result = [];
+                foreach($matches[0] as $key => $value) {                        
+                    if('thsa-quotation' === $matches[2][$key]){
+                        $get = str_replace(" ", "&" , $matches[3][$key] );
+                        parse_str($get, $output);
+                        $keys = array_unique( array_merge( $keys, array_keys($output)));
+                        $result[] = $output;
+                    }
+                }
+          
+                if($keys && $result) {
+                    foreach ($result as $key => $value) {
+                        foreach ($keys as $attr_key) {
+                            $result[$key][$attr_key] = isset( $result[$key][$attr_key] ) ? $result[$key][$attr_key] : NULL;
+                        }
+                        ksort( $result[$key]);              
+                    }
+                }
+
+                foreach($result as $res){
+                    if( isset($res['id']) ){
+                        //set currency
+                        $id = str_replace('"','', $res['id']);
+                        $this->currency( $id );
+                        break;
+                    }
+                }
+
+            }
+
+        }
+    }
+
+
+    /**
+     * 
+     * 
+     * 
+     * currency
+     * @since 1.2.0
+     * @param
+     * @return
+     * 
+     * 
+     */
+    public function currency( $args = 0 )
+    {   
+        if( $args == 0 )
+            return;
+        
+        $args = sanitize_text_field($args);
+        $quote = get_post_meta($args, 'thsa_quotation_data', true);
+
+        if( $quote ){
+
+            $currency = $quote['currency'];
+
+            if ( is_plugin_active( 'woocommerce-aelia-currencyswitcher/woocommerce-aelia-currencyswitcher.php' ) ) {
+                $_POST['aelia_cs_currency'] = $currency;
+            }
+
+        }else{
+            return;
+        }
+
+    }
 
 }
 

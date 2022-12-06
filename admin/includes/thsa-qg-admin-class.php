@@ -91,13 +91,6 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
 
     /**
      * 
-     * change_currency
-     * 
-     * 
-     */
-
-    /**
-     * 
      * 
      * exclude_quotation
      * @since 1.2.0
@@ -1192,6 +1185,14 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
 
         $new_coupon_id = wp_insert_post( $coupon );
         $this->update_coupon_meta($new_coupon_id, $type, $amount);
+        
+        //update currency
+        // $this->support_plugin->coupon_currency(
+        //     $this
+        //);
+   
+
+
         return $new_coupon_id;
     }
 

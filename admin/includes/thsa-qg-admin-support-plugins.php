@@ -84,7 +84,13 @@ class thsa_qg_admin_support_plugins extends thsa_qg_common_class
         $price_regular_number = $args['product_prices']['price_regular_number'];
         $price_sale_number = $args['product_prices']['price_sale_number'];
         
-        //for aelia
+        /**
+         * 
+         * 
+         * aelia currency switcher
+         * 
+         * 
+         */
         if ( is_plugin_active( 'woocommerce-aelia-currencyswitcher/woocommerce-aelia-currencyswitcher.php' ) ) {
             //check if manually added
             $currency_prices = get_post_meta($args['product_id'], '_regular_currency_prices', true);
@@ -223,6 +229,15 @@ class thsa_qg_admin_support_plugins extends thsa_qg_common_class
             }
 
         } 
+        /**
+         * 
+         * 
+         * 
+         * end of aelia curreny switcher
+         * 
+         * 
+         * 
+         */
         
         //just return what is passed
         return [
@@ -231,6 +246,87 @@ class thsa_qg_admin_support_plugins extends thsa_qg_common_class
             'price_regular_number' => $this->format_number( ['amount' => $price_regular_number, 'round' => false ] ),
             'price_sale_number' => $this->format_number( ['amount' => $price_sale_number, 'round' => false ] )
         ];
+    }
+
+
+
+    /**
+     * 
+     * 
+     * switch_currency
+     * @since 1.2.0
+     * @param
+     * @return
+     * 
+     * 
+     */
+
+    public function switch_post_currency( $currency = null )
+    {
+
+        if( !isset($currency) )
+            return;
+
+        /**
+         * 
+         * 
+         * For aelia currency switcher
+         * 
+         * 
+         */
+        if ( is_plugin_active( 'woocommerce-aelia-currencyswitcher/woocommerce-aelia-currencyswitcher.php' ) ) {
+            
+            $_POST['aelia_cs_currency'] = $currency;
+
+        }
+        
+    }
+
+    /**
+     * 
+     * 
+     * coupon_currency
+     * @since 1.2.0
+     * @param object
+     * @return
+     * 
+     * 
+     */
+    public function coupon_currency( $obj = null, $data )
+    {
+
+        if( !isset($obj) )
+            return;
+
+        /**
+         * 
+         * aelia currency switcher
+         * 
+         */
+        if ( is_plugin_active( 'woocommerce-aelia-currencyswitcher/woocommerce-aelia-currencyswitcher.php' ) ) {
+
+            //get endabled currencies
+            $settings = $this->aelia_currency_switcher();
+            $currencies = $settings['enabled_currencies'];
+
+            if(!empty($currencies)){
+                $amounts = [];
+                foreach($currencies as $currencies){
+                    $amounts[$currencies] = [
+                        'coupon_amount' => $data['discount'],
+                        'minimum_amount' => null,
+                        'maximum_amount' => null
+                    ];
+                }
+                if(!empty($amounts))
+                    $obj->update_coupon_meta($data['id'], '_coupon_currency_data', $amounts);
+            }
+
+
+        }
+            
+        
+
     }
 
 
