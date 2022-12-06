@@ -1185,14 +1185,6 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
 
         $new_coupon_id = wp_insert_post( $coupon );
         $this->update_coupon_meta($new_coupon_id, $type, $amount);
-        
-        //update currency
-        // $this->support_plugin->coupon_currency(
-        //     $this
-        //);
-   
-
-
         return $new_coupon_id;
     }
 
@@ -1254,6 +1246,9 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         update_post_meta( $new_coupon_id, 'expiry_date', $expiry_date );
         update_post_meta( $new_coupon_id, 'apply_before_tax', $apply_before_tax );
         update_post_meta( $new_coupon_id, 'free_shipping', $free_shipping );
+
+        //update currency
+        $this->support_plugin->coupon_currency($new_coupon_id, $amount);
 
     }
 

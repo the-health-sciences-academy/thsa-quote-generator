@@ -201,11 +201,7 @@
                         ?>" placeholder="Fix discount">
                     </td>
                     <td valign="middle">
-                        <label><input type="number" class="thsa_qg_percent_amount" name="thsa_qg_percent_amount" value="<?php 
-                            if(isset($params['data']['fixed_amount_discount'])){
-                                esc_html_e($params['data']['fixed_amount_discount'],'thsa-quote-generator');
-                            }
-                        ?>" placeholder="Percentage discount"><span class="thsa_qg_tail_text">%</span></label>
+                        <label><input type="text" class="thsa_qg_percent_amount" name="thsa_qg_percent_amount" placeholder="Percentage discount"><span class="thsa_qg_tail_text">%</span></label>
                     </td>
 
                     <td valign="middle">

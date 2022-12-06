@@ -292,10 +292,10 @@ class thsa_qg_admin_support_plugins extends thsa_qg_common_class
      * 
      * 
      */
-    public function coupon_currency( $obj = null, $data )
+    public function coupon_currency( $id, $amount = 0 )
     {
 
-        if( !isset($obj) )
+        if( !isset($id) )
             return;
 
         /**
@@ -313,13 +313,13 @@ class thsa_qg_admin_support_plugins extends thsa_qg_common_class
                 $amounts = [];
                 foreach($currencies as $currencies){
                     $amounts[$currencies] = [
-                        'coupon_amount' => $data['discount'],
+                        'coupon_amount' => $amount,
                         'minimum_amount' => null,
                         'maximum_amount' => null
                     ];
                 }
                 if(!empty($amounts))
-                    $obj->update_coupon_meta($data['id'], '_coupon_currency_data', $amounts);
+                    update_post_meta( $id, '_coupon_currency_data', $amounts );
             }
 
 
