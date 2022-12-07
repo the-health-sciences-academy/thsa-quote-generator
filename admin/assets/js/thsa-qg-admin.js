@@ -12,6 +12,22 @@ var labels_ = JSON.parse(thsaqgvars.labels);
 
 jQuery(document).ready(function(){
 
+    //check if required plugin is active
+    jQuery('.thsa_qg_payment_type').find('option').each(function(){
+        if(jQuery(this).val() == 'plan'){
+            if(!thsaqgvars.has_subscriptions){
+                jQuery('.thsa_qg_discount_notice').css('display','inline-block');
+                jQuery(this).prop('disabled', true);
+            }else{
+                jQuery(this).prop('disabled', false);
+            }
+        }
+    });
+
+    if(!thsaqgvars.has_currencies){
+        jQuery('.thsa_qg_currency_notice').css('display','inline-block');
+    }
+
     thsa_qg_calculate();
 
     jQuery('.thsa_qg_payment_type').click(function(){
@@ -327,7 +343,7 @@ jQuery(document).ready(function(){
         var td_amount = thsa_field_generator(
             {
                 type: 'td',
-                text: amount
+                text: thsa_qg_format_numbers( parseFloat(amount) )
             }
         );
        
@@ -384,7 +400,9 @@ jQuery(document).ready(function(){
         get_price = (get_price)? parseFloat(get_price) : 0;
         get_qty = (get_qty)? parseFloat(get_qty) : 0;
         var amount = get_price * get_qty;
-        jQuery(get_tr).find('td:last-child').text(amount);
+        jQuery(get_tr).find('td:last-child').text( thsa_qg_format_numbers(amount) );
+        
+        jQuery(get_tr).find('td.thsa_qg_product_amount').attr('data-amount', amount);
         thsa_qg_calculate();
     });
 
@@ -832,7 +850,7 @@ function thsa_generate_field_to(data)
         var td_option_amount = thsa_field_generator(
             {
                 type: 'td',
-                text: amount,
+                text: thsa_qg_format_numbers( amount ),
                 attributes: [
                     {
                         attr: 'class',
@@ -931,7 +949,7 @@ function thsa_qg_calculate(source = null)
                 }
                 break;
         }
-        jQuery('.thsa_qg_total_field').val(thsa_qg_round_number(get_set_total));
+        jQuery('.thsa_qg_total_field').val( thsa_qg_format_numbers( get_set_total ) );
         thsa_qg_update_label();
         
     }
@@ -1056,9 +1074,10 @@ function thsa_qg_update_label()
    var fee = thsa_qg_fee_calculation();
    var discounts = jQuery('.thsa_qg_fix_amount').val();
    discounts = (discounts)? discounts : 0;
-   jQuery('.thsa_qg_original_total_label').text(get_set_total);
-   jQuery('.thsa_qg_total_savings_label').text(discounts);
-   jQuery('.thsa_qg_total_fee_label').text(fee);
+   jQuery('.thsa_qg_original_total_label').text( thsa_qg_format_numbers(get_set_total) );
+   discounts = parseFloat(discounts);
+   jQuery('.thsa_qg_total_savings_label').text( thsa_qg_format_numbers(discounts) );
+   jQuery('.thsa_qg_total_fee_label').text( thsa_qg_format_numbers(fee) );
 
    //plan
    var type = jQuery('.thsa_qg_payment_type').val();
@@ -1077,7 +1096,7 @@ function thsa_qg_update_label()
             jQuery('.thsa_qg_term_label').text(term_text);
 
             var topay = term_num * term;
-            jQuery('.thsa_qg_topay_label').text(thsa_qg_round_number(topay));
+            jQuery('.thsa_qg_topay_label').text( thsa_qg_format_numbers (topay) );
         }else{
             jQuery('.thsa_qg_term_label').text('');
             jQuery('.thsa_qg_topay_label').text('');
@@ -1085,4 +1104,23 @@ function thsa_qg_update_label()
         
    }
    
+}
+
+function thsa_qg_format_numbers( amount = 0 ) {
+
+    if(amount == 0 || amount == '')
+        return 0;
+
+    var round_set = thsaqgvars.round_settings;
+    round_set = JSON.parse(round_set);
+
+    if(round_set.decimal > 0){
+        amount = amount.toFixed(round_set.decimal);
+    }
+
+    var parts = amount.toString().split(".");
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    
+    return parts.join(".");
+
 }

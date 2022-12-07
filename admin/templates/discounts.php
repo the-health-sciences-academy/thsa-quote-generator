@@ -2,6 +2,9 @@
     <div class="thsa_qg_inner">
         <h3><?php esc_html_e('Discounts', 'thsa-quote-generator'); ?></h3>
         <div class="thsa_qg_table_con">
+            
+        <div><div class="thsa_qg_notices thsa_qg_discount_notice no_margin"><span class="dashicons dashicons-info"></span> <?php esc_html_e('No subscription plugin is detected') ?> <a href="javascript:void(0);" class="thsa_qg_see_supported">see supported plugins</a></div></div>
+
             <label class="main_label"><?php esc_html_e('Payment Type','thsa-quote-generator'); ?></label>
             <table border="0" class="thsa_qg_discount_table1">
                 <?php $payment_type = (isset($params['data']['payment_type']))? $params['data']['payment_type'] : null; ?>
@@ -31,7 +34,18 @@
 
         <div class="thsa_qg_plan_settings <?php esc_html_e($display__); ?>">
                         <p>
-                            <label><input type="checkbox" name="thsa_qg_sub_is_virtual" value="Y" <?php echo ($params['data']['is_virtual'] == 'yes')? esc_html__('checked') : null; ?>> <?php esc_html_e('Virtual','thsa-quote-generator'); ?></label>&nbsp;&nbsp;&nbsp;&nbsp;<label><input type="checkbox" name="thsa_qg_sub_is_dl" class="thsa_qg_dl_option" value="Y" <?php echo ($params['data']['is_download'] == 'yes')? esc_html__('checked') : null; ?>> <?php esc_html_e('Downloadable','thsa-quote-generator'); ?>
+                            <?php 
+                                $is_virtual_status = null;
+                                if( isset($params['data']['is_virtual']) ){
+                                    $is_virtual_status = ($params['data']['is_virtual'] == 'yes')? esc_html__('checked') : null;
+                                }
+
+                                $is_download_status = null;
+                                if( isset($params['data']['is_download']) ){
+                                    $is_download_status = ($params['data']['is_download'] == 'yes')? esc_html__('checked') : null;
+                                }
+                            ?>
+                            <label><input type="checkbox" name="thsa_qg_sub_is_virtual" value="Y" <?php echo $is_virtual_status; ?>> <?php esc_html_e('Virtual','thsa-quote-generator'); ?></label>&nbsp;&nbsp;&nbsp;&nbsp;<label><input type="checkbox" name="thsa_qg_sub_is_dl" class="thsa_qg_dl_option" value="Y" <?php echo $is_download_status; ?>> <?php esc_html_e('Downloadable','thsa-quote-generator'); ?>
                             </label>
                         </p>
                         <div>
@@ -129,7 +143,14 @@
                             </label>
                         </p>
 
-                        <div class="thsa_qg_event_action thsa_qg_event_action_downloadable <?php echo ($params['data']['is_download'] == 'yes')? esc_html__('active') : null; ?>">
+                        <?php 
+                            $is_download_div_status = null;
+                            if( isset($params['data']['is_download']) ){
+                                $is_download_div_status = ($params['data']['is_download'] == 'yes')? esc_html__('active') : null;
+                            }
+                        ?>
+
+                        <div class="thsa_qg_event_action thsa_qg_event_action_downloadable <?php echo $is_download_div_status; ?>">
 
                            
                             <table class="thsa_qg_downloadable_files wp-list-table widefat striped table-view-list" border="0">

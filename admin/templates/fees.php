@@ -44,7 +44,7 @@
                             <input name="thsa_qg_added_fee[]" value="<?php echo htmlentities($fee_json); ?>" type="hidden">
                         </td>
                         <td><?php esc_html_e($fee['fee_name'],'thsa-quote-generator'); ?></td>
-                        <td><?php esc_html_e($fee['fee_amount'],'thsa-quote-generator'); ?></td>
+                        <td><?php esc_html_e( $this->format_number([ 'amount' => $fee['fee_amount'], 'round' => false] ),'thsa-quote-generator'); ?></td>
                     </tr>
             <?php 
                     endforeach;

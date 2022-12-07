@@ -229,7 +229,7 @@ class thsa_qg_common_class
 	 */
 	public function format_number( $args = 0 )
 	{
-		if( $args['amount'] == 0 )
+		if( $args['amount'] == 0 || $args['amount'] == '')
 			return;
 
 		$woocommerce_price_thousand_sep = get_option('woocommerce_price_thousand_sep');

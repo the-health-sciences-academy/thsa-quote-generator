@@ -61,7 +61,7 @@ class thsa_qg_public_shortcodes extends thsa_qg_common_class
     {
         $content = null;
         if(empty($attr))
-            $content = __('#Error: No quotation ID were found','thsa_quote_generator');
+            $content = __('#Error: No quotation ID available','thsa_quote_generator');
 
 
         if(isset($_GET['q_id'])){
@@ -71,7 +71,13 @@ class thsa_qg_public_shortcodes extends thsa_qg_common_class
 
         if(isset($attr['id'])){
             $quote = get_post_meta($attr['id'],'thsa_quotation_data',true);
-            //print_r($quote);
+
+            if( empty($quote) ){
+                ob_start();
+                    echo __('#Error: No quotation available','thsa_quote_generator');
+                return ob_get_clean();
+            }
+                
             
             $plan_product = [];
             if($quote['payment_type'] == 'plan'){
@@ -162,7 +168,7 @@ class thsa_qg_public_shortcodes extends thsa_qg_common_class
                 return ob_get_clean();
             }else{
                 ob_start();
-                    echo __('#Error: No quotation were found','thsa_quote_generator');
+                    echo __('#Error: No quotation available','thsa_quote_generator');
                 return ob_get_clean();
             }
         }else{

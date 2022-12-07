@@ -22,7 +22,7 @@
                 </div>  
                 <div class="thsa_qg_total_field_wrap">
                         <?php esc_html_e('Total Today','thsa-quote-generator'); ?>
-                        <input type="number" class="thsa_qg_total_field widefat" placeholder="0">
+                        <input type="text" class="thsa_qg_total_field widefat right_text" placeholder="0" readonly>
                     </div>
             </div>
         </div>
