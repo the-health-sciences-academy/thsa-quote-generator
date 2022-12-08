@@ -878,6 +878,7 @@ function thsa_qg_gen_selected_category(obj, type = null){
     jQuery('.thsa_qg_product_select, .thsa_qg_filter_option').selectWoo("enable", false);
     
     var term = jQuery(obj).val();
+    var currency = jQuery('.thsa_qg_currency').val();
 
     jQuery.ajax({
         method: "POST",
@@ -886,7 +887,8 @@ function thsa_qg_gen_selected_category(obj, type = null){
             action: thsaqgvars.product_from_cat, 
             term: term,
             nonce: thsaqgvars.nonce,
-            type: type
+            type: type,
+            currency: currency
         }
         }).done(function( response ) {
             if(response){

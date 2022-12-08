@@ -350,18 +350,7 @@ class thsa_qg_admin_settings_class extends thsa_qg_common_class
                     if(isset($_POST['checkout'])){
                         $general['checkout'] = sanitize_text_field($_POST['checkout']);
                     }
-
-                    if(isset($_POST['round'])){
-                        $general['round'] = sanitize_text_field($_POST['round']);
-                    }
-
-                    if(isset($_POST['decimal'])){
-                        $general['decimal'] = sanitize_text_field($_POST['decimal']);
-                    }
-
                     
-
-
                     $settings = get_option('thsa_quotation_settings');
                     if(!empty($general)){
                         //get exists

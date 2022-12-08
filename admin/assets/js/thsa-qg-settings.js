@@ -21,13 +21,6 @@ jQuery(document).ready(function(){
         jQuery(this).prop('disabled', true);
 
         var checkout_page = jQuery('.thsa_qg_settings_pages').val();
-        var round = null;
-        jQuery('.thsa_qg_round_option').each(function(){
-            if(jQuery(this).is(':checked')){
-                round = jQuery(this).val();
-            }
-        });
-        var decimal = jQuery('.thsa_qg_decimal_set').val();
         jQuery.ajax({
             method: "POST",
             url: thsaqgvars.ajaxurl,
@@ -35,8 +28,6 @@ jQuery(document).ready(function(){
                 action: thsaqgvars.save_settings, 
                 type: 'general',
                 checkout: checkout_page,
-                round: round,
-                decimal: decimal,
                 nonce: thsaqgvars.nonce
             }
             }).done(function( response ) {

@@ -219,7 +219,7 @@ class thsa_qg_common_class
 	/**
 	 * 
 	 * 
-	 * format number
+	 * format_number
 	 * format the number base from WOO settigns
 	 * @since 1.2.0
 	 * @param int or float
@@ -241,6 +241,118 @@ class thsa_qg_common_class
 			number_format($args['amount'], $woocommerce_price_num_decimals, $woocommerce_price_decimal_sep, $woocommerce_price_thousand_sep)
 		);
 
+	}
+
+	/**
+	 * 
+	 * 
+	 * render_quotation
+	 * @since 1.2.0
+	 * @param int
+	 * @return html
+	 * 
+	 * 
+	 */
+	public function render_quotation( $id = 0 )
+	{
+		
+		if( $id == 0 )
+			return;
+
+			$quote = get_post_meta($id,'thsa_quotation_data',true);
+
+            if( empty($quote) ){
+                return __('#Error: No quotation available','thsa_quote_generator');
+            }
+                
+            
+            $plan_product = [];
+            if($quote['payment_type'] == 'plan'){
+                if(isset($quote['plan_product_id'])){
+                    $plan_prod = wc_get_product( $quote['plan_product_id'] );
+                    $plan_product[] = [
+                        'id' => $plan_prod->get_id(),
+                        'text' => strtoupper($plan_prod->get_title()),
+                        'price_html' => '--',
+                        'price_number' => $plan_prod->get_price_html(),
+                        'price_regular_number' => $plan_prod->get_regular_price(),
+                        'price_sale_number' => $plan_prod->get_sale_price(),
+                        'qty' => '--',
+                        'amount' => '--'
+                    ];
+                }
+            }
+
+            if($quote){
+                //get products
+                $products = [];
+                $total = 0;
+                if(!empty($quote['products'])){
+                    foreach($quote['products'] as $product){
+                        $product_details = wc_get_product($product[0]);
+                        $total = $total + ($product_details->get_price() * $product[1]);
+                        $products[$product[0]] = [
+                            'id' => $product_details->get_id(),
+                            'text' => $product_details->get_title(),
+                            'price_html' => $product_details->get_price_html(),
+                            'price_number' => $product_details->get_price(),
+                            'price_regular_number' => $product_details->get_regular_price(),
+                            'price_sale_number' => $product_details->get_sale_price(),
+                            'qty' => $product[1],
+                            'amount' => ($quote['payment_type'] == 'upfront')? wc_price($product_details->get_price() * $product[1]) : __('included', 'thsa-quote-generator')
+                        ];
+                    }
+                }
+
+                if($quote['payment_type'] == 'plan'){
+                    $products = $plan_product + $products;
+                    $discounted_total = $plan_prod->get_price();
+                }else{
+                    $discount = ($quote['fixed_amount_discount'])? $quote['fixed_amount_discount'] : 0;
+                    $discounted_total = $total - $discount;
+                }
+                    
+
+                //fees
+                $fees = 0;
+                $fee_labels = [];
+                if(isset($quote['fees'])){
+                    foreach($quote['fees'] as $fee){
+                        $fee_ = ($fee['fee_amount'])? $fee['fee_amount'] : 0;
+                        $fees += $fee_;
+                        $fee_labels[] = [
+                            'name' => $fee['fee_name'],
+                            'amount' => $fee['fee_amount']
+                        ];
+                    }
+                }
+                $quote['fees'];
+                $grand_total = $discounted_total + $fees;
+
+                //summary area
+                $summary = [
+                    'Subtotal' => wc_price($total),
+                    'Discount' => '-' . wc_price($quote['fixed_amount_discount']),
+                    'Terms' => (isset($plan_product[0]))? $plan_product[0]['price_number'] : null,
+                    'Fees'  => $fee_labels,
+                    'Total Today' => wc_price($grand_total)
+                ];
+
+                $summary = apply_filters('thsa_qg_quote_summary_before',  $summary);
+				return [
+					'path' => 'public', 
+					'products' => $products, 
+					'data' => $quote,
+					'grand_total' => $grand_total, 
+					'undiscounted' => $total,
+					'qid' => $id,
+					'labels' => $summary
+				];
+
+            }else{
+				return __('#Error: No quotation available','thsa_quote_generator');
+            }
+		
 	}
 
 }

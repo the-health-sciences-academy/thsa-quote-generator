@@ -60,9 +60,11 @@ class thsa_qg_public_class extends thsa_qg_common_class{
                 echo get_woocommerce_currency();
                 die(); 
             }
+           
         });
 
         add_action('woocommerce_init', [$this, 'switch_currency'], 0);
+        add_action('template_redirect', [$this, 'iframe_quotation']);
         
     }
 
@@ -395,6 +397,36 @@ class thsa_qg_public_class extends thsa_qg_common_class{
         }
 
     }
+
+    /**
+	 * 
+	 * 
+	 * iframe_quotation
+	 * @since 1.2.0
+	 * @param
+	 * @return
+	 * 
+	 * 
+	 */
+	public function iframe_quotation()
+	{
+		if(isset($_GET['iframe'])){
+            if($_GET['iframe'] == 'thsa_qg'){
+                $id = sanitize_text_field( $_GET['q_id'] );
+                $res = $this->render_quotation($id);
+                if( is_array($res) ){
+                    $res['from_email'] = true;
+                    $settings = get_option('thsa_quotation_settings');
+                    $res['checkout_url'] = ( isset($settings['checkout']) )? get_permalink($settings['checkout']).'?quotation='.$id : get_site_url().'/checkout?quotation='.$id;
+                    $this->set_template('shortcodes/quotation', $res );
+                }else{
+                    echo $res;
+                }
+                exit();
+            }
+        }
+        
+	}
 
 }
 

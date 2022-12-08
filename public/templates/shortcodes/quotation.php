@@ -1,5 +1,5 @@
 <div class="thsa_quotation_table">
-    <table class="thsa_qg_table">
+    <table class="thsa_qg_table" style="width: 100%;">
         <tr>
             <th width="55%"><?php esc_attr_e('Product','thsa_quote_generator'); ?></th>
             <th width="15%"><?php esc_attr_e('Price','thsa_quote_generator'); ?></th>
@@ -63,7 +63,7 @@
         </div>
         <div class="thsa_qg_col-6">
             <?php if(isset($params['from_email'])): ?>
-            <a href="<?php esc_url(get_permalink($params['checkout']),'thsa-quote-generator'); ?>?quotation=<?php esc_html_e($params['qid'],'thsa-quote-generator'); ?>"><?php esc_html_e('Proceed to checkout','thsa-quote-generator'); ?></a>
+            <p style="text-align: center;"><a href="<?php echo esc_url($params['checkout_url']); ?>"><?php esc_html_e('Proceed to checkout','thsa-quote-generator'); ?></a></p>
             <?php else: ?>
             <input type="button" data-q-id="<?php esc_attr_e($params['qid'],'thsa-quote-generator'); ?>" class="thsa_qg_proceed_checkout" value="<?php esc_attr_e('Proceed to checkout','thsa-quote-generator'); ?>">
             <?php endif; ?>

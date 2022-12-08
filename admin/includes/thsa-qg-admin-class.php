@@ -658,15 +658,6 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         $args = apply_filters('thsa_product_select_arg', $args);
         $products = get_posts($args);
 
-        $rate = null;
-        //aelia
-        $aelia = $this->support_plugin->settings('aelia');
-        if($aelia){
-            if(in_array($currency, $aelia['enabled_currencies'])){
-                $rate = $aelia['exchange_rates'][$currency]['rate'];
-            }
-        }
-
         $data = [];
         if($products){
             foreach($products as $product){
@@ -809,6 +800,7 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         $cat = sanitize_text_field($_POST['term']);
 
         $taxon = ($_POST['type'] == 'category')? $this->product_category : $this->product_tag;
+        $currency = sanitize_text_field( $_POST['currency'] );
 
         if($cat){
             $args = [
@@ -831,14 +823,35 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
             if($products){
                 foreach($products as $product){
                     $product_ = wc_get_product($product->ID);
+
+                    //set for no currency plugin is installed
+                    $price_html = $product_->get_price_html();
+                    $price_number = $product_->get_price();
+                    $price_regular_number = $product_->get_regular_price();
+                    $price_sale_number = $product_->get_sale_price();
+
+                    $prices = $this->support_plugin->currency_values(
+                        [
+                            'product_id' => $product->ID,
+                            'currency' => $currency,
+                            'product_prices' => [
+                                'price_html' => $price_html,
+                                'price_number' => $price_number,
+                                'price_regular_number' => $price_regular_number,
+                                'price_sale_number' => $price_sale_number
+                            ]
+                        ]
+                    );
+                    
                     $data[] = [
                         'id' => $product->ID,
                         'text' => $product->ID.' - '.$product->post_title,
-                        'price_html' => $product_->get_price_html(),
-                        'price_number' => $product_->get_price(),
-                        'price_regular_number' => $product_->get_regular_price(),
-                        'price_sale_number' => $product_->get_sale_price()
+                        'price_html' => $prices['price_html'],
+                        'price_number' => $prices['price_number'],
+                        'price_regular_number' => $prices['price_regular_number'],
+                        'price_sale_number' => $prices['price_sale_number']
                     ];
+
                 }
 
                 echo json_encode($data);
@@ -1170,65 +1183,23 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
      */
     public function email_quotation($attr)
     {
-        $quote = get_post_meta($attr['q_id'],'thsa_quotation_data',true);
-        if($quote){
-            //get products
-            $products = [];
-            $total = 0;
-            if(!empty($quote['products'])){
-                foreach($quote['products'] as $product){
-                    $product_details = wc_get_product($product[0]);
+        $res = $this->render_quotation($attr['q_id']);
 
-                    $total = $total + ($product_details->get_price() * $product[1]);
-                    $products[$product[0]] = [
-                        'id' => $product_details->get_id(),
-                        'text' => $product_details->get_title(),
-                        'price_html' => $product_details->get_price_html(),
-                        'price_number' => $product_details->get_price(),
-                        'price_regular_number' => $product_details->get_regular_price(),
-                        'price_sale_number' => $product_details->get_sale_price(),
-                        'qty' => $product[1],
-                        'amount' => $product_details->get_price() * $product[1]
-                    ];
-                }
-            }
+        $id = sanitize_text_field($attr['q_id']);
 
-            $discount = ($quote['fixed_amount_discount'])? $quote['fixed_amount_discount'] : 0;
-            $discounted_total = $total - $discount;
-
-            //fees
-            $fees = 0;
-            if(isset($quote['fees'])){
-                foreach($quote['fees'] as $fee){
-                    $fee_ = ($fee['fee_amount'])? $fee['fee_amount'] : 0;
-                    $fees += $fee_;
-                }
-            }
-            $quote['fees'];
-            $grand_total = $discounted_total + $fees;
-
-            $settings = new qgsettings\thsa_qg_admin_settings_class();
-            $sett = $settings->get_settings('general');
-            $checkout = (isset($sett['checkout']))? $sett['checkout'] : 0;
-
+        if( is_array($res) ){
+            $res['from_email'] = true;
+            $settings = get_option('thsa_quotation_settings');
+            $res['checkout_url'] = ( isset($settings['checkout']) )? get_permalink($settings['checkout']).'?quotation='.$id : get_site_url().'/checkout?quotation='.$id;
             ob_start();
-                $this->set_template('shortcodes/quotation', [
-                    'path' => 'public', 
-                    'products' => $products, 
-                    'data' => $quote,
-                    'grand_total' => $grand_total, 
-                    'undiscounted' => $total,
-                    'qid' => $attr['q_id'],
-                    'from_email' => true,
-                    'checkout' => $checkout
-                ]
-            );
+                $this->set_template('shortcodes/quotation', $res );
             return ob_get_clean();
         }else{
             ob_start();
-                echo __('#Error: No quotation were found','thsa_quote_generator');
+                echo $res;
             return ob_get_clean();
         }
+
     }
 
     
