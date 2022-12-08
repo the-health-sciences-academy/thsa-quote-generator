@@ -364,40 +364,6 @@ class thsa_qg_public_class extends thsa_qg_common_class{
         }
     }
 
-
-    /**
-     * 
-     * 
-     * 
-     * currency
-     * @since 1.2.0
-     * @param
-     * @return
-     * 
-     * 
-     */
-    public function currency( $args = 0 )
-    {   
-        if( $args == 0 )
-            return;
-        
-        $args = sanitize_text_field($args);
-        $quote = get_post_meta($args, 'thsa_quotation_data', true);
-
-        if( $quote ){
-
-            $currency = $quote['currency'];
-
-            if ( is_plugin_active( 'woocommerce-aelia-currencyswitcher/woocommerce-aelia-currencyswitcher.php' ) ) {
-                $_POST['aelia_cs_currency'] = $currency;
-            }
-
-        }else{
-            return;
-        }
-
-    }
-
     /**
 	 * 
 	 * 

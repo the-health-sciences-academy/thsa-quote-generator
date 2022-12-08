@@ -83,9 +83,29 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         //remove quotation posts from products
         add_action( 'pre_get_posts' , [ $this,'exclude_quotation'] );
 
+        add_action('woocommerce_init', [$this, 'admin_currency'], 0);
     
         
 
+    }
+
+    /**
+     * 
+     * admin currency
+     * @since 1.2.0
+     * @param
+     * @return
+     * 
+     * 
+     */
+    public function admin_currency()
+    {
+        if( isset( $_GET['post'] ) ){
+            $pid = sanitize_text_field( $_GET['post'] );
+            if( get_post_type($pid) == 'thsa-quote-generator'){
+                $this->currency($pid);
+            }
+        }
     }
 
 
