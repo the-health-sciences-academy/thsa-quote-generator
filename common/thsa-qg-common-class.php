@@ -264,7 +264,14 @@ class thsa_qg_common_class
             if( empty($quote) ){
                 return __('#Error: No quotation available','thsa_quote_generator');
             }
-                
+
+			if( isset($quote['expiry']) ){
+				$date = new \DateTime($quote['expiry']);
+				$now = new \DateTime();
+				if($date < $now) {
+					return apply_filters( 'thsa_qg_quote_expired_text', __('Quotation is expired','thsa_quote_generator') );
+				}
+			}  
             
             $plan_product = [];
             if($quote['payment_type'] == 'plan'){

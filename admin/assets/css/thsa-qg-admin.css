@@ -164,7 +164,8 @@ select.thsa_qg_set_field {
   width: 300px;
   display: block; }
 
-.thsa_qg_preview_email {
+.thsa_qg_preview_email,
+.thsa_qg_manage_content {
   position: fixed;
   top: 0;
   left: 0;
@@ -172,7 +173,10 @@ select.thsa_qg_set_field {
   bottom: 0;
   z-index: 999;
   display: none; }
-  .thsa_qg_preview_email .thsa_qg_preview_email_content {
+  .thsa_qg_preview_email .thsa_qg_preview_email_content,
+  .thsa_qg_preview_email .thsa_qg_manage_content_content,
+  .thsa_qg_manage_content .thsa_qg_preview_email_content,
+  .thsa_qg_manage_content .thsa_qg_manage_content_content {
     position: relative;
     max-width: 900px;
     top: 50%;
@@ -184,18 +188,30 @@ select.thsa_qg_set_field {
     box-shadow: 0px 0px 13px -5px rgba(0, 0, 0, 0.75);
     padding: 20px;
     height: 80%; }
-  .thsa_qg_preview_email .thsa_qg_preview_email_content_get {
+  .thsa_qg_preview_email .thsa_qg_preview_email_content_get,
+  .thsa_qg_preview_email .thsa_qg_manage_content_content_get,
+  .thsa_qg_manage_content .thsa_qg_preview_email_content_get,
+  .thsa_qg_manage_content .thsa_qg_manage_content_content_get {
     display: block;
     position: relative;
     height: calc(100% - 50px);
     overflow-y: auto;
     margin-bottom: 20px; }
-  .thsa_qg_preview_email .thsa_qg_preview_email_content_footer {
+  .thsa_qg_preview_email .thsa_qg_preview_email_content_footer,
+  .thsa_qg_preview_email .thsa_qg_manage_content_content_footer,
+  .thsa_qg_manage_content .thsa_qg_preview_email_content_footer,
+  .thsa_qg_manage_content .thsa_qg_manage_content_content_footer {
     height: 100px; }
-  .thsa_qg_preview_email .thsa_qg_loader {
+  .thsa_qg_preview_email .thsa_qg_loader,
+  .thsa_qg_preview_email .thsa_qg_content_loader,
+  .thsa_qg_manage_content .thsa_qg_loader,
+  .thsa_qg_manage_content .thsa_qg_content_loader {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%); }
+  .thsa_qg_preview_email .thsa_qg_content_loader,
+  .thsa_qg_manage_content .thsa_qg_content_loader {
+    z-index: 999; }
 
 /*# sourceMappingURL=thsa-qg-admin.css.map */

@@ -436,6 +436,42 @@ jQuery(document).ready(function(){
         }
     });
 
+    //manage email
+    jQuery('.thsa_qg_manage_email_content').click(function(){
+        jQuery('.thsa_qg_manage_content').show();
+    });
+
+    jQuery('#thsa_qg_close_manage_content').click(function(){
+        jQuery('.thsa_qg_manage_content').hide();
+    });
+
+    jQuery('#thsa_qg_manage_content_last').click(function(){
+        jQuery(this).prop('disabled', true);
+        jQuery(this).val('Saving...');
+        var get_id = jQuery(this).data('id');
+        var get_content = tinymce.get('thsaqgmanageemailcontent').getContent({format: 'raw'});
+        jQuery.ajax({
+            method: "POST",
+            url: thsaqgvars.ajaxurl,
+            data: { 
+                action: thsaqgvars.manage_email_content,
+                content: get_content,
+                id: get_id,
+                nonce: thsaqgvars.nonce
+            }
+            }).done(function( response ) {
+                var details = JSON.parse(response);
+                if(details.status == 'success'){
+                    jQuery('.thsa_qg_manange_email_con').show();
+                }else{
+                    alert(details.message);
+                }
+                jQuery('#thsa_qg_manage_content_last').prop('disabled', false);
+                jQuery('#thsa_qg_manage_content_last').val('Save');
+            }
+        );
+    });
+
     jQuery('#thsa_qg_close_preview').click(function(){
         jQuery('.thsa_qg_preview_email').hide();
         jQuery('.thsa_qg_preview_email_content_get').html('');

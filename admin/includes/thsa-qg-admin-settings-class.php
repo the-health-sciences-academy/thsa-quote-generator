@@ -123,6 +123,7 @@ class thsa_qg_admin_settings_class extends thsa_qg_common_class
             return;
 
         $settings = get_option('thsa_quotation_settings');
+
         $settings['woocommerce_price_thousand_sep'] = get_option('woocommerce_price_thousand_sep');
         $settings['woocommerce_price_decimal_sep'] = get_option('woocommerce_price_decimal_sep');
         $settings['woocommerce_price_num_decimals'] = get_option('woocommerce_price_num_decimals');

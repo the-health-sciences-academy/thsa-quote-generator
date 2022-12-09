@@ -57,7 +57,10 @@ class thsa_qg_public_class extends thsa_qg_common_class{
                 echo '<br/><br/>';
                 print_r(get_post_meta($_GET['debug'], '_coupon_currency_data', true));
 
-                echo get_woocommerce_currency();
+                $get_tags = (array) wp_get_object_terms( 542, $this->product_tag );
+
+                $get_tags = (array) $get_tags[0];
+                print_r($get_tags);
                 die(); 
             }
            
@@ -249,17 +252,25 @@ class thsa_qg_public_class extends thsa_qg_common_class{
         
         if(WC()->session->get('thsa_on_process_quotation')){
             // Loop through cart items
+            $has_plan = false;
+            $the_plans = [];
             foreach ( $cart->get_cart() as $cart_item ) {
                 
-                $get_tags = (array) wp_get_object_terms( $cart_item['product_id'], $this->product_tag );
-                if( empty($get_tags) )
-                    continue;
-
-                $get_tags = (array) $get_tags[0];
-                $it_has = ( in_array($this->quote_slug_tag, $get_tags) )? true : false;
-                if(!$it_has){
-                    $cart_item['data']->set_price( 0 );
+                $get_tags = wp_get_object_terms( $cart_item['product_id'], $this->product_tag );
+                foreach($get_tags as $tag){
+                    if( $this->quote_slug_tag == $tag->slug ){
+                        $has_plan = true;
+                        $the_plans[] = $cart_item['product_id'];
+                    }
                 }
+
+                if( $has_plan ){
+                    if( !in_array($cart_item['product_id'], $the_plans) ){
+                        $cart_item['data']->set_price( 0 );
+                    }
+                }
+
+                
                 
             }
         }
@@ -293,7 +304,7 @@ class thsa_qg_public_class extends thsa_qg_common_class{
             }
             
 
-            if($it_has){
+            if(!$it_has){
                 return 'included';
             }
 

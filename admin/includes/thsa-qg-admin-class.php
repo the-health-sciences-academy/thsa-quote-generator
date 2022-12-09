@@ -177,7 +177,8 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
                 'round_settings'    => json_encode($default_round),
                 'send_email'        => 'thsa_qg_send_email',
                 'has_subscriptions'  => $this->support_plugin->has_subscriptions,
-                'has_currencies' => $this->support_plugin->has_currencies
+                'has_currencies'    => $this->support_plugin->has_currencies,
+                'manage_email_content' => 'thsa_qg_manage_email_content'
             ]
         );
 
@@ -206,6 +207,7 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         add_action('wp_ajax_thsa_qg_product_select_options', [$this, 'thsa_qg_product_select_options']);
         add_action('wp_ajax_thsa_qg_product_from_cat', [$this, 'thsa_qg_product_from_cat']);
         add_action('wp_ajax_thsa_qg_send_email', [$this, 'thsa_qg_send_email']);
+        add_action('wp_ajax_thsa_qg_manage_email_content',[$this, 'thsa_qg_manage_email_content']);
     }
 
 
@@ -489,7 +491,22 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
     {
         $data = get_post_meta($post->ID,'thsa_quotation_data',true);
         $data = isset($data['customer'])? true : null;
-        $this->set_template('action',['path' => 'admin', 'has' => $data, 'id' => $post->ID]);
+
+        //get save content from meta
+        $saved_email = get_post_meta($post->ID, 'thsa_qg_email_content', true);
+
+        if( isset($saved_email) ){
+            $email_con = $saved_email;
+        }else{
+            $settings = $this->setting_class->get_settings('email');
+            $email_con = null;
+            if( isset($settings['content']) ){
+                $email_con = $settings['content'];
+            }else{
+                $email_con = $this->setting_class->default_email_text;
+            }
+        }
+        $this->set_template('action',['path' => 'admin', 'has' => $data, 'id' => $post->ID, 'email_content' => html_entity_decode($email_con) ]);
     }
 
     /**
@@ -1243,10 +1260,17 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
             exit();
         }
 
+        
+
         $id = sanitize_text_field($_POST['id']);
         $type = sanitize_text_field($_POST['type']);
         $get_settings = $this->setting_class->get_settings('email');
-        $email = null;
+        //$email = null;
+
+        $post_email = get_post_meta($id, 'thsa_qg_email_content', true);
+        if(isset($post_email)){
+            $get_settings['content'] = $post_email;
+        }
 
         if(isset($get_settings)){
             //process shortcodes
@@ -1337,6 +1361,50 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
             exit();
         }
 
+    }
+
+    /**
+     * 
+     * 
+     * thsa_qg_manage_email_content
+     * @since 1.2.0
+     * @param
+     * @return
+     * 
+     * 
+     */
+    public function thsa_qg_manage_email_content()
+    {
+        if ( ! wp_verify_nonce( $_POST['nonce'], 'thsa-quotation-generator' ) ) {
+            echo json_encode([
+                'status' => 'failed',
+                'message' => 'Error 105: Invalid Nonce'
+            ]);
+            exit();
+        }
+
+        if(isset($_POST['content'])){
+            $_POST['content'] = stripslashes($_POST['content']);
+            $content =  sanitize_text_field(htmlentities($_POST['content']));
+            $id = sanitize_text_field( $_POST['id'] );
+            if( isset($content) ){
+                update_post_meta( $id, 'thsa_qg_email_content', $content );
+            }else{
+                delete_post_meta( $id, 'thsa_qg_email_content' );
+            }
+
+            echo json_encode([
+                'status' => 'success',
+                'message' => ''
+            ]);
+            exit();
+        }else{
+            echo json_encode([
+                'status' => 'failed',
+                'message' => 'Error 106: No quotation ID found'
+            ]);
+            exit();
+        }
     }
 
 }

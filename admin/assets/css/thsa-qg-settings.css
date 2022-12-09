@@ -31,7 +31,8 @@
     .thsa_qg_settings_wrapper .thsa_qg_inner .thsa_qg_tab_content select.thsa_qg_set_field {
       width: 500px;
       display: block; }
-  .thsa_qg_settings_wrapper .thsa_qg_response {
-    display: none; }
+
+.thsa_qg_response {
+  display: none; }
 
 /*# sourceMappingURL=thsa-qg-settings.css.map */

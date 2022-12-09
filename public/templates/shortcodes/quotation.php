@@ -1,20 +1,20 @@
 <div class="thsa_quotation_table">
-    <table class="thsa_qg_table" style="width: 100%;">
+    <table class="thsa_qg_table" <?php if( isset($params['from_email']) ): ?> cellpadding="5" cellspacing="0" style="width: 100%; border: 1px solid #000; background-color: white;" <?php endif; ?>>
         <tr>
-            <th width="55%"><?php esc_attr_e('Product','thsa_quote_generator'); ?></th>
-            <th width="15%"><?php esc_attr_e('Price','thsa_quote_generator'); ?></th>
-            <th width="15%"><?php esc_attr_e('Quantity','thsa_quote_generator'); ?></th>
-            <th width="15%"><?php esc_attr_e('Amount','thsa_quote_generator'); ?></th>
+            <th width="55%" <?php if( isset($params['from_email']) ): ?> style="text-align: left; border-bottom: 1px solid #000;" <?php endif; ?>><?php esc_attr_e('Product','thsa_quote_generator'); ?></th>
+            <th width="15%" <?php if( isset($params['from_email']) ): ?> style="text-align: left; border-bottom: 1px solid #000;" <?php endif; ?>><?php esc_attr_e('Price','thsa_quote_generator'); ?></th>
+            <th width="15%" <?php if( isset($params['from_email']) ): ?> style="text-align: left; border-bottom: 1px solid #000;" <?php endif; ?>><?php esc_attr_e('Quantity','thsa_quote_generator'); ?></th>
+            <th width="15%" <?php if( isset($params['from_email']) ): ?> style="text-align: left; border-bottom: 1px solid #000;" <?php endif; ?>><?php esc_attr_e('Amount','thsa_quote_generator'); ?></th>
         </tr>
         <?php 
             if(isset($params['products'])):
                 foreach($params['products'] as $pid => $product):
         ?>
         <tr>
-            <td><?php esc_attr_e($product['text'],'thsa-quote-generator'); ?></td>
-            <td><?php echo $product['price_html']; ?></td>
-            <td><?php esc_attr_e($product['qty'],'thsa-quote-generator'); ?></td>
-            <td><?php echo $product['amount']; ?></td>
+            <td <?php if( isset($params['from_email']) ): ?> style="border-bottom: 1px solid #000;" <?php endif; ?>><?php esc_attr_e($product['text'],'thsa-quote-generator'); ?></td>
+            <td <?php if( isset($params['from_email']) ): ?> style="border-bottom: 1px solid #000;" <?php endif; ?>><?php echo $product['price_html']; ?></td>
+            <td <?php if( isset($params['from_email']) ): ?> style="border-bottom: 1px solid #000;" <?php endif; ?>><?php esc_attr_e($product['qty'],'thsa-quote-generator'); ?></td>
+            <td <?php if( isset($params['from_email']) ): ?> style="border-bottom: 1px solid #000;" <?php endif; ?>><?php echo $product['amount']; ?></td>
         </tr>
         <?php 
                 endforeach;
@@ -36,8 +36,8 @@
             ?>
                     <tr class="<?php esc_html_e($class); ?>">
                         <td></td>
-                        <td colspan="2"><?php esc_html_e($label,'thsa-quote-generator'); ?></td>
-                        <td colspan="1"><?php echo $value; ?></td>
+                        <td colspan="2" <?php if( isset($params['from_email']) ): ?> style="border-bottom: 1px solid #000; border-left: 1px solid #000;" <?php endif; ?>><?php esc_html_e($label,'thsa-quote-generator'); ?></td>
+                        <td colspan="1" <?php if( isset($params['from_email']) ): ?> style="border-bottom: 1px solid #000;" <?php endif; ?>><?php echo $value; ?></td>
                     </tr>
             <?php 
                 else:
@@ -45,8 +45,8 @@
             ?>
                     <tr>
                         <td></td>
-                        <td colspan="2"><?php esc_attr_e($fee['name'],'thsa-quote-generator'); ?></td>
-                        <td colspan="1"><?php echo wc_price($fee['amount']); ?></td>
+                        <td colspan="2" <?php if( isset($params['from_email']) ): ?> style="border-bottom: 1px solid #000;" <?php endif; ?>><?php esc_attr_e($fee['name'],'thsa-quote-generator'); ?></td>
+                        <td colspan="1" <?php if( isset($params['from_email']) ): ?> style="border-bottom: 1px solid #000;" <?php endif; ?>><?php echo wc_price($fee['amount']); ?></td>
                     </tr>
             <?php
                     endforeach;
@@ -63,7 +63,7 @@
         </div>
         <div class="thsa_qg_col-6">
             <?php if(isset($params['from_email'])): ?>
-            <p style="text-align: center;"><a href="<?php echo esc_url($params['checkout_url']); ?>"><?php esc_html_e('Proceed to checkout','thsa-quote-generator'); ?></a></p>
+            <p style="text-align: center;"><a href="<?php echo esc_url($params['checkout_url']); ?>" <?php if($params['from_email'] == true): ?> style="padding: 10px 20px; background: #f2f2f2; border: 1px solid #CCC;" <?php endif; ?>><?php esc_html_e('Proceed to checkout','thsa-quote-generator'); ?></a></p>
             <?php else: ?>
             <input type="button" data-q-id="<?php esc_attr_e($params['qid'],'thsa-quote-generator'); ?>" class="thsa_qg_proceed_checkout" value="<?php esc_attr_e('Proceed to checkout','thsa-quote-generator'); ?>">
             <?php endif; ?>
