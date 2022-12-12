@@ -682,6 +682,21 @@ jQuery(document).ready(function(){
         }
     });
 
+    if( thsaqgvars.is_admin_edit ){
+        jQuery('.thsa_qg_currency').on('select2:open',function(){
+            thsa_prev_curren = jQuery(this).val();   
+            if(!confirm(labels_.currency_confirm)){
+                jQuery('.thsa_qg_currency').select2("close");
+            }
+        });
+
+        jQuery('.thsa_qg_currency').on('change', function(){
+            thsa_qg_reset_add_product();
+        });
+    }
+
+    
+    
 
 });
 
@@ -1161,4 +1176,60 @@ function thsa_qg_format_numbers( amount = 0 ) {
     
     return parts.join(".");
 
+}
+
+function thsa_qg_reset_add_product()
+{
+    var message_div = thsa_field_generator(
+        {
+            type: 'div',
+            attributes: [
+                {
+                    attr: 'class',
+                    value: 'thsa_qg_select_products_loader'
+                }
+            ]
+        }
+    );
+    var message_div_message = thsa_field_generator(
+        {
+            type: 'span',
+            text: labels_.processing
+        }
+    );
+    jQuery(message_div).append(message_div_message);
+
+    jQuery('.thsa_product_options').prepend(message_div);
+
+
+    //get product ids first
+    var ids = [];
+    jQuery('.thsa_qg_selected_products tr').each( function(){
+        var get_id = jQuery(this).attr('data-selected');
+        if(get_id){
+            ids.push(get_id); 
+        }
+    } );
+
+    var currency = jQuery('.thsa_qg_currency').val();
+
+    //call new currency
+    jQuery.ajax({
+        method: "POST",
+        url: thsaqgvars.ajaxurl,
+        data: { 
+            action: thsaqgvars.product_currency, 
+            nonce: thsaqgvars.nonce,
+            currency: currency,
+            products: JSON.stringify(ids)
+        }
+        }).done(function( response ) {
+            if(response){
+                var data = JSON.parse(response);
+                console.log(data.data);
+            }
+            jQuery('.thsa_qg_select_products_loader').remove();
+        }
+    );
+    
 }

@@ -97,7 +97,8 @@ class thsa_qg_common_class
 			'file'	=> __('File', 'thsa-quote-generator'),
 			'upload_' => __('Upload', 'thsa-quote-generator'),
 			'add_file' => __('Add File', 'thsa-quote-generator'),
-			'confirm' => __('Are you sure you want to remove', 'thsa-quote-generator')
+			'confirm' => __('Are you sure you want to remove', 'thsa-quote-generator'),
+			'currency_confirm' => __('WARNING: Changing currency will break previous calculation please review the numbers', 'thsa-quote-generator')
 		];
 		return json_encode($labels);
 	}

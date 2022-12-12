@@ -104,6 +104,19 @@
     vertical-align: bottom;
     margin-bottom: 10px;
     display: none; }
+  .thsa_qg_wrapper .thsa_qg_select_products_loader {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.7);
+    z-index: 999; }
+    .thsa_qg_wrapper .thsa_qg_select_products_loader span {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%); }
 
 .thsa_admin_qg_tab {
   margin: 0;

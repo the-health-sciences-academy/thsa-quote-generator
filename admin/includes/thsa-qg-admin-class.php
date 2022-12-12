@@ -172,13 +172,15 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
                 'customer_details'  =>  'thsa_qg_customer_details',
                 'product_options'   =>  'thsa_qg_product_select_options',
                 'product_from_cat'  =>  'thsa_qg_product_from_cat',
+                'product_currency'  =>  'thsa_qg_product_currency_prices',
                 'labels'            =>  $this->labels(),
                 'save_settings'     => 'thsa_qg_save_settings',
                 'round_settings'    => json_encode($default_round),
                 'send_email'        => 'thsa_qg_send_email',
                 'has_subscriptions'  => $this->support_plugin->has_subscriptions,
                 'has_currencies'    => $this->support_plugin->has_currencies,
-                'manage_email_content' => 'thsa_qg_manage_email_content'
+                'manage_email_content' => 'thsa_qg_manage_email_content',
+                'is_admin_edit'     => (isset($_GET['post']))? true : false
             ]
         );
 
@@ -208,6 +210,7 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         add_action('wp_ajax_thsa_qg_product_from_cat', [$this, 'thsa_qg_product_from_cat']);
         add_action('wp_ajax_thsa_qg_send_email', [$this, 'thsa_qg_send_email']);
         add_action('wp_ajax_thsa_qg_manage_email_content',[$this, 'thsa_qg_manage_email_content']);
+        add_action('wp_ajax_thsa_qg_product_currency_prices', [$this, 'thsa_qg_product_currency_prices']);
     }
 
 
@@ -1402,6 +1405,100 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
             echo json_encode([
                 'status' => 'failed',
                 'message' => 'Error 106: No quotation ID found'
+            ]);
+            exit();
+        }
+    }
+
+
+    /**
+     * 
+     * 
+     * 
+     * @since 1.2.0
+     * @param
+     * @return
+     * 
+     * 
+     * 
+     */
+    public function thsa_qg_product_currency_prices()
+    {
+        if ( ! wp_verify_nonce( $_POST['nonce'], 'thsa-quotation-generator' ) ) {
+            echo json_encode([
+                'status' => 'failed',
+                'message' => 'Error 105: Invalid Nonce'
+            ]);
+            exit();
+        }
+
+        if( !isset($_POST['products']) ){
+            echo json_encode([
+                'status' => 'failed',
+                'message' => 'Error 106: No product id is found'
+            ]);
+            exit();
+        }
+
+
+        $ids = json_decode(stripslashes($_POST['products']));
+        $products_ar = array_map(function($id){
+            return sanitize_text_field( $id );
+        }, $ids);
+
+        $currency = sanitize_text_field( $_POST['currency'] );
+
+        $products = [];
+        if(!empty( $products_ar )){
+            foreach($products_ar as $product){
+                $product_details = wc_get_product($product);
+
+
+                $price_html = $product_details->get_price_html();
+                $price_number = $product_details->get_price();
+                $price_regular_number = $product_details->get_regular_price();
+                $price_sale_number = $product_details->get_sale_price();
+
+
+                //get prices based on what plugin is installed
+                $prices = $this->support_plugin->currency_values(
+                    [
+                        'product_id' => $product_details->get_id(),
+                        'currency' => $currency,
+                        'product_prices' => [
+                            'price_html' => $price_html,
+                            'price_number' => $price_number,
+                            'price_regular_number' => $price_regular_number,
+                            'price_sale_number' => $price_sale_number
+                        ]
+                    ]
+                );
+
+
+                $products[$product[0]] = [
+                    'id' => $product_details->get_id(),
+                    'text' => $product_details->get_id().' - '.$product_details->get_title(),
+                    'price_html' => $prices['price_html'],
+                    'price_number' => $prices['price_number'],
+                    'price_regular_number' => $prices['price_regular_number'],
+                    'price_sale_number' => $prices['price_sale_number'],
+                    'qty' => $product[1],
+                    'amount' => $this->format_number( ['amount' => $prices['price_number'] * $product[1], 'round' => false ] )
+                ];
+                
+            }
+        }
+
+        if( !empty( $products ) ){
+            echo json_encode([
+                'status' => 'success',
+                'data' => json_encode( $products )
+            ]);
+            exit();
+        }else{
+            echo json_encode([
+                'status' => 'failed',
+                'message' => 'Error 107: No product is found'
             ]);
             exit();
         }
