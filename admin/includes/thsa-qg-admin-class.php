@@ -498,12 +498,12 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         //get save content from meta
         $saved_email = get_post_meta($post->ID, 'thsa_qg_email_content', true);
 
-        if( isset($saved_email) ){
+        if( !empty($saved_email) ){
             $email_con = $saved_email;
         }else{
             $settings = $this->setting_class->get_settings('email');
             $email_con = null;
-            if( isset($settings['content']) ){
+            if( !empty($settings['content']) ){
                 $email_con = $settings['content'];
             }else{
                 $email_con = $this->setting_class->default_email_text;
@@ -1271,7 +1271,7 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         //$email = null;
 
         $post_email = get_post_meta($id, 'thsa_qg_email_content', true);
-        if(isset($post_email)){
+        if(!empty($post_email)){
             $get_settings['content'] = $post_email;
         }
 

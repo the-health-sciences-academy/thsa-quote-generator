@@ -430,6 +430,8 @@ jQuery(document).ready(function(){
                            
                         }
                     }
+
+                    jQuery('.thsa_qg_loader').hide();
                     
                 }
             );
@@ -1226,7 +1228,13 @@ function thsa_qg_reset_add_product()
         }).done(function( response ) {
             if(response){
                 var data = JSON.parse(response);
-                console.log(data.data);
+                if(data.data){
+                    var dd = JSON.parse(data.data);
+                    jQuery('.thsa_qg_selected_products').html('');
+                    for(var x in dd){
+                        thsa_generate_field_to(dd[x]);
+                    }
+                }
             }
             jQuery('.thsa_qg_select_products_loader').remove();
         }
