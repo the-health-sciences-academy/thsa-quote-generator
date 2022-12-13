@@ -56,6 +56,126 @@ class thsa_qg_admin_settings_class extends thsa_qg_common_class
         wp_register_script( THSA_QG_PREFIX.'-admin-settings-js', THSA_QG_PLUGIN_URL.'admin/assets/js/thsa-qg-settings.js', array('jquery') );
         wp_enqueue_script( THSA_QG_PREFIX.'-admin-settings-js' );
         wp_enqueue_style( THSA_QG_PREFIX.'-admin-settings-css', THSA_QG_PLUGIN_URL.'admin/assets/css/thsa-qg-settings.css');
+        wp_enqueue_style( THSA_QG_PREFIX.'-admin-quotation-css', THSA_QG_PLUGIN_URL.'admin/assets/css/quotation.css');
+
+        wp_localize_script( THSA_QG_PREFIX.'-admin-settings-js', 'thsaqg_plates', 
+            [
+                'blackcurrant' => [
+                        'border_color' => '#000000',
+                        'background_color' => '#f2f2f2',
+                        'color' => '#000000',
+                        'title' => [
+                            'background_color' => '#000000',
+                            'color' => '#FFFFFF'
+                        ],
+                        'total' => [
+                            'color' => '#000000'
+                        ]
+                    ],
+                'honeydew' => [
+                        'border_color' => '#cfc87a',
+                        'background_color' => '#fdf8e2',
+                        'color' => '#000000',
+                        'title' => [
+                            'background_color' => '#e9e5b6',
+                            'color' => '#000000'
+                        ],
+                        'total' => [
+                            'color' => '#000000'
+                        ]
+                    ],
+                'pear' => [
+                        'border_color' => '#899100',
+                        'background_color' => '#f8fadb',
+                        'color' => '#000000',
+                        'title' => [
+                            'background_color' => '#d3d951',
+                            'color' => '#000000'
+                        ],
+                        'total' => [
+                            'color' => '#000000'
+                        ]
+                    ],
+                'banana' => [
+                        'border_color' => '#c79e05',
+                        'background_color' => '#f9e7a9',
+                        'color' => '#000000',
+                        'title' => [
+                            'background_color' => '#edc230',
+                            'color' => '#000000'
+                        ],
+                        'total' => [
+                            'color' => '#000000'
+                        ]
+                    ],
+                'strawberry' => [
+                        'border_color' => '#b50002',
+                        'background_color' => '#ff5c68',
+                        'color' => '#FFFFFF',
+                        'title' => [
+                            'background_color' => '#ee1d2b',
+                            'color' => '#FFFFFF'
+                        ],
+                        'total' => [
+                            'color' => '#FFFFFF'
+                        ]
+                    ],
+                'blueberry' => [
+                        'border_color' => '#084391',
+                        'background_color' => '#68caf9',
+                        'color' => '#000000',
+                        'title' => [
+                            'background_color' => '#2786e2',
+                            'color' => '#000000'
+                        ],
+                        'total' => [
+                            'color' => '#000000'
+                        ]
+                    ],
+                'poncan' => [
+                        'border_color' => '#ff6700',
+                        'background_color' => '#ffd7b5',
+                        'color' => '#000000',
+                        'title' => [
+                            'background_color' => '#ff9248',
+                            'color' => '#000000'
+                        ],
+                        'total' => [
+                            'color' => '#000000'
+                        ]
+                    ],
+                'lychees' => [
+                        'border_color' => '#aa0a1e',
+                        'background_color' => '#d06776',
+                        'color' => '#FFFFFF',
+                        'title' => [
+                            'background_color' => '#c83a54',
+                            'color' => '#FFFFFF'
+                        ],
+                        'total' => [
+                            'color' => '#FFFFFF'
+                        ]
+                    ],
+                'grapes' => [
+                        'border_color' => '#810066',
+                        'background_color' => '#c877ba',
+                        'color' => '#FFFFFF',
+                        'title' => [
+                            'background_color' => '#ad027e',
+                            'color' => '#FFFFFF'
+                        ],
+                        'total' => [
+                            'color' => '#FFFFFF'
+                        ]
+                    ],
+
+            ]
+        );
+
+        //color picker
+        wp_register_script( THSA_QG_PREFIX.'-admin-color-js', THSA_QG_PLUGIN_URL.'admin/assets/js/coloris.min.js', array('jquery') );
+        wp_enqueue_script( THSA_QG_PREFIX.'-admin-color-js' );
+        wp_enqueue_style( THSA_QG_PREFIX.'-admin-color-css', THSA_QG_PLUGIN_URL.'admin/assets/css/coloris.min.css');
 
 
         $this->default_email_text = "Hi ".$this->shortcodes[0].",\n\nKindly find below the quotation you requested \n\n".$this->shortcodes[1]."\n\n Any questions or concerns please contact us through this email ".get_bloginfo('admin_email')."\n\nRegards,\n".get_bloginfo('site_name');

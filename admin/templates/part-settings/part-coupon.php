@@ -81,7 +81,7 @@
         </p>
         <br/>
         <p>
-            <input type="submit" class="button button-primary thsa_qg_settings_save_coupon" value="Save"> 
+            <input type="submit" class="button button-primary thsa_qg_settings_save_coupon" value="Save Changes"> 
             <span class="thsa_qg_response thsa_qg_coupon_message"><?php esc_html_e('Changes has been save','thsa-quote-generator'); ?></span>
         </p>
 </div>

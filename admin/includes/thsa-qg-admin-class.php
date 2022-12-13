@@ -180,7 +180,8 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
                 'has_subscriptions'  => $this->support_plugin->has_subscriptions,
                 'has_currencies'    => $this->support_plugin->has_currencies,
                 'manage_email_content' => 'thsa_qg_manage_email_content',
-                'is_admin_edit'     => (isset($_GET['post']))? true : false
+                'is_admin_edit'     => (isset($_GET['post']))? true : false,
+                'save_plate'        => 'thsa_qg_save_plate'
             ]
         );
 
@@ -1499,6 +1500,27 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
             echo json_encode([
                 'status' => 'failed',
                 'message' => 'Error 107: No product is found'
+            ]);
+            exit();
+        }
+    }
+
+    /**
+     * 
+     * 
+     * thsa_qg_save_plate
+     * @since 1.2.0
+     * @param
+     * @return
+     * 
+     * 
+     */
+    public function thsa_qg_save_plate()
+    {
+        if ( ! wp_verify_nonce( $_POST['nonce'], 'thsa-quotation-generator' ) ) {
+            echo json_encode([
+                'status' => 'failed',
+                'message' => 'Error 105: Invalid Nonce'
             ]);
             exit();
         }

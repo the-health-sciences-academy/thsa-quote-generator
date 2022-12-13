@@ -21,7 +21,7 @@
         </p>
         <br/>
         <p>
-            <input type="button" class="button button-primary button-large thsa_save_gen_ettings" value="<?php esc_html_e('Save', 'thsa-quote-generator') ?>"> <span class="thsa_qg_response thsa_qg_response_general"><?php esc_html_e('Changes has been save','thsa-quote-generator'); ?></span>
+            <input type="button" class="button button-primary button-large thsa_save_gen_ettings" value="<?php esc_html_e('Save Changes', 'thsa-quote-generator') ?>"> <span class="thsa_qg_response thsa_qg_response_general"><?php esc_html_e('Changes has been save','thsa-quote-generator'); ?></span>
         </p>
         
 </div>

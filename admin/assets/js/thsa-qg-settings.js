@@ -8,6 +8,12 @@
  * 
  */
 jQuery(document).ready(function(){
+    Coloris({
+        el: '.coloris',
+        theme: 'large',
+        themeMode: 'light' // light, dark, auto,
+    });
+
     jQuery('.thsa_qg_settings_tab li').click(function(){
         var get_target = jQuery(this).data('target');
         jQuery('.thsa_qg_settings_tab li').removeClass('active');
@@ -143,6 +149,65 @@ jQuery(document).ready(function(){
                         }, 10000);
                     }
                 }
+            }
+        );
+    });
+
+    jQuery('.thsa_qg_plates_el').click( function(){
+
+        var plate = jQuery(this).find('.thsa_qg_plate').data('plate');
+        var plate_cap = jQuery(this).find('.thsa_qg_plate').data('plate-cap');
+        jQuery('.thsa_quote_settings_content').find('.thsa_qg_plates_el').each(function(){
+            jQuery(this).removeClass('active');
+        });
+        jQuery(this).addClass('active');
+
+        jQuery('.thsa_qg_plate_name').val(plate_cap);
+        jQuery('.thsa_qg_text_color').val(thsaqg_plates[plate].color);
+        jQuery('.thsa_qg_text_color').closest('.clr-field').css('color',thsaqg_plates[plate].color);
+        jQuery('.thsa_qg_header_text_color').val(thsaqg_plates[plate].title.color);
+        jQuery('.thsa_qg_header_text_color').closest('.clr-field').css('color',thsaqg_plates[plate].title.color);
+        jQuery('.thsa_qg_header_color').val(thsaqg_plates[plate].title.background_color);
+        jQuery('.thsa_qg_header_color').closest('.clr-field').css('color',thsaqg_plates[plate].title.background_color);
+        jQuery('.thsa_qg_border_color').val(thsaqg_plates[plate].border_color);
+        jQuery('.thsa_qg_border_color').closest('.clr-field').css('color',thsaqg_plates[plate].border_color);
+        jQuery('.thsa_qg_total_font_color').val(thsaqg_plates[plate].total.color);
+        jQuery('.thsa_qg_total_font_color').closest('.clr-field').css('color',thsaqg_plates[plate].total.color);
+        
+    } );
+
+    jQuery('.thsa_qg_save_plate').click(function(){
+        jQuery(this).prop('disabled', true);
+        jQuery(this).val('Saving...');
+
+        var thsa_qg_plate_name = jQuery('.thsa_qg_plate_name').val();
+        var thsa_qg_text_color = jQuery('.thsa_qg_text_color').val();
+        var thsa_qg_item_row_even = jQuery('.thsa_qg_item_row_even').val();
+        var thsa_qg_item_row_odd = jQuery('.thsa_qg_item_row_odd').val();
+        var thsa_qg_header_text_color = jQuery('.thsa_qg_header_text_color').val();
+        var thsa_qg_header_color = jQuery('.thsa_qg_header_color').val();
+        var thsa_qg_border_color = jQuery('.thsa_qg_border_color').val();
+        var thsa_qg_total_font_color = jQuery('.thsa_qg_total_font_color').val();
+        var thsa_qg_total_row_color = jQuery('.thsa_qg_total_row_color').val();
+        var thsa_qg_total_font_size = jQuery('.thsa_qg_total_font_size').val();
+
+
+        jQuery.ajax({
+            method: "POST",
+            url: thsaqgvars.ajaxurl,
+            data: { 
+                action: thsaqgvars.save_plate,
+                nonce: thsaqgvars.nonce
+            }
+            }).done(function( response ) {
+                if(response){
+                    response = JSON.parse(response);
+                    if(response.status == 'success'){
+                        
+                    }
+                }
+                jQuery('.thsa_qg_save_plate').prop('disabled', false);
+                jQuery('.thsa_qg_save_plate').val('Save');
             }
         );
     });
