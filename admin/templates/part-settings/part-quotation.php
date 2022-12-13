@@ -1,5 +1,4 @@
 <div class="thsa_quote_settings_content">
-    
     <table cellpadding="0" cellspacing="0" class="thsa_qg_appe_table" width="100%">
         <tr>
             <td width="15%" valign="top">
@@ -7,64 +6,60 @@
                 <p>
                     <label>
                         <?php esc_html_e('Style Name', 'thsa-quote-generator'); ?><br/>
-                        <input class="widefat thsa_qg_plate_name" type="text">
-                    </label>
-                </p>
-                <p>
-                    <label>
-                        <?php esc_html_e('Text color', 'thsa-quote-generator'); ?><br/>
-                        <input class="widefat thsa_qg_text_color coloris" type="text">
-                    </label>
-                </p>
-                <p>
-                    <label>
-                        <?php esc_html_e('Header text color', 'thsa-quote-generator'); ?><br/>
-                        <input class="widefat thsa_qg_header_text_color coloris" type="text">
-                    </label>
-                </p>
-                <p>
-                    <label>
-                        <?php esc_html_e('Header background color', 'thsa-quote-generator'); ?><br/>
-                        <input class="widefat thsa_qg_header_color coloris" type="text">
-                    </label>
-                </p>
-                <p>
-                    <label>
-                        <?php esc_html_e('Item row(even) background color', 'thsa-quote-generator'); ?><br/>
-                        <input class="widefat thsa_qg_item_row_even coloris" type="text">
-                    </label>
-                </p>
-                <p>
-                    <label>
-                        <?php esc_html_e('Item row(odd) background color', 'thsa-quote-generator'); ?><br/>
-                        <input class="widefat thsa_qg_item_row_odd coloris" type="text">
+                        <input class="widefat thsa_qg_plate_name" type="text" value="<?php echo ( isset($params['plate']['thsa_qg_plate_name']) )? esc_html__($params['plate']['thsa_qg_plate_name']) : null; ?>">
                     </label>
                 </p>
 
                 <p>
                     <label>
+                        <?php esc_html_e('Background Color', 'thsa-quote-generator'); ?><br/>
+                        <input class="widefat thsa_qg_background_color coloris" type="text" value="<?php echo ( isset($params['plate']['thsa_qg_background_color']) )? esc_html__($params['plate']['thsa_qg_background_color']) : null; ?>">
+                    </label>
+                </p>
+                <p>
+                    <label>
+                        <?php esc_html_e('Text color', 'thsa-quote-generator'); ?><br/>
+                        <input class="widefat thsa_qg_text_color coloris" type="text" value="<?php echo ( isset($params['plate']['thsa_qg_text_color']) )? esc_html__($params['plate']['thsa_qg_text_color']) : null; ?>">
+                    </label>
+                </p>
+                <p>
+                    <label>
+                        <?php esc_html_e('Header text color', 'thsa-quote-generator'); ?><br/>
+                        <input class="widefat thsa_qg_header_text_color coloris" type="text" value="<?php echo ( isset($params['plate']['thsa_qg_header_text_color']) )? esc_html__($params['plate']['thsa_qg_header_text_color']) : null; ?>">
+                    </label>
+                </p>
+                <p>
+                    <label>
+                        <?php esc_html_e('Header background color', 'thsa-quote-generator'); ?><br/>
+                        <input class="widefat thsa_qg_header_color coloris" type="text" value="<?php echo ( isset($params['plate']['thsa_qg_header_color']) )? esc_html__($params['plate']['thsa_qg_header_color']) : null; ?>">
+                    </label>
+                </p>
+ 
+
+                <p>
+                    <label>
                         <?php esc_html_e('Border color', 'thsa-quote-generator'); ?><br/>
-                        <input class="widefat thsa_qg_border_color coloris" type="text">
+                        <input class="widefat thsa_qg_border_color coloris" type="text" value="<?php echo ( isset($params['plate']['thsa_qg_border_color']) )? esc_html__($params['plate']['thsa_qg_border_color']) : null; ?>">
                     </label>
                 </p>
                 <p>
                     <label>
                         <?php esc_html_e('Total row background color', 'thsa-quote-generator'); ?><br/>
-                        <input class="widefat thsa_qg_total_row_color coloris" type="text">
+                        <input class="widefat thsa_qg_total_row_color coloris" type="text" value="<?php echo ( isset($params['plate']['thsa_qg_total_row_color']) )? esc_html__($params['plate']['thsa_qg_total_row_color']) : null; ?>">
                     </label>
                 </p>
 
                 <p>
                     <label>
                         <?php esc_html_e('Total font color', 'thsa-quote-generator'); ?><br/>
-                        <input class="widefat thsa_qg_total_font_color coloris" type="text">
+                        <input class="widefat thsa_qg_total_font_color coloris" type="text" value="<?php echo ( isset($params['plate']['thsa_qg_total_font_color']) )? esc_html__($params['plate']['thsa_qg_total_font_color']) : null; ?>">
                     </label>
                 </p>
 
                 <p>
                     <label>
                         <?php esc_html_e('Total font size', 'thsa-quote-generator'); ?><br/>
-                        <input class="widefat thsa_qg_total_font_size" type="number" placeholder="default">
+                        <input class="widefat thsa_qg_total_font_size" type="number" placeholder="default" value="<?php echo ( isset($params['plate']['thsa_qg_total_font_size']) )? esc_html__($params['plate']['thsa_qg_total_font_size']) : null; ?>">
                     </label>
                 </p>
 

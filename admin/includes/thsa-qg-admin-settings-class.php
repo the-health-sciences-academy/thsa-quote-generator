@@ -377,9 +377,11 @@ class thsa_qg_admin_settings_class extends thsa_qg_common_class
      */
     public function quote_settings()
     {
+        $plate = $this->get_settings('plates');
         $this->set_template('part-settings/part-quotation',
         [
-            'path' => 'admin'
+            'path' => 'admin',
+            'plate' => $plate
         ]   
         );
     }
@@ -550,6 +552,31 @@ class thsa_qg_admin_settings_class extends thsa_qg_common_class
                     } 
 
                     break;
+                case 'plates':
+
+                    $plates = ['thsa_qg_plate_name', 'thsa_qg_background_color', 'thsa_qg_text_color', 'thsa_qg_header_text_color', 'thsa_qg_header_color', 'thsa_qg_border_color', 'thsa_qg_total_font_color','thsa_qg_total_row_color','thsa_qg_total_font_size'];
+
+                    $qplates = [];
+                    foreach($plates as $plate){
+                        if( isset( $_POST[$plate] ) ){
+                            $qplates[$plate] = sanitize_text_field( $_POST[$plate] );
+                        }
+                    }
+
+                    $settings = get_option('thsa_quotation_settings');
+                    if( !empty($qplates) ){
+                        $settings['plates'] = $qplates;
+                    }else{
+                        $settings['plates'] = null;
+                    }
+                    update_option('thsa_quotation_settings', $settings);
+
+                    break;
+                case 'restore_plate':
+                    $settings = get_option('thsa_quotation_settings');
+                    unset($settings['plates']);
+                    update_option('thsa_quotation_settings', $settings);
+                    break;
                 default:
                     break;
             }
@@ -569,7 +596,6 @@ class thsa_qg_admin_settings_class extends thsa_qg_common_class
         }
         exit();
     }
-
 
    
 }

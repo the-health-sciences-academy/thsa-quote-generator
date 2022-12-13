@@ -347,6 +347,8 @@ class thsa_qg_common_class
                 ];
 
                 $summary = apply_filters('thsa_qg_quote_summary_before',  $summary);
+
+				$settings = get_option('thsa_quotation_settings');
 				return [
 					'path' => 'public', 
 					'products' => $products, 
@@ -354,7 +356,8 @@ class thsa_qg_common_class
 					'grand_total' => $grand_total, 
 					'undiscounted' => $total,
 					'qid' => $id,
-					'labels' => $summary
+					'labels' => $summary,
+					'style' => ( isset( $settings['plates'] ) )? $settings['plates'] : null
 				];
 
             }else{
@@ -395,6 +398,53 @@ class thsa_qg_common_class
         }
 
     }
+
+	/**
+	 * 
+	 * 
+	 * 
+	 * 
+	 * render_inline_style
+	 * @since 1.2.0
+	 * @param
+	 * @return
+	 * 
+	 * 
+	 */
+	public function render_inline_style( $args = null)
+	{
+		if( !isset($args) )
+			return;
+
+		$style = null;
+		foreach($args as $arg){
+			switch( $arg['type'] ){
+				case 'thsa_qg_text_color':
+				case 'thsa_qg_header_text_color':
+				case 'thsa_qg_total_font_color':
+					if(isset($arg['value']))
+						$style .= 'color: '.$arg['value'].';';
+					break;
+				case 'thsa_qg_header_color':
+				case 'thsa_qg_total_row_color':
+				case 'thsa_qg_background_color':
+					if(isset($arg['value']))
+						$style .= 'background-color: '.$arg['value'].';';
+					break;
+				case 'thsa_qg_border_color':
+					if(isset($arg['value']))
+						$style .= 'border: 1px solid '.$arg['value'].';';
+					break;
+				case 'thsa_qg_total_font_size':
+					if(isset($arg['value']))
+						$style .= 'font-size: '.$arg['value'].';';
+					break;
+			}	
+		}
+		
+		
+		return $style;
+	}
 
 }
 ?>
