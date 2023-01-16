@@ -63,6 +63,13 @@
                     </label>
                 </p>
 
+                <p>
+                    <label>
+                        <?php esc_html_e('Padding', 'thsa-quote-generator'); ?><br/>
+                        <input class="widefat thsa_qg_padding" type="number" placeholder="default" value="<?php echo ( isset($params['plate']['thsa_qg_padding']) )? esc_html__($params['plate']['thsa_qg_padding']) : null; ?>">
+                    </label>
+                </p>
+
                 <p><br/>
                     <input type="button" class="button button-primary thsa_qg_save_plate" value="<?php esc_html_e('Save Changes', 'thsa-quote-generator') ?>">&nbsp;
                     <input type="button" class="button button-secondary thsa_qg_restore_default" value="<?php esc_html_e('Restore Default', 'thsa-quote-generator') ?>">

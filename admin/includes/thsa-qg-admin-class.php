@@ -438,7 +438,8 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
                     'price_regular_number' => $prices['price_regular_number'],
                     'price_sale_number' => $prices['price_sale_number'],
                     'qty' => $product[1],
-                    'amount' => $this->format_number( ['amount' => $prices['price_number'] * $product[1], 'round' => false ] )
+                    'amount' => $this->format_number( ['amount' => $prices['price_number'] * $product[1], 'round' => false ] ),
+                    'amount_num' => $prices['price_number'] * $product[1]
                 ];
                 
             }
@@ -1194,7 +1195,6 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
             if(isset($get_settings['coupon']['free_shipping'])){
                 $free_shipping = $get_settings['coupon']['free_shipping'];
             }
-
         }
 
         // Add meta
@@ -1277,54 +1277,51 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
             $get_settings['content'] = $post_email;
         }
 
-        if(isset($get_settings)){
-            //process shortcodes
-            $quote_user = get_post_meta($id, 'thsa_quotation_data', true);
-            $customer_details = [];
-            if(isset($quote_user['customer'])){
+        $quote_user = get_post_meta($id, 'thsa_quotation_data', true);
+        $customer_details = [];
+        if(isset($quote_user['customer'])){
 
-                if(is_array($quote_user['customer'])){
+            if(is_array($quote_user['customer'])){
+                $customer_details = [
+                    'fullname' => $quote_user['customer']['firstname'].' '.$quote_user['customer']['lastname'],
+                    'email' => $quote_user['customer']['email']
+                ];
+            }else{
+                if(is_numeric($quote_user['customer'])){
+                    $user = get_userdata($quote_user['customer']);
                     $customer_details = [
-                        'fullname' => $quote_user['customer']['firstname'].' '.$quote_user['customer']['lastname'],
-                        'email' => $quote_user['customer']['email']
+                        'fullname' => $user->first_name.' '.$user->last_name,
+                        'email' => $user->user_email
                     ];
                 }else{
-                    if(is_numeric($quote_user['customer'])){
-                        $user = get_userdata($quote_user['customer']);
-                        $customer_details = [
-                            'fullname' => $user->first_name.' '.$user->last_name,
-                            'email' => $user->user_email
-                        ];
-                    }else{
-                        echo json_encode([
-                            'status' => 'failed',
-                            'message' => __('Error 108: No customer is found','thsa-quote-generator')
-                        ]);
-                        exit();
-                    }
+                    echo json_encode([
+                        'status' => 'failed',
+                        'message' => __('Error 108: No customer is found','thsa-quote-generator')
+                    ]);
+                    exit();
                 }
-                if(!empty($customer_details)){
-                    $get_settings['content'] = str_replace('[thsa_qg_customer_name]', $customer_details['fullname'], $get_settings['content']);
-                }
+            }                
+        }
 
-                //render the quotation
-                if(strpos($get_settings['content'],'[thsa_qg_quotation_holder]') !== false && $type != 'send'){
-                    $quotation__ = do_shortcode('[thsa-quotation-email q_id='.$id.']');
-                    $get_settings['content'] = str_replace('[thsa_qg_quotation_holder]', htmlentities($quotation__), $get_settings['content']);
-                }else{
-                    $quotation__ = do_shortcode('[thsa-quotation-email q_id='.$id.']');
-                    $get_settings['content'] = html_entity_decode(stripslashes($get_settings['content']));
-                    $get_settings['content'] = str_replace('[thsa_qg_quotation_holder]', $quotation__, $get_settings['content']);
-                }
-                
-                
+        if(isset($get_settings)){
+            //process shortcodes
+            if(!empty($customer_details)){
+                $get_settings['content'] = str_replace('[thsa_qg_customer_name]', $customer_details['fullname'], $get_settings['content']);
+            }
 
+            //render the quotation
+            if(strpos($get_settings['content'],'[thsa_qg_quotation_holder]') !== false && $type != 'send'){
+                $quotation__ = do_shortcode('[thsa-quotation-email q_id='.$id.']');
+                $get_settings['content'] = str_replace('[thsa_qg_quotation_holder]', htmlentities($quotation__), $get_settings['content']);
+            }else{
+                $quotation__ = do_shortcode('[thsa-quotation-email q_id='.$id.']');
+                $get_settings['content'] = html_entity_decode(stripslashes($get_settings['content']));
+                $get_settings['content'] = str_replace('[thsa_qg_quotation_holder]', $quotation__, $get_settings['content']);
             }
 
             if($type == 'send'){
                 //send email
                 if(isset($customer_details['email'])){
-          
 
                     $to = $customer_details['email'];
                     $subject = $get_settings['title'];
@@ -1346,8 +1343,6 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
                     exit();
                 }
                 
-
-                
             }else{
                 echo json_encode([
                     'status' => 'success',
@@ -1358,10 +1353,15 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
 
             
         }else{
-            $get_text = $this->setting_class->default_email_text;
+            $email_default_content = $this->setting_class->default_email_text;
+            if(!empty($customer_details)){
+                $email_default_content = str_replace('[thsa_qg_customer_name]', $customer_details['fullname'], $email_default_content);
+            }
+            $quotation__ = do_shortcode('[thsa-quotation-email q_id='.$id.']');
+            $get_text = str_replace('[thsa_qg_quotation_holder]', htmlentities($quotation__),  $email_default_content);
             echo json_encode([
                 'status' => 'success',
-                'message' => $get_text
+                'message' => html_entity_decode($get_text)
             ]);
             exit();
         }

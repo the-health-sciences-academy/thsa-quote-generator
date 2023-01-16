@@ -8,7 +8,7 @@
  * 
  * 
  */
-namespace thsa\qg\public\shortcodes;
+namespace thsa\qg\front\shortcodes;
 use thsa\qg\common\thsa_qg_common_class;
 
 defined( 'ABSPATH' ) or die( 'No access area' );

@@ -191,6 +191,7 @@ jQuery(document).ready(function(){
         var thsa_qg_total_row_color = jQuery('.thsa_qg_total_row_color').val();
         var thsa_qg_total_font_size = jQuery('.thsa_qg_total_font_size').val();
         var thsa_qg_background_color = jQuery('.thsa_qg_background_color').val();
+        var thsa_qg_padding = jQuery('.thsa_qg_padding').val();
 
 
         jQuery.ajax({
@@ -208,6 +209,7 @@ jQuery(document).ready(function(){
                 thsa_qg_total_font_color: thsa_qg_total_font_color,
                 thsa_qg_total_row_color: thsa_qg_total_row_color,
                 thsa_qg_total_font_size: thsa_qg_total_font_size,
+                thsa_qg_padding: thsa_qg_padding,
                 type: 'plates'
             }
             }).done(function( response ) {

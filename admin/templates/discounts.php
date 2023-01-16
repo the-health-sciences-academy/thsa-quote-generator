@@ -215,7 +215,7 @@
             <table border="0" class="thsa_qg_discount_table2">
                 <tr>
                     <td valign="middle">
-                        <input type="number" class="widefat thsa_qg_fix_amount" name="thsa_qg_fix_amount" value="<?php
+                        <input type="text" class="widefat thsa_qg_fix_amount right_text" name="thsa_qg_fix_amount" value="<?php
                             if(isset($params['data']['fixed_amount_discount'])){
                                 esc_html_e($params['data']['fixed_amount_discount'],'thsa-quote-generator');
                             }

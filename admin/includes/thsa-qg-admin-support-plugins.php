@@ -423,7 +423,7 @@ class thsa_qg_admin_support_plugins extends thsa_qg_common_class
                     continue;
                 }
                 $prod = wc_get_product($product[0]);
-                $tem_total += $prod->get_price();
+                $tem_total += ($prod->get_price() * $product[1]);
             }
 
             //deduct the discount

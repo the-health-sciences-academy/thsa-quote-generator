@@ -437,13 +437,51 @@ class thsa_qg_common_class
 					break;
 				case 'thsa_qg_total_font_size':
 					if(isset($arg['value']))
-						$style .= 'font-size: '.$arg['value'].';';
+						$style .= 'font-size: '.$arg['value'].'px;';
+					break;
+				case 'thsa_qg_padding':
+					if(isset($arg['value']))
+						$style .= 'padding: '.$arg['value'].'px;';
+					break;
 					break;
 			}	
 		}
 		
 		
 		return $style;
+	}
+
+	/**
+	 * 
+	 * 
+	 * pro_features
+	 * @since 1.2.0
+	 * @param mixed
+	 * @return mixed
+	 * 
+	 * 
+	 */
+	public function pro_features( $data = null, $type = null )
+	{
+		if( !$data )
+			return;
+
+		if( is_plugin_active('thsa-quote-generator-pro/thsa-quote-generator-pro.php') ){
+
+			switch( $type ){
+				case 'settings-quotation':
+					$pro = 'thsa\qg\pro\admin\thsa_qg_pro_admin_class';
+					$pro_content = new $pro();
+					$pro_content->load_qoutation_settings( $data );
+					break;
+				default:
+					return $data;
+				break;
+			}
+		}else{
+			return;
+		}
+
 	}
 
 }

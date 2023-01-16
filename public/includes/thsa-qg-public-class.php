@@ -9,9 +9,9 @@
  * 
  */
 
-namespace thsa\qg\public;
+namespace thsa\qg\front;
 use thsa\qg\common\thsa_qg_common_class;
-use thsa\qg\public\shortcodes as thsaqgshorcodes;
+use thsa\qg\front\shortcodes as thsaqgshorcodes;
 use thsa\qg\admin\settings as qgsettings;
 
 defined( 'ABSPATH' ) or die( 'No access area' );

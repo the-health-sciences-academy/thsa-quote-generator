@@ -1,5 +1,5 @@
 <div class="thsa_quotation_table">
-    <table cellspacing="0" cellpadding="10" class="thsa_qg_table" style="<?php echo $this->render_inline_style(
+    <table cellspacing="0" class="thsa_qg_table" style="<?php echo $this->render_inline_style(
                     [
                         [
                         'type' => 'thsa_qg_text_color',
@@ -28,8 +28,11 @@
                         [
                         'type' => 'thsa_qg_border_color',
                         'value' => (isset($params['style']['thsa_qg_border_color']))? $params['style']['thsa_qg_border_color'] : null
+                        ],
+                        [
+                        'type' => 'thsa_qg_padding',
+                        'value' => (isset($params['style']['thsa_qg_padding']))? $params['style']['thsa_qg_padding'] : null
                         ]
-
                     ]
                 ); 
             ?> text-align: left;"><?php esc_attr_e('Product','thsa_quote_generator'); ?></th>
@@ -45,9 +48,13 @@
                         'value' => (isset($params['style']['thsa_qg_header_text_color']))? $params['style']['thsa_qg_header_text_color'] : null
                         ],
                         [
-                            'type' => 'thsa_qg_border_color',
-                            'value' => (isset($params['style']['thsa_qg_border_color']))? $params['style']['thsa_qg_border_color'] : null
-                            ]
+                        'type' => 'thsa_qg_border_color',
+                        'value' => (isset($params['style']['thsa_qg_border_color']))? $params['style']['thsa_qg_border_color'] : null
+                        ],
+                        [
+                        'type' => 'thsa_qg_padding',
+                        'value' => (isset($params['style']['thsa_qg_padding']))? $params['style']['thsa_qg_padding'] : null
+                        ]
 
                     ]
                 ); 
@@ -64,9 +71,13 @@
                         'value' => (isset($params['style']['thsa_qg_header_text_color']))? $params['style']['thsa_qg_header_text_color'] : null
                         ],
                         [
-                            'type' => 'thsa_qg_border_color',
-                            'value' => (isset($params['style']['thsa_qg_border_color']))? $params['style']['thsa_qg_border_color'] : null
-                            ]
+                        'type' => 'thsa_qg_border_color',
+                        'value' => (isset($params['style']['thsa_qg_border_color']))? $params['style']['thsa_qg_border_color'] : null
+                        ],
+                        [
+                        'type' => 'thsa_qg_padding',
+                        'value' => (isset($params['style']['thsa_qg_padding']))? $params['style']['thsa_qg_padding'] : null
+                        ]
 
                     ]
                 ); 
@@ -83,9 +94,13 @@
                         'value' => (isset($params['style']['thsa_qg_header_text_color']))? $params['style']['thsa_qg_header_text_color'] : null
                         ],
                         [
-                            'type' => 'thsa_qg_border_color',
-                            'value' => (isset($params['style']['thsa_qg_border_color']))? $params['style']['thsa_qg_border_color'] : null
-                            ]
+                        'type' => 'thsa_qg_border_color',
+                        'value' => (isset($params['style']['thsa_qg_border_color']))? $params['style']['thsa_qg_border_color'] : null
+                        ],
+                        [
+                        'type' => 'thsa_qg_padding',
+                        'value' => (isset($params['style']['thsa_qg_padding']))? $params['style']['thsa_qg_padding'] : null
+                        ]
 
                     ]
                 ); 
@@ -112,7 +127,11 @@
                         [
                             'type' => 'thsa_qg_border_color',
                             'value' => (isset($params['style']['thsa_qg_border_color']))? $params['style']['thsa_qg_border_color'] : null
-                        ]
+                        ],
+                        [
+                            'type' => 'thsa_qg_padding',
+                            'value' => (isset($params['style']['thsa_qg_padding']))? $params['style']['thsa_qg_padding'] : null
+                            ]
 
                     ]
                 ); 
@@ -129,8 +148,12 @@
                         'value' => (isset($params['style']['thsa_qg_background_color']))? $params['style']['thsa_qg_background_color'] : null
                         ],
                         [
-                            'type' => 'thsa_qg_border_color',
-                            'value' => (isset($params['style']['thsa_qg_border_color']))? $params['style']['thsa_qg_border_color'] : null
+                        'type' => 'thsa_qg_border_color',
+                        'value' => (isset($params['style']['thsa_qg_border_color']))? $params['style']['thsa_qg_border_color'] : null
+                        ],
+                        [
+                        'type' => 'thsa_qg_padding',
+                        'value' => (isset($params['style']['thsa_qg_padding']))? $params['style']['thsa_qg_padding'] : null
                         ]
 
                     ]
@@ -148,8 +171,12 @@
                         'value' => (isset($params['style']['thsa_qg_background_color']))? $params['style']['thsa_qg_background_color'] : null
                         ],
                         [
-                            'type' => 'thsa_qg_border_color',
-                            'value' => (isset($params['style']['thsa_qg_border_color']))? $params['style']['thsa_qg_border_color'] : null
+                        'type' => 'thsa_qg_border_color',
+                        'value' => (isset($params['style']['thsa_qg_border_color']))? $params['style']['thsa_qg_border_color'] : null
+                        ],
+                        [
+                        'type' => 'thsa_qg_padding',
+                        'value' => (isset($params['style']['thsa_qg_padding']))? $params['style']['thsa_qg_padding'] : null
                         ]
 
                     ]
@@ -167,8 +194,12 @@
                         'value' => (isset($params['style']['thsa_qg_background_color']))? $params['style']['thsa_qg_background_color'] : null
                         ],
                         [
-                            'type' => 'thsa_qg_border_color',
-                            'value' => (isset($params['style']['thsa_qg_border_color']))? $params['style']['thsa_qg_border_color'] : null
+                        'type' => 'thsa_qg_border_color',
+                        'value' => (isset($params['style']['thsa_qg_border_color']))? $params['style']['thsa_qg_border_color'] : null
+                        ],
+                        [
+                        'type' => 'thsa_qg_padding',
+                        'value' => (isset($params['style']['thsa_qg_padding']))? $params['style']['thsa_qg_padding'] : null
                         ]
 
                     ]
@@ -193,6 +224,10 @@
                         [
                             'type' => 'thsa_qg_border_color',
                             'value' => (isset($params['style']['thsa_qg_border_color']))? $params['style']['thsa_qg_border_color'] : null
+                        ],
+                        [
+                            'type' => 'thsa_qg_padding',
+                            'value' => (isset($params['style']['thsa_qg_padding']))? $params['style']['thsa_qg_padding'] : null
                         ]
 
                     ]
@@ -227,10 +262,37 @@
                         [
                             'type' => 'thsa_qg_border_color',
                             'value' => (isset($params['style']['thsa_qg_border_color']))? $params['style']['thsa_qg_border_color'] : null
-                        ]
+                        ],
+                        [
+                            'type' => 'thsa_qg_padding',
+                            'value' => (isset($params['style']['thsa_qg_padding']))? $params['style']['thsa_qg_padding'] : null
+                            ]
 
                     ]
                 ); 
+
+                if($label == 'Total Today'){
+                    echo $this->render_inline_style(
+                        [
+                            [
+                            'type' => 'thsa_qg_total_row_color',
+                            'value' => (isset($params['style']['thsa_qg_total_row_color']))? $params['style']['thsa_qg_total_row_color'] : null
+                            ],
+                            [
+                            'type' => 'thsa_qg_total_font_color',
+                            'value' => (isset($params['style']['thsa_qg_total_font_color']))? $params['style']['thsa_qg_total_font_color'] : null
+                            ],
+                            [
+                                'type' => 'thsa_qg_total_font_size',
+                                'value' => (isset($params['style']['thsa_qg_total_font_size']))? $params['style']['thsa_qg_total_font_size'] : null
+                            ],
+                            [
+                                'type' => 'thsa_qg_padding',
+                                'value' => (isset($params['style']['thsa_qg_padding']))? $params['style']['thsa_qg_padding'] : null
+                                ]
+                        ]
+                    );
+                }
             ?>"></td>
                         <td style="<?php 
                 echo $this->render_inline_style(
@@ -246,10 +308,37 @@
                         [
                             'type' => 'thsa_qg_border_color',
                             'value' => (isset($params['style']['thsa_qg_border_color']))? $params['style']['thsa_qg_border_color'] : null
-                        ]
+                        ],
+                        [
+                            'type' => 'thsa_qg_padding',
+                            'value' => (isset($params['style']['thsa_qg_padding']))? $params['style']['thsa_qg_padding'] : null
+                            ]
 
                     ]
                 ); 
+
+                if($label == 'Total Today'){
+                    echo $this->render_inline_style(
+                        [
+                            [
+                            'type' => 'thsa_qg_total_row_color',
+                            'value' => (isset($params['style']['thsa_qg_total_row_color']))? $params['style']['thsa_qg_total_row_color'] : null
+                            ],
+                            [
+                            'type' => 'thsa_qg_total_font_color',
+                            'value' => (isset($params['style']['thsa_qg_total_font_color']))? $params['style']['thsa_qg_total_font_color'] : null
+                            ],
+                            [
+                                'type' => 'thsa_qg_total_font_size',
+                                'value' => (isset($params['style']['thsa_qg_total_font_size']))? $params['style']['thsa_qg_total_font_size'] : null
+                            ],
+                            [
+                                'type' => 'thsa_qg_padding',
+                                'value' => (isset($params['style']['thsa_qg_padding']))? $params['style']['thsa_qg_padding'] : null
+                                ]
+                        ]
+                    );
+                }
             ?> font-weight: bold;"><?php esc_html_e($label,'thsa-quote-generator'); ?></td>
                         <td colspan="2" style="<?php 
                 echo $this->render_inline_style(
@@ -265,10 +354,37 @@
                         [
                             'type' => 'thsa_qg_border_color',
                             'value' => (isset($params['style']['thsa_qg_border_color']))? $params['style']['thsa_qg_border_color'] : null
-                        ]
+                        ],
+                        [
+                            'type' => 'thsa_qg_padding',
+                            'value' => (isset($params['style']['thsa_qg_padding']))? $params['style']['thsa_qg_padding'] : null
+                            ]
 
                     ]
                 ); 
+
+                if($label == 'Total Today'){
+                    echo $this->render_inline_style(
+                        [
+                            [
+                            'type' => 'thsa_qg_total_row_color',
+                            'value' => (isset($params['style']['thsa_qg_total_row_color']))? $params['style']['thsa_qg_total_row_color'] : null
+                            ],
+                            [
+                            'type' => 'thsa_qg_total_font_color',
+                            'value' => (isset($params['style']['thsa_qg_total_font_color']))? $params['style']['thsa_qg_total_font_color'] : null
+                            ],
+                            [
+                                'type' => 'thsa_qg_total_font_size',
+                                'value' => (isset($params['style']['thsa_qg_total_font_size']))? $params['style']['thsa_qg_total_font_size'] : null
+                            ],
+                            [
+                                'type' => 'thsa_qg_padding',
+                                'value' => (isset($params['style']['thsa_qg_padding']))? $params['style']['thsa_qg_padding'] : null
+                                ]
+                        ]
+                    );
+                }
             ?>; text-align: right; font-weight: bold;"><?php echo $value; ?></td>
                     </tr>
             <?php 
@@ -276,7 +392,52 @@
                     foreach($value as $fee):
             ?>
                     <tr>
-                        <td></td>
+                        <td style="<?php 
+                echo $this->render_inline_style(
+                    [
+                        [
+                        'type' => 'thsa_qg_text_color',
+                        'value' => (isset($params['style']['thsa_qg_text_color']))? $params['style']['thsa_qg_text_color'] : null
+                        ],
+                        [
+                        'type' => 'thsa_qg_background_color',
+                        'value' => (isset($params['style']['thsa_qg_background_color']))? $params['style']['thsa_qg_background_color'] : null
+                        ],
+                        [
+                            'type' => 'thsa_qg_border_color',
+                            'value' => (isset($params['style']['thsa_qg_border_color']))? $params['style']['thsa_qg_border_color'] : null
+                        ],
+                        [
+                            'type' => 'thsa_qg_padding',
+                            'value' => (isset($params['style']['thsa_qg_padding']))? $params['style']['thsa_qg_padding'] : null
+                            ]
+
+                    ]
+                ); 
+            ?> font-weight: bold;"></td>
+                        <td style="<?php 
+                echo $this->render_inline_style(
+                    [
+                        [
+                        'type' => 'thsa_qg_text_color',
+                        'value' => (isset($params['style']['thsa_qg_text_color']))? $params['style']['thsa_qg_text_color'] : null
+                        ],
+                        [
+                        'type' => 'thsa_qg_background_color',
+                        'value' => (isset($params['style']['thsa_qg_background_color']))? $params['style']['thsa_qg_background_color'] : null
+                        ],
+                        [
+                            'type' => 'thsa_qg_border_color',
+                            'value' => (isset($params['style']['thsa_qg_border_color']))? $params['style']['thsa_qg_border_color'] : null
+                        ],
+                        [
+                            'type' => 'thsa_qg_padding',
+                            'value' => (isset($params['style']['thsa_qg_padding']))? $params['style']['thsa_qg_padding'] : null
+                            ]
+
+                    ]
+                ); 
+            ?> font-weight: bold;"><?php esc_attr_e($fee['name'],'thsa-quote-generator'); ?></td>
                         <td colspan="2" style="<?php 
                 echo $this->render_inline_style(
                     [
@@ -291,30 +452,15 @@
                         [
                             'type' => 'thsa_qg_border_color',
                             'value' => (isset($params['style']['thsa_qg_border_color']))? $params['style']['thsa_qg_border_color'] : null
-                        ]
+                        ],
+                        [
+                            'type' => 'thsa_qg_padding',
+                            'value' => (isset($params['style']['thsa_qg_padding']))? $params['style']['thsa_qg_padding'] : null
+                            ]
 
                     ]
                 ); 
-            ?>"><?php esc_attr_e($fee['name'],'thsa-quote-generator'); ?></td>
-                        <td colspan="1" style="<?php 
-                echo $this->render_inline_style(
-                    [
-                        [
-                        'type' => 'thsa_qg_text_color',
-                        'value' => (isset($params['style']['thsa_qg_text_color']))? $params['style']['thsa_qg_text_color'] : null
-                        ],
-                        [
-                        'type' => 'thsa_qg_background_color',
-                        'value' => (isset($params['style']['thsa_qg_background_color']))? $params['style']['thsa_qg_background_color'] : null
-                        ],
-                        [
-                            'type' => 'thsa_qg_border_color',
-                            'value' => (isset($params['style']['thsa_qg_border_color']))? $params['style']['thsa_qg_border_color'] : null
-                        ]
-
-                    ]
-                ); 
-            ?>"><?php echo wc_price($fee['amount']); ?></td>
+            ?> font-weight: bold; text-align: right;"><?php echo wc_price($fee['amount']); ?></td>
                     </tr>
             <?php
                     endforeach;

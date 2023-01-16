@@ -989,7 +989,6 @@ function thsa_qg_calculate(source = null)
                 get_set_total = thsa_qg_product_total();
                 var discount = thsa_qg_fixed_calculation(get_set_total);
                 var fee = thsa_qg_fee_calculation();
-
                 var type = jQuery('.thsa_qg_payment_type').val();
                 if(type == 'upfront'){
                     get_set_total = (get_set_total - discount) + fee;
@@ -1004,6 +1003,7 @@ function thsa_qg_calculate(source = null)
                 }
                 break;
         }
+        
         jQuery('.thsa_qg_total_field').val( thsa_qg_format_numbers( get_set_total ) );
         thsa_qg_update_label();
         
@@ -1029,7 +1029,7 @@ function thsa_qg_fixed_calculation(get_set_total = 0)
 
     var get_dis_fixed = jQuery('.thsa_qg_fix_amount').val();
     get_dis_fixed = (get_dis_fixed)? get_dis_fixed : 0;
-    get_dis_fixed = parseInt(get_dis_fixed);
+    get_dis_fixed = parseFloat(get_dis_fixed);
     var temp_percent = get_dis_fixed / get_set_total * 100;
     if(temp_percent > 0){
         jQuery('.thsa_qg_percent_amount').val(thsa_qg_round_number(temp_percent));

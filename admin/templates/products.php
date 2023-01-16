@@ -57,7 +57,7 @@
                                         <td>
                                             <input name="thsa_qg_added_product_qty[]" class="thsa_qg_added_product_qty" value="<?php esc_html_e( $product['qty'] ,'thsa-quote-generator'); ?>" type="number">
                                         </td>
-                                        <td class="thsa_qg_product_amount" data-amount="<?php esc_attr_e($product['price_number']); ?>"><?php esc_html_e( $product['amount'] ,'thsa-quote-generator'); ?></td>
+                                        <td class="thsa_qg_product_amount" data-amount="<?php esc_attr_e($product['amount_num']); ?>"><?php esc_html_e( $product['amount'] ,'thsa-quote-generator'); ?></td>
                                     </tr>
                                 <?php 
                             endforeach;  

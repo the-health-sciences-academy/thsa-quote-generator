@@ -103,6 +103,6 @@ function thsa_qg_init(){
         new thsa\qg\admin\thsa_qg_admin_class();
     }
     //load public
-    new thsa\qg\public\thsa_qg_public_class();
+    new thsa\qg\front\thsa_qg_public_class();
 }
 ?>

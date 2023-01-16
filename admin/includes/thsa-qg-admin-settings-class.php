@@ -53,6 +53,30 @@ class thsa_qg_admin_settings_class extends thsa_qg_common_class
         //add custom menu
         add_action('admin_menu',[$this, 'submenu']);
 
+        add_action('admin_enqueue_scripts', [$this, 'load_settings_assets']);
+
+        $this->default_email_text = "<p>Hi ".$this->shortcodes[0].",</p><p>Kindly find below the quotation you requested </p>".$this->shortcodes[1]."<p> Any questions or concerns please contact us through this email ".get_bloginfo('admin_email')."</p>Regards,<p>".get_bloginfo('site_name')."</p>";
+
+        $this->default_admin_email = get_bloginfo('admin_email');
+
+        $this->default_email_title = get_bloginfo('site_title').__(' - Quotation','thsa_quote_generator');
+
+        add_action('wp_ajax_thsa_qg_save_settings', [$this, 'thsa_qg_save_settings']);
+        
+    }
+
+    /**
+     * 
+     * 
+     * load_settings_assets
+     * @since 1.2.0
+     * @param
+     * @return
+     * 
+     * 
+     */
+    public function load_settings_assets()
+    {
         wp_register_script( THSA_QG_PREFIX.'-admin-settings-js', THSA_QG_PLUGIN_URL.'admin/assets/js/thsa-qg-settings.js', array('jquery') );
         wp_enqueue_script( THSA_QG_PREFIX.'-admin-settings-js' );
         wp_enqueue_style( THSA_QG_PREFIX.'-admin-settings-css', THSA_QG_PLUGIN_URL.'admin/assets/css/thsa-qg-settings.css');
@@ -176,16 +200,6 @@ class thsa_qg_admin_settings_class extends thsa_qg_common_class
         wp_register_script( THSA_QG_PREFIX.'-admin-color-js', THSA_QG_PLUGIN_URL.'admin/assets/js/coloris.min.js', array('jquery') );
         wp_enqueue_script( THSA_QG_PREFIX.'-admin-color-js' );
         wp_enqueue_style( THSA_QG_PREFIX.'-admin-color-css', THSA_QG_PLUGIN_URL.'admin/assets/css/coloris.min.css');
-
-
-        $this->default_email_text = "Hi ".$this->shortcodes[0].",\n\nKindly find below the quotation you requested \n\n".$this->shortcodes[1]."\n\n Any questions or concerns please contact us through this email ".get_bloginfo('admin_email')."\n\nRegards,\n".get_bloginfo('site_name');
-
-        $this->defaul_admin_email = get_bloginfo('admin_email');
-
-        $this->default_email_title = get_bloginfo('site_title').__(' - Quotation','thsa_quote_generator');
-
-        add_action('wp_ajax_thsa_qg_save_settings', [$this, 'thsa_qg_save_settings']);
-        
     }
 
     /**
@@ -266,7 +280,69 @@ class thsa_qg_admin_settings_class extends thsa_qg_common_class
      */
     public function settings()
     {
-        $this->set_template('settings',['path' => 'admin']);
+        $tabs = [
+            [
+                'text' => 'General',
+                'target' => 'thsa_set_gen_con',
+                'status' => 'active'
+            ],
+            [
+                'text' => 'Coupon',
+                'target' => 'thsa_set_coupon_con',
+                'status' => ''
+            ],
+            [
+                'text' => 'Email',
+                'target' => 'thsa_set_email_con',
+                'status' => ''
+            ]
+        ];
+
+        
+        $pro_data = $this->pro_features(
+            [
+                'text' => 'Quotation',
+                'target' => 'thsa_set_quote_con',
+                'status' => ''
+            ]
+        );
+
+        if( isset($pro_data) ){
+            $tabs[] = $pro_data;
+        }
+
+
+        $tab_targets = [
+            [
+                'class' => 'thsa_set_gen_con',
+                'content' => [$this, 'general_settings'],
+                'status' => 'active'
+            ],
+            [
+                'class' => 'thsa_set_coupon_con',
+                'content' => [$this, 'coupon_settings'],
+                'status' => null
+            ],
+            [
+                'class' => 'thsa_set_email_con',
+                'content' => [$this, 'email_settings'],
+                'status' => null
+            ]
+        ];
+
+        $pro_data_targets = $this->pro_features(
+            [
+                'class' => 'thsa_set_quote_con',
+                'content' => [$this, 'quote_settings'],
+                'status' => null
+            ]
+        );
+
+        if( isset($pro_data_targets) ){
+            $tab_targets[] = $pro_data_targets;
+        }
+
+        $this->set_template('settings',['path' => 'admin', 'tabs' => $tabs, 'tab_targets' => $tab_targets]);
     }
 
     /**
@@ -360,7 +436,7 @@ class thsa_qg_admin_settings_class extends thsa_qg_common_class
             [
                 'path' => 'admin', 
                 'message' => (isset($email['content']))? $email['content'] : $this->default_email_text, 
-                'email' => (isset($email['from_email']))? $email['from_email'] : $this->defaul_admin_email,
+                'email' => (isset($email['from_email']))? $email['from_email'] : $this->default_admin_email,
                 'title' => (isset($email['title']))? $email['title'] : $this->default_email_title,
                 'shortcodes' => $this->shortcodes
             ]
@@ -378,12 +454,15 @@ class thsa_qg_admin_settings_class extends thsa_qg_common_class
     public function quote_settings()
     {
         $plate = $this->get_settings('plates');
-        $this->set_template('part-settings/part-quotation',
+        $this->pro_features( $plate, 'settings-quotation' );
+
+        //remove this if final
+        /*$this->set_template('part-settings/part-quotation',
         [
             'path' => 'admin',
             'plate' => $plate
         ]   
-        );
+        );*/
     }
 
 
@@ -440,7 +519,7 @@ class thsa_qg_admin_settings_class extends thsa_qg_common_class
         [
             'path' => 'admin',
             'products' => $products_,
-            'settings' => $settings['coupon']
+            'settings' => ( isset($settings['coupon']) )? $settings['coupon'] : null
         ]   
         );
     }
@@ -554,7 +633,7 @@ class thsa_qg_admin_settings_class extends thsa_qg_common_class
                     break;
                 case 'plates':
 
-                    $plates = ['thsa_qg_plate_name', 'thsa_qg_background_color', 'thsa_qg_text_color', 'thsa_qg_header_text_color', 'thsa_qg_header_color', 'thsa_qg_border_color', 'thsa_qg_total_font_color','thsa_qg_total_row_color','thsa_qg_total_font_size'];
+                    $plates = ['thsa_qg_plate_name', 'thsa_qg_background_color', 'thsa_qg_text_color', 'thsa_qg_header_text_color', 'thsa_qg_header_color', 'thsa_qg_border_color', 'thsa_qg_total_font_color','thsa_qg_total_row_color','thsa_qg_total_font_size', 'thsa_qg_padding'];
 
                     $qplates = [];
                     foreach($plates as $plate){
