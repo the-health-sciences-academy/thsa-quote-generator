@@ -217,15 +217,6 @@ class thsa_qg_admin_settings_class extends thsa_qg_common_class
 
         add_submenu_page(
             'edit.php?post_type=thsa-quote-generator',
-            __( 'Subscriptions', 'thsa-quote-generator' ),
-            __( 'Subscriptions', 'thsa-quote-generator' ),
-            'manage_options',
-            'thsaqgsubscriptions',
-            [$this, 'subscriptions']
-        );
-
-        add_submenu_page(
-            'edit.php?post_type=thsa-quote-generator',
             __( 'Settings', 'thsa-quote-generator' ),
             __( 'Settings', 'thsa-quote-generator' ),
             'manage_options',
@@ -357,46 +348,6 @@ class thsa_qg_admin_settings_class extends thsa_qg_common_class
     public function about()
     {
         $this->set_template('about',['path' => 'admin']);
-    }
-
-    /**
-     * 
-     * 
-     * subscriptions
-     * @since 1.2.0
-     * @param
-     * @return
-     * 
-     * 
-     */
-    public function subscriptions()
-    {
-        $args = [
-            'posts_per_page' => -1,
-            'post_type' => 'product',
-            'tax_query' => [
-                [
-                    'taxonomy' => $this->product_tag,
-                    'field' => 'slug',
-                    'terms' => $this->quote_slug_tag
-                ]
-            ],
-            'order' => 'DESC',
-            'orderby' => 'post_date',
-            'post_status' => 'publish'
-        ];
-        $quotes = get_posts( $args );
-        $data = [];
-        foreach( $quotes as $quote ){
-            $user = get_userdata( $quote->post_author );
-            $data[$quote->ID] = [
-                'title' => $quote->post_title,
-                'author' => $user->user_nicename,
-                'date' => date('M d, Y - h:i A', strtotime($quote->post_date)),
-                'edit' => get_edit_post_link($quote->ID)
-            ];
-        }
-        $this->set_template('subscriptions',['path' => 'admin', 'data' => $data]);
     }
 
     /**
