@@ -34,17 +34,17 @@
             <tbody class="thsa_qg_added_fees">
 
             <?php 
-                if(isset($params['data']['fees'])): 
-                    foreach($params['data']['fees'] as $fee):   
-                        $fee_json = json_encode($fee); 
+                if( isset( $params['data']['fees'] ) ): 
+                    foreach( $params['data']['fees'] as $fee ):   
+                        $fee_json = json_encode( $fee ); 
             ?>
-                    <tr data-fee="<?php esc_html_e($fee['fee_amount'],'thsa-quote-generator'); ?>">
+                    <tr data-fee="<?php echo esc_attr( $fee['fee_amount'] ); ?>">
                         <td>
                             <input type="checkbox">
                             <input name="thsa_qg_added_fee[]" value="<?php echo htmlentities($fee_json); ?>" type="hidden">
                         </td>
-                        <td><?php esc_html_e($fee['fee_name'],'thsa-quote-generator'); ?></td>
-                        <td><?php esc_html_e( $this->format_number([ 'amount' => $fee['fee_amount'], 'round' => false] ),'thsa-quote-generator'); ?></td>
+                        <td><?php echo esc_html( $fee['fee_name'] ); ?></td>
+                        <td><?php echo esc_html( $this->format_number( [ 'amount' => $fee['fee_amount'], 'round' => false] ) ); ?></td>
                     </tr>
             <?php 
                     endforeach;

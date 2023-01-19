@@ -181,7 +181,9 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
                 'has_currencies'    => $this->support_plugin->has_currencies,
                 'manage_email_content' => 'thsa_qg_manage_email_content',
                 'is_admin_edit'     => (isset($_GET['post']))? true : false,
-                'save_plate'        => 'thsa_qg_save_plate'
+                'save_plate'        => 'thsa_qg_save_plate',
+                'default_currency'  => get_woocommerce_currency(),
+                'upgraded_features' => $this->pro_features(null, 'upgraded')
             ]
         );
 
@@ -210,7 +212,6 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         add_action('wp_ajax_thsa_qg_product_select_options', [$this, 'thsa_qg_product_select_options']);
         add_action('wp_ajax_thsa_qg_product_from_cat', [$this, 'thsa_qg_product_from_cat']);
         add_action('wp_ajax_thsa_qg_send_email', [$this, 'thsa_qg_send_email']);
-        add_action('wp_ajax_thsa_qg_manage_email_content',[$this, 'thsa_qg_manage_email_content']);
         add_action('wp_ajax_thsa_qg_product_currency_prices', [$this, 'thsa_qg_product_currency_prices']);
 
     }
@@ -454,7 +455,7 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         }
         $currencies = get_woocommerce_currencies();
         
-        $this->set_template('currency',['path' => 'admin', 'currency' => $currencies, 'current' => $current]);
+        $this->pro_features(['currency' => $currencies, 'current' => $current ], 'currency');
         $this->set_template('customer-details',['path' => 'admin', 'post' => $post, 'data' => $customer, 'tab' =>  $tab]);
         $this->set_template('products',['path' => 'admin', 'products' => $products]);
         $this->set_template('discounts',['path' => 'admin','data' => $data, 'taxes' => $this->get_taxes()]);
@@ -906,10 +907,14 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
 
     /**
      * 
+     * 
+     * 
      * save_quote
      * @since 1.2.0
      * @param int
      * @return
+     * 
+     * 
      * 
      */
     public function save_quote($post_id){
@@ -981,91 +986,7 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
 
         if(isset($quote_data['payment_type'])){
             if($quote_data['payment_type'] == 'plan'){
-
-                $is_virtual = (!empty($_POST['thsa_qg_sub_is_virtual']))? 'yes' : 'no';
-                if($is_virtual){
-                    $quote_data['is_virtual'] = $is_virtual;
-                }
-
-                $is_dl = (!empty($_POST['thsa_qg_sub_is_dl']))? 'yes' : 'no';
-                if($is_dl){
-                    $quote_data['is_download'] = $is_dl;
-                    if($is_dl == 'yes'){
-                        $dl_files = [];
-                        foreach($_POST['thsa_qg_file_name'] as $index => $file){
-                            
-                            if(!isset($file))
-                                continue;
-
-                            $id = md5($file);
-                            $dl_files[$id] = [
-                                'id' => $id,
-                                'name' => sanitize_text_field($file),
-                                'file' => sanitize_url($_POST['thsa_qg_file_url'][$index])
-                            ];
-                        }
-                        $quote_data['dl_files'] = $dl_files;
-                    }else{
-                        $quote_data['dl_files'] = null;
-                    }
-
-                    $dl_limit = (!empty($_POST['thsa_qg_sub_dl_limit']))? sanitize_text_field($_POST['thsa_qg_sub_dl_limit']) : -1;
-                    if($dl_limit){
-                        $quote_data['dl_limit'] = $dl_limit;
-                    }
-
-                    $dl_limit_expiry = (!empty($_POST['thsa_qg_sub_dl_expiry']))? sanitize_text_field($_POST['thsa_qg_sub_dl_expiry']) : -1;
-                    if($dl_limit_expiry){
-                        $quote_data['dl_limit_expiry'] = $dl_limit_expiry;
-                    }
-
-                }
-
-                $term_number = (!empty($_POST['thsa_qg_term_number']))? sanitize_text_field($_POST['thsa_qg_term_number']) : null;
-                if($term_number){
-                    $quote_data['term_number'] = $term_number;
-                }
-
-                $term_every = (!empty($_POST['thsa_qg_term_every']))? sanitize_text_field($_POST['thsa_qg_term_every']) : null;
-                if($term_every){
-                    $quote_data['term_plan_every'] = $term_every;
-                }
-
-                $plan_type = (!empty($_POST['thsa_qg_plan_term']))? sanitize_text_field($_POST['thsa_qg_plan_term']) : null;
-                if($plan_type){
-                    $quote_data['term_plan_type'] = $plan_type;
-                }
-
-                $term_edit = (!empty($_POST['thsa_allow_term_edit']))? sanitize_text_field($_POST['thsa_allow_term_edit']) : null;
-                if($term_edit){
-                    $quote_data['allow_term_edit'] = $term_edit;
-                }
-
-                $every_term = (!empty($_POST['thsa_qg_term_every']))? sanitize_text_field($_POST['thsa_qg_term_every']) : 1;
-                if($every_term){
-                    $quote_data['term_every'] = $every_term;
-                }
-
-                $free_trial = (!empty($_POST['thsa_qg_sub_free_trial']))? sanitize_text_field($_POST['thsa_qg_sub_free_trial']) : null;
-                if($free_trial){
-                    $quote_data['free_trial_interval'] = $free_trial;
-                }
-
-                $free_trial_duration = (!empty($_POST['thsa_qg_sub_free_trial_duration']))? sanitize_text_field($_POST['thsa_qg_sub_free_trial_duration']) : null;
-                if($free_trial_duration){
-                    $quote_data['free_trial_interval_duration'] = $free_trial_duration;
-                }
-
-                $is_tax = (!empty($_POST['thsa_qg_sub_tax_status']))? sanitize_text_field($_POST['thsa_qg_sub_tax_status']) : null;
-                if($is_tax){
-                    $quote_data['is_taxable'] = $is_tax;
-                }
-
-                $tax_class = (!empty($_POST['thsa_qg_sub_tax_class']))? sanitize_text_field($_POST['thsa_qg_sub_tax_class']) : null;
-                if($tax_class){
-                    $quote_data['tax_class'] = $tax_class;
-                }
-
+                $quote_data = $this->pro_features( [ 'post' => $_POST, 'quote_data' => $quote_data ], 'payment_plan_settings_data_save' );
                 $plan_id = $this->support_plugin->generate_plan($post_id, $quote_data);
             }
         }
@@ -1367,51 +1288,6 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         }
 
     }
-
-    /**
-     * 
-     * 
-     * thsa_qg_manage_email_content
-     * @since 1.2.0
-     * @param
-     * @return
-     * 
-     * 
-     */
-    public function thsa_qg_manage_email_content()
-    {
-        if ( ! wp_verify_nonce( $_POST['nonce'], 'thsa-quotation-generator' ) ) {
-            echo json_encode([
-                'status' => 'failed',
-                'message' => 'Error 105: Invalid Nonce'
-            ]);
-            exit();
-        }
-
-        if(isset($_POST['content'])){
-            $_POST['content'] = stripslashes($_POST['content']);
-            $content =  sanitize_text_field(htmlentities($_POST['content']));
-            $id = sanitize_text_field( $_POST['id'] );
-            if( isset($content) ){
-                update_post_meta( $id, 'thsa_qg_email_content', $content );
-            }else{
-                delete_post_meta( $id, 'thsa_qg_email_content' );
-            }
-
-            echo json_encode([
-                'status' => 'success',
-                'message' => ''
-            ]);
-            exit();
-        }else{
-            echo json_encode([
-                'status' => 'failed',
-                'message' => 'Error 106: No quotation ID found'
-            ]);
-            exit();
-        }
-    }
-
 
     /**
      * 

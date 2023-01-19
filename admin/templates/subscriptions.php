@@ -5,9 +5,9 @@
     <table class="wp-list-table widefat fixed striped table-view-list">
         <thead>
             <tr>
-                <th width="70%">Title</th>
-                <th width="15%">Author</th>
-                <th width="15%">Date Published</th>
+                <th width="70%"><?php esc_attr_e( 'Title', 'thsa-quote-generator'); ?></th>
+                <th width="15%"><?php esc_attr_e( 'Author', 'thsa-quote-generator'); ?></th>
+                <th width="15%"><?php esc_attr_e( 'Date Published', 'thsa-quote-generator'); ?></th>
             </tr>
         </thead>
         <tbody>
@@ -15,9 +15,9 @@
                     foreach( $params['data'] as $quote ):    
             ?>
             <tr>
-                <td><a href="<?php echo esc_url( $quote['edit'] ); ?>" target="_blank"><?php esc_html_e( $quote['title'] ); ?></a></td>
-                <td><?php esc_html_e( $quote['author'] ); ?></td>
-                <td><?php esc_html_e( $quote['date'] ); ?></td>
+                <td><a href="<?php echo esc_url( $quote['edit'] ); ?>" target="_blank"><?php echo esc_html( $quote['title'] ); ?></a></td>
+                <td><?php echo esc_html( $quote['author'] ); ?></td>
+                <td><?php echo esc_html( $quote['date'] ); ?></td>
             </tr>
             <?php 
                     endforeach;

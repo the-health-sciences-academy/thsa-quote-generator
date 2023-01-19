@@ -157,8 +157,6 @@ class thsa_qg_common_class
 		if(empty($data))
 			return;
 
-
-
 		$data = apply_filters('thsa_quote_settings_content_manager', $data);
 		$content = null;
 		foreach($data as $row){
@@ -463,23 +461,41 @@ class thsa_qg_common_class
 	 */
 	public function pro_features( $data = null, $type = null )
 	{
-		if( !$data )
-			return;
-
+		
 		if( is_plugin_active('thsa-quote-generator-pro/thsa-quote-generator-pro.php') ){
-
+			$pro = 'thsa\qg\pro\admin\thsa_qg_pro_admin_class';
+			$pro_content = new $pro();
 			switch( $type ){
 				case 'settings-quotation':
-					$pro = 'thsa\qg\pro\admin\thsa_qg_pro_admin_class';
-					$pro_content = new $pro();
 					$pro_content->load_qoutation_settings( $data );
+					break;
+				case 'edit-email':
+					$pro_content->load_edit_email( $data );
+					break;
+				case 'currency':
+					$pro_content->load_currency( $data );
+					break;
+				case 'payment-plan':
+					$pro_content->load_payment_plan( $data );
+					break;
+				case 'payment-plan-settings':
+					$pro_content->load_payment_plan_settings( $data );
+					break;
+				case 'payment-plan-settings-area':
+					$pro_content->load_payment_plan_settings_area( $data );
+					break;
+				case 'payment_plan_settings_data_save':
+					return $pro_content->load_plan_settings_save( $data );
+					break;
+				case 'upgraded':
+					return true;
 					break;
 				default:
 					return $data;
 				break;
 			}
 		}else{
-			return;
+			return null;
 		}
 
 	}

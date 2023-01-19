@@ -233,14 +233,14 @@ class thsa_qg_admin_settings_class extends thsa_qg_common_class
             [$this, 'settings']
         );
 
-        add_submenu_page(
+        /*add_submenu_page(
             'edit.php?post_type=thsa-quote-generator',
             __( 'About', 'thsa-quote-generator' ),
             __( 'About', 'thsa-quote-generator' ),
             'manage_options',
             'thsaqgabout',
             [$this, 'about']
-        );
+        );*/
     }
 
     /**
@@ -455,14 +455,6 @@ class thsa_qg_admin_settings_class extends thsa_qg_common_class
     {
         $plate = $this->get_settings('plates');
         $this->pro_features( $plate, 'settings-quotation' );
-
-        //remove this if final
-        /*$this->set_template('part-settings/part-quotation',
-        [
-            'path' => 'admin',
-            'plate' => $plate
-        ]   
-        );*/
     }
 
 

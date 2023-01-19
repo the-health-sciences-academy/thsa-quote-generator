@@ -1,6 +1,6 @@
 <div class="thsa_qg_wrapper thsa_qg_settings_wrapper">
     <div class="thsa_qg_inner">
-        <h2><?php _e('Settings','thsa-quote-generator'); ?></h2>
+        <h2><?php esc_html_e('Settings','thsa-quote-generator'); ?></h2>
         <ul class="thsa_qg_settings_tab">
             <?php 
                 echo $this->tab_settings_manager( $params['tabs'] );

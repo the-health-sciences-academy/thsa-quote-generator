@@ -24,7 +24,7 @@ jQuery(document).ready(function(){
         }
     });
 
-    if(!thsaqgvars.has_currencies){
+    if(!thsaqgvars.has_currencies && thsaqgvars.upgraded_features ){
         jQuery('.thsa_qg_currency_notice').css('display','inline-block');
     }
 
@@ -438,41 +438,6 @@ jQuery(document).ready(function(){
         }
     });
 
-    //manage email
-    jQuery('.thsa_qg_manage_email_content').click(function(){
-        jQuery('.thsa_qg_manage_content').show();
-    });
-
-    jQuery('#thsa_qg_close_manage_content').click(function(){
-        jQuery('.thsa_qg_manage_content').hide();
-    });
-
-    jQuery('#thsa_qg_manage_content_last').click(function(){
-        jQuery(this).prop('disabled', true);
-        jQuery(this).val('Saving...');
-        var get_id = jQuery(this).data('id');
-        var get_content = tinymce.get('thsaqgmanageemailcontent').getContent({format: 'raw'});
-        jQuery.ajax({
-            method: "POST",
-            url: thsaqgvars.ajaxurl,
-            data: { 
-                action: thsaqgvars.manage_email_content,
-                content: get_content,
-                id: get_id,
-                nonce: thsaqgvars.nonce
-            }
-            }).done(function( response ) {
-                var details = JSON.parse(response);
-                if(details.status == 'success'){
-                    jQuery('.thsa_qg_manange_email_con').show();
-                }else{
-                    alert(details.message);
-                }
-                jQuery('#thsa_qg_manage_content_last').prop('disabled', false);
-                jQuery('#thsa_qg_manage_content_last').val('Save');
-            }
-        );
-    });
 
     jQuery('#thsa_qg_close_preview').click(function(){
         jQuery('.thsa_qg_preview_email').hide();
@@ -684,22 +649,6 @@ jQuery(document).ready(function(){
         }
     });
 
-    if( thsaqgvars.is_admin_edit ){
-        jQuery('.thsa_qg_currency').on('select2:open',function(){
-            thsa_prev_curren = jQuery(this).val();   
-            if(!confirm(labels_.currency_confirm)){
-                jQuery('.thsa_qg_currency').select2("close");
-            }
-        });
-
-        jQuery('.thsa_qg_currency').on('change', function(){
-            thsa_qg_reset_add_product();
-        });
-    }
-
-    
-    
-
 });
 
 function thsa_qg_load_select()
@@ -713,7 +662,7 @@ function thsa_qg_load_select()
             url: thsaqgvars.ajaxurl,
             data: function (params) {
                 var get_filter = jQuery('.thsa_qg_filter_option').val();
-                var get_currency = jQuery('.thsa_qg_currency').val();
+                var get_currency = ( thsaqgvars.upgraded_features )? jQuery('.thsa_qg_currency').val() : thsaqgvars.default_currency;
                 var query = {
                     search: params.term,
                     action: thsaqgvars.product_options,
@@ -931,7 +880,7 @@ function thsa_qg_gen_selected_category(obj, type = null){
     jQuery('.thsa_qg_product_select, .thsa_qg_filter_option').selectWoo("enable", false);
     
     var term = jQuery(obj).val();
-    var currency = jQuery('.thsa_qg_currency').val();
+    var currency = ( thsaqgvars.upgraded_features )? jQuery('.thsa_qg_currency').val() : thsaqgvars.default_currency;
 
     jQuery.ajax({
         method: "POST",
@@ -1213,7 +1162,7 @@ function thsa_qg_reset_add_product()
         }
     } );
 
-    var currency = jQuery('.thsa_qg_currency').val();
+    var currency = ( thsaqgvars.upgraded_features )? jQuery('.thsa_qg_currency').val() : thsaqgvars.default_currency;
 
     //call new currency
     jQuery.ajax({
