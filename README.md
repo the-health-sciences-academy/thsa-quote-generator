@@ -1,4 +1,4 @@
-# THSA - Quotation Generator for WooCommerce
+# THSA Quotation Generator for WooCommerce
 Contributors: thsadevteam
 Tags: Extension, WooCommerce, Product, eCommerce, Quotation
 Requires at least: 4.7

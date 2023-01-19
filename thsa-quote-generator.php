@@ -1,26 +1,17 @@
 <?php
-/**
- *
- * Plugin Information
+ /** 
  * 
- * @link              http://thehealthsciencesacademy.org/tool/plugins/thsa-quote-generator
- * @since             1.2.0
- * @package           thsa_quote_generator
- *
- * @wordpress-plugin
- * Plugin Name:       THSA Quotation Generator
- * Plugin URI:        http://thehealthsciencesacademy.org/tool/plugins/thsa-quote-generator
- * Description:       THSA plugin that will generate custom quotation generator
- * Version:           1.2.0
- * Author:            thsa
- * Author URI:        http://thehealthsciencesacademy.org/tool/plugins/thsa-quote-generator
- * Text Domain:       thsa-quote-generator
- * Domain Path:       /languages
- * Plugin Type:       Commercial
- * Text Domain:       thsa-quote-generator
+ * Plugin Name: THSA Quotation Generator for WooCommerce
+ * Plugin URI: https://thsaapps.com/subscription-switcher/
+ * Description: Enables a display of simple subscriptions linked in a grouped product so users can easily switch between them
+ * Author:      thsadevteam
+ * Plugin Type: Extension
+ * Author URI: https://thsaapps.com
+ * Version: 1.2.0
+ * Text Domain: thsa-quote-generator
  * 
  * 
- */
+*/
 
 
 
