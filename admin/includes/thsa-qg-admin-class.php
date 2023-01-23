@@ -84,6 +84,8 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         add_action( 'pre_get_posts' , [ $this,'exclude_quotation'] );
 
         add_action('woocommerce_init', [$this, 'admin_currency'], 0);
+
+        add_filter( 'views_edit-product', [$this, 'update_count'], 10, 1);
     
         
 
@@ -128,10 +130,36 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
      
         if( 'edit.php' == $pagenow && ( get_query_var('post_type') && 'product' == get_query_var('post_type') ) ){
             if(!empty($this->quotation_ids)){
-                $query->set( 'post__not_in', $this->quotation_ids ); 
+                $query->set( 'post__not_in', $this->quotation_ids );
             }
         }
         return $query;
+    }
+
+    /**
+     * 
+     * update counts
+     * @since 1.2.0
+     * @param
+     * @return
+     * 
+     * 
+     */
+    public function update_count( $count )
+    {
+
+        //update all
+        $qg_count = count( $this->quotation_ids );
+        $label_count = [ 'all', 'publish' ];
+
+        foreach( $label_count  as $type ){
+            $clean = strip_tags( $count[ $type ] );
+            $all_count = (int) filter_var( $clean, FILTER_SANITIZE_NUMBER_INT);
+            $new_count = $all_count - $qg_count;
+            $count[ $type ] = str_replace( $all_count, $new_count, $count[ $type ] );
+        }
+
+        return $count;
     }
 
 
