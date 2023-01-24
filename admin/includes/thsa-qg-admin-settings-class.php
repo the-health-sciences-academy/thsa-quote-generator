@@ -486,10 +486,11 @@ class thsa_qg_admin_settings_class extends thsa_qg_common_class
             exit();
         }
 
-        if(isset($_POST['type'])){
+        if( isset( $_POST['type'] ) ){
 
+            $type__ = sanitize_text_field( $_POST['type'] );
 
-            switch($_POST['type']){
+            switch( $type__ ){
                 case 'general':
                     $general = [];
                     if(isset($_POST['checkout'])){

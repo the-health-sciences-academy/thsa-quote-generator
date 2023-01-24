@@ -43,7 +43,7 @@ class thsa_qg_public_shortcodes extends thsa_qg_common_class
         }
 
         ob_start();
-            echo $content;
+            echo esc_html( $content );
         return ob_get_clean();
     }
 
@@ -79,13 +79,13 @@ class thsa_qg_public_shortcodes extends thsa_qg_common_class
                 return ob_get_clean();
             }else{
                 ob_start();
-                    echo $res;
+                    echo wp_kses_post( $res );
                 return ob_get_clean();
             }
 
         }else{
             ob_start();
-                echo $content;
+                echo esc_html( $content );
             return ob_get_clean();
         }
         

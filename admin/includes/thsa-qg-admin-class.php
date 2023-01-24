@@ -240,7 +240,6 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         add_action('wp_ajax_thsa_qg_product_select_options', [$this, 'thsa_qg_product_select_options']);
         add_action('wp_ajax_thsa_qg_product_from_cat', [$this, 'thsa_qg_product_from_cat']);
         add_action('wp_ajax_thsa_qg_send_email', [$this, 'thsa_qg_send_email']);
-        add_action('wp_ajax_thsa_qg_product_currency_prices', [$this, 'thsa_qg_product_currency_prices']);
 
     }
 
@@ -954,7 +953,7 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         $quote_data = [];
 
         //customer details
-        $customer_type = (isset($_POST['thsa_qg_customer_type']))? $_POST['thsa_qg_customer_type'] : null;
+        $customer_type = ( isset( $_POST['thsa_qg_customer_type'] ) )? sanitize_text_field( $_POST['thsa_qg_customer_type'] ) : null;
         $customer_details = null;
         if($customer_type == 1){
             $customer_details = [
@@ -963,7 +962,7 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
                 'email'     => sanitize_text_field($_POST['thsa_qg_customer_email'])  
             ];
         }else{
-            $customer_id = (isset($_POST['thsa_qg_customer_select']))? $_POST['thsa_qg_customer_select'] : null;
+            $customer_id = ( isset( $_POST['thsa_qg_customer_select'] ) )? sanitize_text_field( $_POST['thsa_qg_customer_select'] ) : null;
             $customer_details = sanitize_text_field($customer_id);
         }
 
@@ -972,7 +971,7 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         }
 
         //currency
-        $currency_ = (isset($_POST['thsa_qg_currency']))? $_POST['thsa_qg_currency'] : null;
+        $currency_ = ( isset( $_POST['thsa_qg_currency'] ) )? sanitize_text_field( $_POST['thsa_qg_currency'] ) : null;
         $quote_data['currency'] = sanitize_text_field($currency_);
 
         //products
@@ -1014,7 +1013,18 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
 
         if(isset($quote_data['payment_type'])){
             if($quote_data['payment_type'] == 'plan'){
-                $quote_data = $this->pro_features( [ 'post' => $_POST, 'quote_data' => $quote_data ], 'payment_plan_settings_data_save' );
+
+                //resanitize $_POST
+                $post__ = array_map( function( $data ){
+                    if( is_array( $data ) ){
+                        return array_map( function( $file ){
+                            return sanitize_text_field( $file );
+                         }, $data );
+                    }
+                    return $data;
+                }, $_POST);
+
+                $quote_data = $this->pro_features( [ 'post' => $post__, 'quote_data' => $quote_data ], 'payment_plan_settings_data_save' );
                 $plan_id = $this->support_plugin->generate_plan($post_id, $quote_data);
             }
         }
@@ -1315,99 +1325,6 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
             exit();
         }
 
-    }
-
-    /**
-     * 
-     * 
-     * 
-     * @since 1.2.0
-     * @param
-     * @return
-     * 
-     * 
-     * 
-     */
-    public function thsa_qg_product_currency_prices()
-    {
-        if ( ! wp_verify_nonce( $_POST['nonce'], 'thsa-quotation-generator' ) ) {
-            echo json_encode([
-                'status' => 'failed',
-                'message' => 'Error 105: Invalid Nonce'
-            ]);
-            exit();
-        }
-
-        if( !isset($_POST['products']) ){
-            echo json_encode([
-                'status' => 'failed',
-                'message' => 'Error 106: No product id is found'
-            ]);
-            exit();
-        }
-
-
-        $ids = json_decode(stripslashes($_POST['products']));
-        $products_ar = array_map(function($id){
-            return sanitize_text_field( $id );
-        }, $ids);
-
-        $currency = sanitize_text_field( $_POST['currency'] );
-
-        $products = [];
-        if(!empty( $products_ar )){
-            foreach($products_ar as $product){
-                $product_details = wc_get_product($product);
-
-
-                $price_html = $product_details->get_price_html();
-                $price_number = $product_details->get_price();
-                $price_regular_number = $product_details->get_regular_price();
-                $price_sale_number = $product_details->get_sale_price();
-
-
-                //get prices based on what plugin is installed
-                $prices = $this->support_plugin->currency_values(
-                    [
-                        'product_id' => $product_details->get_id(),
-                        'currency' => $currency,
-                        'product_prices' => [
-                            'price_html' => $price_html,
-                            'price_number' => $price_number,
-                            'price_regular_number' => $price_regular_number,
-                            'price_sale_number' => $price_sale_number
-                        ]
-                    ]
-                );
-
-
-                $products[$product[0]] = [
-                    'id' => $product_details->get_id(),
-                    'text' => $product_details->get_id().' - '.$product_details->get_title(),
-                    'price_html' => $prices['price_html'],
-                    'price_number' => $prices['price_number'],
-                    'price_regular_number' => $prices['price_regular_number'],
-                    'price_sale_number' => $prices['price_sale_number'],
-                    'qty' => $product[1],
-                    'amount' => $this->format_number( ['amount' => $prices['price_number'] * $product[1], 'round' => false ] )
-                ];
-                
-            }
-        }
-
-        if( !empty( $products ) ){
-            echo json_encode([
-                'status' => 'success',
-                'data' => json_encode( $products )
-            ]);
-            exit();
-        }else{
-            echo json_encode([
-                'status' => 'failed',
-                'message' => 'Error 107: No product is found'
-            ]);
-            exit();
-        }
     }
 
 }

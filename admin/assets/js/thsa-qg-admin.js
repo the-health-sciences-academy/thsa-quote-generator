@@ -619,9 +619,7 @@ jQuery(document).ready(function(){
         }
     });
 
-
-
-    if (jQuery('.thsa_qg_upload_file').length > 0) {
+    //if (jQuery('.thsa_qg_upload_file').length > 0) {
         if ( typeof wp !== 'undefined' && wp.media && wp.media.editor) {
             jQuery('body').on('click', '.thsa_qg_upload_file',function(e) {
                 e.preventDefault();
@@ -634,7 +632,7 @@ jQuery(document).ready(function(){
                 return false;
             });
         }
-    }
+    //}
 
     jQuery('.thsa_qg_manage_plan_settings').click(function(){
         jQuery('.thsa_qg_plan_settings').addClass('active');
@@ -1127,66 +1125,4 @@ function thsa_qg_format_numbers( amount = 0 ) {
     
     return parts.join(".");
 
-}
-
-function thsa_qg_reset_add_product()
-{
-    var message_div = thsa_field_generator(
-        {
-            type: 'div',
-            attributes: [
-                {
-                    attr: 'class',
-                    value: 'thsa_qg_select_products_loader'
-                }
-            ]
-        }
-    );
-    var message_div_message = thsa_field_generator(
-        {
-            type: 'span',
-            text: labels_.processing
-        }
-    );
-    jQuery(message_div).append(message_div_message);
-
-    jQuery('.thsa_product_options').prepend(message_div);
-
-
-    //get product ids first
-    var ids = [];
-    jQuery('.thsa_qg_selected_products tr').each( function(){
-        var get_id = jQuery(this).attr('data-selected');
-        if(get_id){
-            ids.push(get_id); 
-        }
-    } );
-
-    var currency = ( thsaqgvars.upgraded_features )? jQuery('.thsa_qg_currency').val() : thsaqgvars.default_currency;
-
-    //call new currency
-    jQuery.ajax({
-        method: "POST",
-        url: thsaqgvars.ajaxurl,
-        data: { 
-            action: thsaqgvars.product_currency, 
-            nonce: thsaqgvars.nonce,
-            currency: currency,
-            products: JSON.stringify(ids)
-        }
-        }).done(function( response ) {
-            if(response){
-                var data = JSON.parse(response);
-                if(data.data){
-                    var dd = JSON.parse(data.data);
-                    jQuery('.thsa_qg_selected_products').html('');
-                    for(var x in dd){
-                        thsa_generate_field_to(dd[x]);
-                    }
-                }
-            }
-            jQuery('.thsa_qg_select_products_loader').remove();
-        }
-    );
-    
 }

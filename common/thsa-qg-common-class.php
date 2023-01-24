@@ -164,11 +164,11 @@ class thsa_qg_common_class
 				$cl = $row['content'][0];
 				$fn = $row['content'][1];
 			?>
-				<div class="thsa_qg_tab_content <?php echo $row['class'].' '.$row['status']; ?>"><?php $cl->$fn(); ?></div>
+				<div class="thsa_qg_tab_content <?php echo esc_attr( $row['class'] ) .' '.esc_attr( $row['status'] ); ?>"><?php wp_kses_post( $cl->$fn() ); ?></div>
 			<?php
 			else:
 			?>
-				<div class="thsa_qg_tab_content <?php echo $row['class'].' '.$row['status']; ?>"><?php $row['content']; ?></div>
+				<div class="thsa_qg_tab_content <?php echo esc_attr( $row['class'] ).' '.esc_attr( $row['status'] ); ?>"><?php wp_kses_post( $row['content'] ); ?></div>
 			<?php
 			endif;
 		}

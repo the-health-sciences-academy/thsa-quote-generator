@@ -51,7 +51,7 @@
                                             <input name="thsa_qg_added_product[]" value="<?php echo esc_attr( $product['id'] ); ?>" type="hidden">
                                         </td>
                                         <td><?php echo esc_html( $product['text'] ); ?></td>
-                                        <td><?php echo $product['price_html']; ?></td>
+                                        <td><?php echo wp_kses_post( $product['price_html'] ); ?></td>
                                         <td>
                                             <input name="thsa_qg_added_product_qty[]" class="thsa_qg_added_product_qty" value="<?php echo esc_attr( $product['qty'] ); ?>" type="number">
                                         </td>
