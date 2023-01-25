@@ -85,9 +85,7 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
 
         add_action('woocommerce_init', [$this, 'admin_currency'], 0);
 
-        add_filter( 'views_edit-product', [$this, 'update_count'], 10, 1);
-    
-        
+        add_filter( 'views_edit-product', [$this, 'update_count'], 10, 1);        
 
     }
 
@@ -971,7 +969,7 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         }
 
         //currency
-        $currency_ = ( isset( $_POST['thsa_qg_currency'] ) )? sanitize_text_field( $_POST['thsa_qg_currency'] ) : null;
+        $currency_ = ( isset( $_POST['thsa_qg_currency'] ) )? sanitize_text_field( $_POST['thsa_qg_currency'] ) : get_woocommerce_currency();
         $quote_data['currency'] = sanitize_text_field($currency_);
 
         //products
@@ -1184,9 +1182,9 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
      */
     public function email_quotation($attr)
     {
-        $res = $this->render_quotation($attr['q_id']);
 
-        $id = sanitize_text_field($attr['q_id']);
+        $id = sanitize_text_field( $attr['q_id'] );
+        $res = $this->render_quotation( $id );
 
         if( is_array($res) ){
             $res['from_email'] = true;
@@ -1197,7 +1195,7 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
             return ob_get_clean();
         }else{
             ob_start();
-                echo $res;
+                echo wp_kses_post( $res );
             return ob_get_clean();
         }
 

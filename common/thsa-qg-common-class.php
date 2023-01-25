@@ -385,7 +385,7 @@ class thsa_qg_common_class
 
         if( $quote ){
 
-            $currency = $quote['currency'];
+            $currency = ( strlen( $quote['currency'] ) > 0 )? $quote['currency'] : get_woocommerce_currency();
 
             if ( is_plugin_active( 'woocommerce-aelia-currencyswitcher/woocommerce-aelia-currencyswitcher.php' ) ) {
                 $_POST['aelia_cs_currency'] = $currency;
@@ -445,8 +445,8 @@ class thsa_qg_common_class
 			}	
 		}
 		
-		
-		return $style;
+		//escape css content
+		return esc_attr( $style );
 	}
 
 	/**

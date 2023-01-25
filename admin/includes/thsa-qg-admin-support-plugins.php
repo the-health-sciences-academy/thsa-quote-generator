@@ -251,16 +251,15 @@ class thsa_qg_admin_support_plugins extends thsa_qg_common_class
                             $rate = $settings['exchange_rates'][ $args['currency'] ]['rate'];
                             
                             if(isset( $mark_up['rate_markup'] )){
-                                
+
                                 if( strpos($mark_up['rate_markup'],'%') !== false ){
-                                    $mark_up = $mark_up['rate_markup'] / 100;
+                                    $temp_markup = str_replace('%','',$mark_up['rate_markup']);
+                                    $temp_rate =  $rate * ($temp_markup / 100 ) + $rate;
                                 }else{
-                                    $mark_up = $mark_up['rate_markup'];
+                                    $temp_rate = $rate + $mark_up['rate_markup'];
                                 }
-
-                                $temp_rate = $rate + $mark_up;
                                 $price_regular_number = $price_regular_number * $temp_rate;
-
+    
                             }else{
                                 //no markup
                                 $price_regular_number = $price_regular_number * $rate;

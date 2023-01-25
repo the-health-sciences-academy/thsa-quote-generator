@@ -701,10 +701,8 @@ function thsa_qg_load_select()
 
 function thsa_qg_gen_selected_product(obj)
 {
-        var data = jQuery(obj).selectWoo('data')[0];            
-        thsa_generate_field_to(data);
-        
-        
+    var data = jQuery(obj).selectWoo('data')[0];      
+    thsa_generate_field_to(data);
 }
 
 function thsa_generate_field_to(data)
@@ -726,7 +724,6 @@ function thsa_generate_field_to(data)
     }
 
     jQuery('tr.thsa_qg_no_product').remove();
-
 
     var item_price = data.price_number;
     item_price = (item_price)? parseFloat(item_price) : 0;

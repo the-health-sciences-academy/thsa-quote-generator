@@ -204,9 +204,9 @@ class thsa_qg_public_class extends thsa_qg_common_class{
     {
 
         if(WC()->session->get('thsa_on_process_quotation')){
-            _e('Discount', 'thsa-quote-generator');
+            esc_html_e('Discount', 'thsa-quote-generator');
         }else{
-            echo $sprintf;
+            echo esc_html_e( $sprintf );
         }
 
     }
@@ -376,7 +376,7 @@ class thsa_qg_public_class extends thsa_qg_common_class{
                     $res['checkout_url'] = ( isset($settings['checkout']) )? get_permalink($settings['checkout']).'?quotation='.$id : get_site_url().'/checkout?quotation='.$id;
                     $this->set_template('shortcodes/quotation', $res );
                 }else{
-                    echo $res;
+                    echo esc_html( $res );
                 }
                 exit();
             }

@@ -1,5 +1,5 @@
 <div class="thsa_quotation_table">
-    <table cellspacing="0" class="thsa_qg_table" style="<?php echo $this->render_inline_style(
+    <table cellspacing="0" class="thsa_qg_table" style="width: 100%; <?php echo $this->render_inline_style(
                     [
                         [
                         'type' => 'thsa_qg_text_color',
@@ -204,7 +204,7 @@
 
                     ]
                 ); 
-            ?>"><?php echo $product['amount']; ?></td>
+            ?>"><?php echo wp_kses_post( $product['amount'] ); ?></td>
         </tr>
         <?php 
                 endforeach;
@@ -385,7 +385,7 @@
                         ]
                     );
                 }
-            ?>; text-align: right; font-weight: bold;"><?php echo $value; ?></td>
+            ?>; text-align: right; font-weight: bold;"><?php echo wp_kses_post( $value ); ?></td>
                     </tr>
             <?php 
                 else:
@@ -460,7 +460,7 @@
 
                     ]
                 ); 
-            ?> font-weight: bold; text-align: right;"><?php echo wc_price($fee['amount']); ?></td>
+            ?> font-weight: bold; text-align: right;"><?php echo wc_price( esc_html( $fee['amount'] ) ); ?></td>
                     </tr>
             <?php
                     endforeach;

@@ -17,7 +17,7 @@
                     </label>
                 </td>
                 <td valign="bottom">
-                    <input type="button" class="button button-primary thsa_qg_add_fee" value="Add">
+                    <input type="button" class="button button-primary thsa_qg_add_fee" value="<?php esc_attr_e( 'Add', 'thsa-quote-generator'); ?>">
                 </td>
             </tr>
         </table>
