@@ -211,7 +211,7 @@ class thsa_qg_common_class
 
 		$price_html .= ' <ins><span class="amount">'.$currency.number_format($amount, $woocommerce_price_num_decimals, $woocommerce_price_decimal_sep, $woocommerce_price_thousand_sep).'</span></ins>';
 
-		return apply_filters('thsa_qg_get_price_html', $price_html );
+		return apply_filters( 'thsa_qg_get_price_html', wp_kses_post( $price_html ) );
 		
 	}
 
@@ -445,7 +445,7 @@ class thsa_qg_common_class
 			}	
 		}
 		
-		//escape css content
+		//escape css
 		return esc_attr( $style );
 	}
 
