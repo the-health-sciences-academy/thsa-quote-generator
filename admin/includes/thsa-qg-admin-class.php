@@ -81,13 +81,52 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         add_action('admin_init', [$this, 'generate_tag'] );
 
         //remove quotation posts from products
-        add_action( 'pre_get_posts' , [ $this,'exclude_quotation'] );
+        //add_action( 'pre_get_posts' , [ $this,'exclude_quotation'] );
 
         add_action('woocommerce_init', [$this, 'admin_currency'], 0);
 
-        add_filter( 'views_edit-product', [$this, 'update_count'], 10, 1);        
+        add_filter( 'views_edit-product', [$this, 'update_count'], 10, 1);    
+        
+        if( !is_plugin_active( 'thsa-quote-generator-pro/thsa-quote-generator-pro.php' ) ){
+			add_action('admin_menu',[$this, 'custom_menu']);
+		}
 
     }
+
+    /**
+     * 
+     * 
+     * custom_menu
+     * render page for full version information
+     * @since 1.2.0
+     * 
+     * 
+     */
+    public function custom_menu()
+    {
+        add_submenu_page(
+			'edit.php?post_type=thsa-quote-generator',
+			__( 'Full Version', 'thsa-quote-generator' ),
+			'<span style="color:#1E7B72; font-weight: bold;">'.esc_html__( 'Pro Version', 'thsa-quote-generator' ).'</span>',
+			'manage_options',
+			'thsa-qg-pro-custom-menu',
+			[$this, 'pro_page']
+		);
+    }
+
+    /**
+     * 
+     * pro_page
+     * @since 1.2.0
+     * 
+     * 
+     */
+    public function pro_page()
+    {
+       $this->set_template( 'pro-version', [ 'path' => 'admin' ]);
+    }
+
+
 
     /**
      * 
@@ -129,6 +168,7 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         if( 'edit.php' == $pagenow && ( get_query_var('post_type') && 'product' == get_query_var('post_type') ) ){
             if(!empty($this->quotation_ids)){
                 $query->set( 'post__not_in', $this->quotation_ids );
+                $query->set( 'posts_per_page', 19 );
             }
         }
         return $query;

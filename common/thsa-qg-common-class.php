@@ -98,7 +98,11 @@ class thsa_qg_common_class
 			'upload_' => __('Upload', 'thsa-quote-generator'),
 			'add_file' => __('Add File', 'thsa-quote-generator'),
 			'confirm' => __('Are you sure you want to remove', 'thsa-quote-generator'),
-			'currency_confirm' => __('WARNING: Changing currency will break previous calculation please review the numbers', 'thsa-quote-generator')
+			'currency_confirm' => __('WARNING: Changing currency will break previous calculation please review the numbers', 'thsa-quote-generator'),
+			'day' => __('day', 'thsa-quote-generator'),
+			'week' => __('week', 'thsa-quote-generator'),
+			'month' => __('month', 'thsa-quote-generator'),
+			'year' => __('year', 'thsa-quote-generator')
 		];
 		return json_encode($labels);
 	}
@@ -486,6 +490,9 @@ class thsa_qg_common_class
 					break;
 				case 'payment_plan_settings_data_save':
 					return $pro_content->load_plan_settings_save( $data );
+					break;
+				case 'payment-plan-term-area':
+					return $pro_content->payment_plan_term_area( $data );
 					break;
 				case 'upgraded':
 					return true;

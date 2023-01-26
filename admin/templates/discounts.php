@@ -25,8 +25,6 @@
                                 $selected = ($params['data']['allow_payment_type_edit'] == 'Y')? 'checked' : null;
                             }
                         ?>
-                        <!-- this feature seems not needed -->
-                        <!-- <label><input type="checkbox" name="allow_payment_type_edit" <?php //echo $selected; ?> value="Y"> <?php //esc_html_e('not allow changing Payment Type', 'thsa-quote-generator'); ?></label> -->
                     </td>
                 </tr>
             </table>
@@ -49,51 +47,7 @@
                         <label><input type="text" class="thsa_qg_percent_amount" name="thsa_qg_percent_amount" placeholder="<?php esc_attr_e( 'Percentage discount', 'thsa-quote-generator' ) ?>"><span class="thsa_qg_tail_text">%</span></label>
                     </td>
 
-                    <td valign="middle">
-                        <table class="thsa_qg_wide thsa_qg_plan_fields" border="0" <?php echo ($payment_type == 'plan')? "style=\"display:block;\"" : null; ?>>
-                            <tr>
-                                <td>
-                                    <select name="thsa_qg_term_every">
-                                        <option value="1"><?php esc_html_e('every', 'thsa-quote-generator'); ?></option>
-                                        <option value="2"><?php esc_html_e('every 2nd', 'thsa-quote-generator'); ?></option>
-                                        <option value="3"><?php esc_html_e('every 3rd', 'thsa-quote-generator'); ?></option>
-                                        <option value="4"><?php esc_html_e('every 4th', 'thsa-quote-generator'); ?></option>
-                                        <option value="5"><?php esc_html_e('every 5th', 'thsa-quote-generator'); ?></option>
-                                        <option value="6"><?php esc_html_e('every 6th', 'thsa-quote-generator'); ?></option>
-                                    </select>
-                                </td>
-                                <td>
-                                    <input type="number" name="thsa_qg_term_number" class="thsa_qg_term_number" value="<?php
-                                        if(isset($params['data']['term_number'])){
-                                            echo esc_attr( $params['data']['term_number'] );
-                                        }
-                                    ?>" placeholder="<?php esc_attr_e('Term','thsa-quote-generator'); ?>">
-                                </td>
-                                
-                                <td>
-                                    <?php 
-                                        $plan_type = ( isset( $params['data']['term_plan_type'] ) )? $params['data']['term_plan_type'] : null;
-                                    ?>
-                                    <select class="thsa_qg_plan_term" name="thsa_qg_plan_term">
-                                        <option value="day" <?php echo ($plan_type == 'day')? 'selected' : null; ?>><?php esc_html_e('Day(s)','thsa-quote-generator'); ?></option>
-                                        <option value="week" <?php echo ($plan_type == 'week')? 'selected' : null; ?>><?php esc_html_e('Week(s)','thsa-quote-generator'); ?></option>
-                                        <option value="month" <?php echo ($plan_type == 'month')? 'selected' : null; ?>><?php esc_html_e('Month(s)','thsa-quote-generator'); ?></option>
-                                        <option value="year" <?php echo ($plan_type == 'year')? 'selected' : null; ?>><?php esc_html_e('Year(s)','thsa-quote-generator'); ?></option>
-                                    </select>
-                                </td>
-                                <td>
-                                    <?php 
-                                        $allow_status = 'checked';
-                                        if( isset( $params['data']['allow_term_edit'] ) ){
-                                            $allow_status = ( $params['data']['allow_term_edit'] == 'Y' )? 'checked' : null;
-                                        }
-                                    ?>
-                                    <!-- this feature seems not needed -->
-                                    <!-- <label><input type="checkbox" name="thsa_allow_term_edit" <?php //echo $allow_status; ?> value="Y"> <?php //esc_html_e('Do not allow term edit', 'thsa-quote-generator'); ?></label> -->
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
+                    <?php $this->pro_features( $params['data'], 'payment-plan-term-area' ); ?>
      
                 </tr>
             </table>

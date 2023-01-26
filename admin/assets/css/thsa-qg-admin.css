@@ -227,4 +227,36 @@ select.thsa_qg_set_field {
   .thsa_qg_manage_content .thsa_qg_content_loader {
     z-index: 999; }
 
+.thsa_qg_pro_version {
+  padding: 20px; }
+  .thsa_qg_pro_version table {
+    width: 100%; }
+    .thsa_qg_pro_version table tr td:first-child {
+      height: 400px;
+      background: url(https://thsaapps.com/wp-content/uploads/2023/01/thsa-hero1.png) right center no-repeat;
+      background-size: contain;
+      width: 80%;
+      background-color: #1E7B72; }
+      .thsa_qg_pro_version table tr td:first-child .thsa_head_pro_text {
+        padding-left: 60px; }
+        .thsa_qg_pro_version table tr td:first-child .thsa_head_pro_text h2 {
+          color: white;
+          font-size: 50px;
+          margin: 35px 0; }
+        .thsa_qg_pro_version table tr td:first-child .thsa_head_pro_text h3 {
+          color: #f2f2f2;
+          font-size: 30px;
+          margin: 35px 0; }
+    .thsa_qg_pro_version table tr td:last-child {
+      background-color: #EAEAEA; }
+  .thsa_qg_pro_version .thsa_qg_other_information {
+    margin: 40px 0; }
+    .thsa_qg_pro_version .thsa_qg_other_information h2 {
+      font-size: 26px; }
+    .thsa_qg_pro_version .thsa_qg_other_information ul {
+      margin: 30px 0; }
+      .thsa_qg_pro_version .thsa_qg_other_information ul li {
+        font-size: 15px;
+        margin: 15px 0; }
+
 /*# sourceMappingURL=thsa-qg-admin.css.map */

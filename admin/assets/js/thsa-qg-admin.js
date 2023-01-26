@@ -385,10 +385,50 @@ jQuery(document).ready(function(){
         thsa_qg_calculate();
     });
 
-    jQuery('.thsa_qg_term_number').on('keyup',function(){
+    jQuery('.thsa_qg_term_number').on('change',function(){
         thsa_qg_calculate('term');
     });
+    
     jQuery('.thsa_qg_plan_term').change(function(){
+
+        //update expiry content
+        var duration = jQuery(this).val();
+
+        if( duration ){
+            var dura = 90;
+            var dura_label = labels_.day;
+
+            switch( duration ){
+                case 'week':
+                    dura = 52;
+                    dura_label = labels_.week;
+                    break;
+                case 'month':
+                    dura = 24;
+                    dura_label = labels_.month;
+                    break;
+                case 'year':
+                    dura = 5;
+                    dura_label = labels_.year;
+                    break;
+            }
+
+            jQuery('.thsa_qg_term_number').find('option').each(
+                function(){
+                    if( jQuery( this ).val() != '' ){
+                        jQuery( this ).remove();
+                    }
+                }
+            );
+            
+            var plural = ( dura_label == 'day' || dura_label == 'week' || dura_label == 'month' || dura_label == 'year' )? 's' : '';
+            for( var xx = 1; xx <= dura; xx++ ){
+                var nplural = ( xx > 1 )? plural : '';
+                jQuery('.thsa_qg_term_number').append( new Option(xx+' '+dura_label+nplural , xx) );
+            }
+
+        }
+
         thsa_qg_calculate('term');
     });
 

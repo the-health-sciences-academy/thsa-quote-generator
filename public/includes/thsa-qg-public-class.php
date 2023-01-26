@@ -206,7 +206,7 @@ class thsa_qg_public_class extends thsa_qg_common_class{
         if(WC()->session->get('thsa_on_process_quotation')){
             esc_html_e('Discount', 'thsa-quote-generator');
         }else{
-            echo esc_html_e( $sprintf );
+            echo esc_html( $sprintf );
         }
 
     }
