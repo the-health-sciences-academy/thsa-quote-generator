@@ -40,7 +40,7 @@ Benefits of upgrading:
 ### How it works?
 
 * Settings allow you to manage the email content and look and feel using WP classic editor
-* Settings allow you to set what page you assigned your checkout page
+* Settings allow you to set what page you assigned to your checkout page
 * Select existing customer or new one
 * Select currency (if you are upgraded to pro)
 * Select products you wanted to add in the table
