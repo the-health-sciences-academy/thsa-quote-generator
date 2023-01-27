@@ -486,6 +486,7 @@ jQuery(document).ready(function(){
 
 
     jQuery('#thsa_qg_send_email_last').click(function(){
+        jQuery('#thsa_qg_close_preview').prop('disabled',true);
         jQuery(this).prop('disabled',true);
         jQuery(this).val('Sending...');
         var get_id = jQuery(this).data('id');
@@ -509,6 +510,7 @@ jQuery(document).ready(function(){
                 }
 
                 jQuery('#thsa_qg_send_email_last').prop('disabled',false);
+                jQuery('#thsa_qg_close_preview').prop('disabled',false);
                 jQuery('#thsa_qg_send_email_last').val('Send');
                 
             }

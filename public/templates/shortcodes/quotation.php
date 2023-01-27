@@ -385,7 +385,7 @@
                         ]
                     );
                 }
-            ?>; text-align: right; font-weight: bold;"><?php echo wp_kses_post( $value ); ?></td>
+            ?> text-align: right; font-weight: bold;"><?php echo wp_kses_post( $value ); ?></td>
                     </tr>
             <?php 
                 else:
@@ -456,7 +456,7 @@
                         [
                             'type' => 'thsa_qg_padding',
                             'value' => (isset($params['style']['thsa_qg_padding']))? $params['style']['thsa_qg_padding'] : null
-                            ]
+                        ]
 
                     ]
                 ); 
@@ -471,17 +471,5 @@
        
     </table>
     <?php do_action('thsa_qg_before_total_button'); ?>
-    <div class="thsa_qg_row thsa_qg_total_foot">
-        <div class="thsa_qg_col-6">
-            <strong><?php if(isset($params['data']['expiry'])){ esc_attr_e('Quotation expires on '.date('M d, Y',strtotime($params['data']['expiry'])),'thsa-quote-generator'); } ?></strong>
-        </div>
-        <div class="thsa_qg_col-6">
-            <?php if(isset($params['from_email'])): ?>
-            <p style="text-align: center;"><a href="<?php echo esc_url($params['checkout_url']); ?>" <?php if($params['from_email'] == true): ?> style="padding: 10px 20px; background: #f2f2f2; border: 1px solid #CCC;" <?php endif; ?>><?php esc_html_e('Proceed to checkout','thsa-quote-generator'); ?></a></p>
-            <?php else: ?>
-            <input type="button" data-q-id="<?php esc_attr_e($params['qid'],'thsa-quote-generator'); ?>" class="thsa_qg_proceed_checkout" value="<?php esc_attr_e('Proceed to checkout','thsa-quote-generator'); ?>">
-            <?php endif; ?>
-        </div>
-    </div>
     
 </div>

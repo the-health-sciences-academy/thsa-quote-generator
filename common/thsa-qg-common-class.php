@@ -43,17 +43,15 @@ class thsa_qg_common_class
 			$other = $params['other'].'/';
 		}
 
-		$path = get_template_directory().'/'.THSA_QG_FOLDER.'/'.$other.'templates';
-		$child = get_template_directory().'-child/'.THSA_QG_FOLDER.'/'.$other.'templates';
+		if(isset($params['path'])){
+			$other = $params['path'].'/';
+		}
 
-		if(is_dir($path.'/'.$file)){
+		$path = get_stylesheet_directory().'/'.THSA_QG_FOLDER.'/'.$other.'templates';		
+
+		if(file_exists($path.'/'.$file)){
 			include $path.'/'.$file;
-		}elseif(is_dir($child.'/'.$file)){
-			include $child.'/'.$file;
 		}else{
-			if(isset($params['path'])){
-				$other = $params['path'];
-			}
 			include THSA_QG_PLUGIN_PATH.$other.'/templates/'.$file;
 		}
     }
@@ -424,25 +422,25 @@ class thsa_qg_common_class
 				case 'thsa_qg_text_color':
 				case 'thsa_qg_header_text_color':
 				case 'thsa_qg_total_font_color':
-					if(isset($arg['value']))
+					if(!empty($arg['value']))
 						$style .= 'color: '.$arg['value'].';';
 					break;
 				case 'thsa_qg_header_color':
 				case 'thsa_qg_total_row_color':
 				case 'thsa_qg_background_color':
-					if(isset($arg['value']))
+					if(!empty($arg['value']))
 						$style .= 'background-color: '.$arg['value'].';';
 					break;
 				case 'thsa_qg_border_color':
-					if(isset($arg['value']))
+					if(!empty($arg['value']))
 						$style .= 'border: 1px solid '.$arg['value'].';';
 					break;
 				case 'thsa_qg_total_font_size':
-					if(isset($arg['value']))
+					if(!empty($arg['value']))
 						$style .= 'font-size: '.$arg['value'].'px;';
 					break;
 				case 'thsa_qg_padding':
-					if(isset($arg['value']))
+					if(!empty($arg['value']))
 						$style .= 'padding: '.$arg['value'].'px;';
 					break;
 					break;

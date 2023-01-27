@@ -1227,9 +1227,6 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         $res = $this->render_quotation( $id );
 
         if( is_array($res) ){
-            $res['from_email'] = true;
-            $settings = get_option('thsa_quotation_settings');
-            $res['checkout_url'] = ( isset($settings['checkout']) )? get_permalink($settings['checkout']).'?quotation='.$id : get_site_url().'/checkout?quotation='.$id;
             ob_start();
                 $this->set_template('shortcodes/quotation', $res );
             return ob_get_clean();
@@ -1280,9 +1277,11 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
 
             if(is_array($quote_user['customer'])){
                 $customer_details = [
-                    'fullname' => $quote_user['customer']['firstname'].' '.$quote_user['customer']['lastname'],
+                    'fullname' => $quote_user['customer']['firstname'],
                     'email' => $quote_user['customer']['email']
                 ];
+
+                $customer_details = apply_filters('thsa_quotation_email_customer_details', $customer_details, $quote_user );
             }else{
                 if(is_numeric($quote_user['customer'])){
                     $user = get_userdata($quote_user['customer']);
@@ -1290,6 +1289,8 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
                         'fullname' => $user->first_name.' '.$user->last_name,
                         'email' => $user->user_email
                     ];
+
+                    $customer_details = apply_filters('thsa_quotation_email_customer_details', $customer_details, $user );
                 }else{
                     echo json_encode([
                         'status' => 'failed',
@@ -1303,42 +1304,39 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         if(isset($get_settings)){
             //process shortcodes
             if(!empty($customer_details)){
-                $get_settings['content'] = str_replace('[thsa_qg_customer_name]', $customer_details['fullname'], $get_settings['content']);
+                $get_settings['content'] = str_replace('[thsa-quotation-user-name]', $customer_details['fullname'], $get_settings['content']);
             }
 
             //render the quotation
-            if(strpos($get_settings['content'],'[thsa_qg_quotation_holder]') !== false && $type != 'send'){
+            if(strpos($get_settings['content'],'[thsa-quotation]') !== false && $type != 'send'){
                 $quotation__ = do_shortcode('[thsa-quotation-email q_id='.$id.']');
-                $get_settings['content'] = str_replace('[thsa_qg_quotation_holder]', htmlentities($quotation__), $get_settings['content']);
+                $get_settings['content'] = str_replace('[thsa-quotation]', htmlentities($quotation__), $get_settings['content']);
             }else{
                 $quotation__ = do_shortcode('[thsa-quotation-email q_id='.$id.']');
                 $get_settings['content'] = html_entity_decode(stripslashes($get_settings['content']));
-                $get_settings['content'] = str_replace('[thsa_qg_quotation_holder]', $quotation__, $get_settings['content']);
+                $get_settings['content'] = str_replace('[thsa-quotation]', $quotation__, $get_settings['content']);
+            }
+
+            if(strpos($get_settings['content'],'[thsa-quotation-checkout-button]') !== false && $type != 'send'){
+                $button__ = do_shortcode('[thsa-quotation-checkout-button id='.$id.' from_email=1]');
+                $get_settings['content'] = str_replace('[thsa-quotation-checkout-button]', htmlentities($button__), $get_settings['content']);
+            }else{
+                $button__ = do_shortcode('[thsa-quotation-checkout-button id='.$id.' from_email=1]');
+                $get_settings['content'] = html_entity_decode(stripslashes($get_settings['content']));
+                $get_settings['content'] = str_replace('[thsa-quotation-checkout-button]', $button__, $get_settings['content']);
             }
 
             if($type == 'send'){
-                //send email
-                if(isset($customer_details['email'])){
-
-                    $to = $customer_details['email'];
-                    $subject = $get_settings['title'];
-                    $body = $get_settings['content'];
-                    $headers = array('Content-Type: text/html; charset=UTF-8','From: My Site Name <orayapps@gmail.com>');
-
-                    wp_mail( $to, $subject, $body, $headers );
-
-                    echo json_encode([
-                        'status' => 'success',
-                        'message' => ''
-                    ]);
-                    exit();
-                }else{
-                    echo json_encode([
-                        'status' => 'failed',
-                        'message' => __('Error 013: No email has been sent -'.$customer_details['fullname'], 'thsa-quote-generator')
-                    ]);
-                    exit();
-                }
+                echo $this->send_wp_email(
+                    [
+                       'email' => $customer_details['email'],
+                       'title' => $get_settings['title'],
+                       'content' => $get_settings['content'],
+                       'from_email' => $get_settings['from_email'],
+                       'fullname' => $customer_details['fullname']
+                    ]
+                );
+                exit();
                 
             }else{
                 echo json_encode([
@@ -1350,17 +1348,97 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
 
             
         }else{
+
             $email_default_content = $this->setting_class->default_email_text;
+            $email_default_title = $this->setting_class->default_email_title;
+            $email_default_from_email = $this->setting_class->default_admin_email;
+
             if(!empty($customer_details)){
-                $email_default_content = str_replace('[thsa_qg_customer_name]', $customer_details['fullname'], $email_default_content);
+                $email_default_content = str_replace('[thsa-quotation-user-name]', $customer_details['fullname'], $email_default_content);
             }
-            $quotation__ = do_shortcode('[thsa-quotation-email q_id='.$id.']');
-            $get_text = str_replace('[thsa_qg_quotation_holder]', htmlentities($quotation__),  $email_default_content);
-            echo json_encode([
-                'status' => 'success',
-                'message' => html_entity_decode($get_text)
+            
+            if( $type == 'send' ){
+                $quotation__ = do_shortcode('[thsa-quotation-email q_id='.$id.']');
+                $get_text = html_entity_decode( stripslashes ($email_default_content) );
+                $get_text = str_replace('[thsa-quotation]', $quotation__, $get_text);
+            }else{
+                $quotation__ = do_shortcode('[thsa-quotation-email q_id='.$id.']');
+                $get_text = str_replace('[thsa-quotation]', htmlentities($quotation__), $email_default_content);
+            }   
+
+            if( $type == 'send' ){                
+                $button__ = do_shortcode('[thsa-quotation-checkout-button id='.$id.' from_email=1]');
+                $button__ = html_entity_decode( stripslashes ($button__ ) );
+                $get_text = str_replace('[thsa-quotation-checkout-button]', $button__, $get_text);
+
+            }else{
+                $button__ = do_shortcode('[thsa-quotation-checkout-button id='.$id.' from_email=1]');
+                $get_text = str_replace('[thsa-quotation-checkout-button]', htmlentities($button__), $get_text);
+            }
+           
+            
+            if($type == 'send'){
+
+                
+                
+                echo $this->send_wp_email(
+                    [
+                       'email' => $customer_details['email'],
+                       'title' => $email_default_title,
+                       'content' => $get_text,
+                       'from_email' => $email_default_from_email,
+                       'fullname' => $customer_details['fullname']
+                    ]
+                );
+                exit();
+
+            }else{
+                echo json_encode([
+                    'status' => 'success',
+                    'message' => html_entity_decode($get_text)
+                ]);
+                exit();
+            }
+        }
+
+    }
+
+    /**
+     * 
+     * send_wp_email
+     * @since 1.2.0
+     * @param mixed
+     * @return json
+     * 
+     * 
+     */
+    public function send_wp_email( $data = [] )
+    {
+        if( empty( $data ) )
+            return;
+
+        //send email
+        if(isset($data['email'])){
+
+            $to = $data['email'];
+            $subject = $data['title'];
+            $body = $data['content'];
+            $headers = array( 'Content-Type: text/html; charset=UTF-8','From: '.$data['from_email'] );
+
+            $res = wp_mail( $to, $subject, $body, $headers );
+
+            $status = ( $res )? 'success' : 'failed';
+            $message = ( $res )? '' : __('Failed to send email please check your the quotation settings or your SMTP' ,'thsa-quote-generator');
+            return json_encode([
+                'status' => $status,
+                'message' => $message
             ]);
-            exit();
+
+        }else{
+            return json_encode([
+                'status' => 'failed',
+                'message' => __( 'Error 013: No email has been sent','thsa-quote-generator' )
+            ]);
         }
 
     }

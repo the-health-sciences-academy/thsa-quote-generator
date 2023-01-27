@@ -52,9 +52,16 @@ jQuery(document).ready(function(){
         );
     });
 
-    jQuery('.thsa_qg_save_email_settings').click(function(){
+    jQuery('.thsa_qg_save_email_settings, .thsa_qg_reset_email_settings').click(function(){
 
-        jQuery(this).val('Saving...');
+        var mode = jQuery(this).val();
+
+        if( mode == 'Save Changes'){
+            jQuery(this).val('Saving...');
+        }else{
+            jQuery(this).val('Reseting...');
+        }
+       
         jQuery(this).prop('disabled', true);
 
         var from_email = jQuery('.thsa_email_set_email').val();
@@ -70,15 +77,17 @@ jQuery(document).ready(function(){
                 from_email: from_email,
                 title: title,
                 content: content,
-                nonce: thsaqgvars.nonce
+                nonce: thsaqgvars.nonce,
+                mode: mode
             }
             }).done(function( response ) {
                 if(response){
                     response = JSON.parse(response);
                     if(response.status == 'success'){
                         jQuery('.thsa_qg_response_email').show();
-                        jQuery('.thsa_qg_save_email_settings').val('Save');
-                        jQuery('.thsa_qg_save_email_settings').prop('disabled', false);
+                        jQuery('.thsa_qg_save_email_settings').val('Save Changes');
+                        jQuery('.thsa_qg_save_email_settings, .thsa_qg_reset_email_settings').prop('disabled', false);
+                        jQuery('.thsa_qg_reset_email_settings').val('Reset');
                         setTimeout(function(){
                             jQuery('.thsa_qg_response_email').hide();
                         }, 10000);

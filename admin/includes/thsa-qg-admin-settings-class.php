@@ -41,11 +41,13 @@ class thsa_qg_admin_settings_class extends thsa_qg_common_class
     /**
      * 
      * shortcodes
+     * old shortcode [thsa_qg_quotation_holder]
      * 
      */
     public $shortcodes = [
-        '[thsa_qg_customer_name]',
-        '[thsa_qg_quotation_holder]'
+        '[thsa-quotation-user-name]',
+        '[thsa-quotation]',
+        '[thsa-quotation-checkout-button]'
     ];
 
     public function __construct()
@@ -55,7 +57,7 @@ class thsa_qg_admin_settings_class extends thsa_qg_common_class
 
         add_action('admin_enqueue_scripts', [$this, 'load_settings_assets']);
 
-        $this->default_email_text = "<p>Hi ".$this->shortcodes[0].",</p><p>Kindly find below the quotation you requested </p>".$this->shortcodes[1]."<p> Any questions or concerns please contact us through this email ".get_bloginfo('admin_email')."</p>Regards,<p>".get_bloginfo('site_name')."</p>";
+        $this->default_email_text = "<p>Hi ".$this->shortcodes[0].",</p><p>Kindly find below the quotation you requested </p>".$this->shortcodes[1]."<p><p>".$this->shortcodes[2]."</p> Any questions or concerns please contact us through this email ".get_bloginfo('admin_email')."</p>Regards,<p>".get_bloginfo('site_name')."</p>";
 
         $this->default_admin_email = get_bloginfo('admin_email');
 
@@ -547,32 +549,44 @@ class thsa_qg_admin_settings_class extends thsa_qg_common_class
                     break;
                 case 'email':
 
-                    $email_data = [];
-                    if(isset($_POST['from_email'])){
-                        $email_data['from_email'] =  sanitize_text_field($_POST['from_email']);
-                    }
+                    $mode = sanitize_text_field( $_POST['mode'] );
 
-                    if(isset($_POST['title'])){
-                        $email_data['title'] =  sanitize_text_field($_POST['title']);
-                    }
+                    if( $mode == 'Save Changes' ){
 
-                    if(isset($_POST['content'])){
-                        $_POST['content'] = stripslashes($_POST['content']);
-                        $email_data['content'] =  sanitize_text_field(htmlentities($_POST['content']));
-                    }
-
-
-                    $settings = get_option('thsa_quotation_settings');
-                    if(!empty($email_data)){
-                        //get exists
-                        if(isset($settings)){
-                            $settings['email'] = $email_data;
-                            update_option('thsa_quotation_settings', $settings);
+                        $email_data = [];
+                        if(isset($_POST['from_email'])){
+                            $email_data['from_email'] =  sanitize_text_field($_POST['from_email']);
                         }
+
+                        if(isset($_POST['title'])){
+                            $email_data['title'] =  sanitize_text_field($_POST['title']);
+                        }
+
+                        if(isset($_POST['content'])){
+                            $_POST['content'] = stripslashes($_POST['content']);
+                            $email_data['content'] =  sanitize_text_field(htmlentities($_POST['content']));
+                        }
+
+
+                        $settings = get_option('thsa_quotation_settings');
+                        if(!empty($email_data)){
+                            //get exists
+                            if(isset($settings)){
+                                $settings['email'] = $email_data;
+                                update_option('thsa_quotation_settings', $settings);
+                            }
+                        }else{
+                            $settings['email'] = null;
+                            update_option('thsa_quotation_settings', $settings);
+                        } 
+
                     }else{
+                        
+                        $settings = get_option('thsa_quotation_settings');
                         $settings['email'] = null;
                         update_option('thsa_quotation_settings', $settings);
-                    } 
+
+                    }
 
                     break;
                 case 'plates':
