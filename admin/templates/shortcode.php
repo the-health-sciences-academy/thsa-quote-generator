@@ -1,6 +1,7 @@
 <div class="thsa_qg_wrapper">
-    <div class="thsa_qg_inner thsa_qg_action">
-        <p><?php echo esc_html( $params['shortcode'] ); ?></p>
-        <p><?php esc_html_e('To access the shortcode dynamically don\'t assign the id in the shortcode and instead pass this to url ?q_id=' , 'thsa-quote-generator'); ?><?php echo esc_html( $params['id'] ); ?></p>
+    <div class="thsa_qg_inner thsa_qg_action thsa_qg_shortcodes_">
+        <p><b><?php esc_html_e( 'Quotation Table', 'thsa-quote-generator' ); ?></b><br/><?php echo esc_html( $params['shortcode'][0] ); ?></p>
+        <p><b><?php esc_html_e( 'Checkout Button', 'thsa-quote-generator' ); ?></b><br/><?php echo esc_html( $params['shortcode'][1] ); ?></p>
+        <p><?php esc_html_e('Access the shortcodes dynamically by passing the id to the URL instead of assigning it in the shortcode.' , 'thsa-quote-generator'); ?> <b><?php echo esc_html( 'e.g. sample.com/quotation?q_id='.$params['id'] ); ?></b></p>
     </div>
 </div>

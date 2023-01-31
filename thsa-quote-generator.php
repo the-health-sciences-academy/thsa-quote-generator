@@ -4,10 +4,10 @@
  * Plugin Name: THSA Quotation Generator for WooCommerce
  * Plugin URI: https://thsaapps.com/subscription-switcher/
  * Description: A plugin that will allow you to create quotations with advanced computation features. 
- * Author:      thsadevteam
+ * Author:      THSAapps
  * Plugin Type: Extension
  * Author URI: https://thsaapps.com
- * Version: 1.2.0
+ * Version: 1.2.1
  * Text Domain: thsa-quote-generator
  * 
  * 

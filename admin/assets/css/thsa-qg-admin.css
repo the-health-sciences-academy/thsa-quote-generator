@@ -61,6 +61,8 @@
         display: block; }
   .thsa_qg_wrapper .thsa_qg_action p {
     text-align: center; }
+  .thsa_qg_wrapper .thsa_qg_shortcodes_ p {
+    text-align: left; }
   .thsa_qg_wrapper .thsa_qg_action p:first-child {
     margin-top: 0; }
   .thsa_qg_wrapper .thsa_qg_action p:last-child {

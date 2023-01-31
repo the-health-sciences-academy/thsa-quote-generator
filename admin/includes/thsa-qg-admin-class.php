@@ -72,6 +72,9 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
 
         add_shortcode( 'thsa-quotation-email' , [$this, 'email_quotation'] );
 
+        add_filter('manage_thsa-quote-generator_posts_columns' , [$this, 'table_tabs'] );
+		add_action('manage_thsa-quote-generator_posts_custom_column', [$this,'table_tabs_content'], 10, 2 );
+
         add_action ( 'admin_enqueue_scripts', function () {
             if (is_admin ())
                 wp_enqueue_media ();
@@ -91,6 +94,47 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
 			add_action('admin_menu',[$this, 'custom_menu']);
 		}
 
+    }
+
+    /**
+     * 
+     * 
+     * table_tabs
+     * @since 1.2.1
+     * @param $columns (array)
+     * 
+     * 
+     */
+    public function table_tabs( $columns )
+    {
+        array_splice( $columns, 2, 0, [__('Shortcodes','thsa-quote-generator')] );
+		array_splice( $columns, 3, 0, [__('Author','thsa-quote-generator')] );
+		return $columns;
+    }
+
+    /**
+     * 
+     * 
+     * table_tabs_content
+     * @since 1.2.1
+     * @param $column (int)
+     * @param $post_id (int)
+     * 
+     * 
+     */
+    public function table_tabs_content( $column, $post_id )
+    {
+        $post_id = sanitize_text_field( $post_id );
+		switch($column){
+			case 0:
+				echo '[thsa-quotation id="' . $post_id . '"]<br/>[thsa-quotation-checkout-button id="' . $post_id . '"]';
+				break;
+			case 1:
+				$post_author_id = get_post_field( 'post_author', $post_id );
+				$user = get_userdata($post_author_id);
+				echo '<a href="user-edit.php?user_id='.esc_attr( $post_author_id ).'" target="_blank">'.esc_html( $user->user_login ).'</a>';
+				break;
+		}
     }
 
     /**
@@ -613,10 +657,13 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
     {
         $data = get_post_meta($post->ID,'thsa_quotation_data',true);
         $shortcode = null;
-        if(isset($data['customer'])){
-            $shortcode = htmlentities('[thsa-quotation id="'.$post->ID.'"]');
+        if( isset( $data['customer'] ) ){
+            $shortcodes = [
+                htmlentities('[thsa-quotation id="'.$post->ID.'"]'),
+                htmlentities('[thsa-quotation-checkout-button id="'.$post->ID.'"]')
+            ];
         }
-        $this->set_template('shortcode',['path' => 'admin','shortcode' => $shortcode, 'id' => $post->ID]);
+        $this->set_template('shortcode',['path' => 'admin','shortcode' => $shortcodes, 'id' => $post->ID]);
     }
 
 
