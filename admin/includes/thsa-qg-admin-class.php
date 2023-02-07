@@ -90,7 +90,7 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
 
         add_filter( 'views_edit-product', [$this, 'update_count'], 10, 1);    
         
-        if( !is_plugin_active( 'thsa-quote-generator-pro/thsa-quote-generator-pro.php' ) ){
+        if( !is_plugin_active( $this->pro_id ) ){
 			add_action('admin_menu',[$this, 'custom_menu']);
 		}
 
@@ -656,7 +656,7 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
     public function customer_shortcode($post)
     {
         $data = get_post_meta($post->ID,'thsa_quotation_data',true);
-        $shortcode = null;
+        $shortcodes = null;
         if( isset( $data['customer'] ) ){
             $shortcodes = [
                 htmlentities('[thsa-quotation id="'.$post->ID.'"]'),
@@ -1475,7 +1475,7 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
             $res = wp_mail( $to, $subject, $body, $headers );
 
             $status = ( $res )? 'success' : 'failed';
-            $message = ( $res )? '' : __('Failed to send email please check your the quotation settings or your SMTP' ,'thsa-quote-generator');
+            $message = ( $res )? '' : __('Failed to send email please check your quotation settings or your SMTP' ,'thsa-quote-generator');
             return json_encode([
                 'status' => $status,
                 'message' => $message

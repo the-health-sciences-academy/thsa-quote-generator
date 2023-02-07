@@ -7,7 +7,7 @@
  * Author:      THSAapps
  * Plugin Type: Extension
  * Author URI: https://thsaapps.com
- * Version: 1.2.1
+ * Version: 1.2.3
  * Text Domain: thsa-quote-generator
  * 
  * 
@@ -18,7 +18,7 @@
 defined( 'ABSPATH' ) or die( 'No access area' );
 define('THSA_QG_PLUGIN_PATH', plugin_dir_path( __FILE__ ));
 define('THSA_QG_PLUGIN_URL', plugin_dir_url( __FILE__ ));
-define('THSA_QG_FOLDER','thsa-quote-generator');
+define('THSA_QG_FOLDER','thsa-quotation-generator-for-woocommerce');
 define('THSA_QG_PREFIX','thsa_qg');
 
 /**

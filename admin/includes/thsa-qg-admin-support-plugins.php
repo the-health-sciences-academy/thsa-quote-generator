@@ -115,6 +115,7 @@ class thsa_qg_admin_support_plugins extends thsa_qg_common_class
         if ( $this->aelia_woo_currency_switcher ) {
             //do stuffs for aelia
             $settings = get_option('wc_aelia_currency_switcher');
+
             return apply_filters('thsa_qg_aelia_settings', 
                 [
                     'enabled_currencies' => $settings['enabled_currencies'],
@@ -414,8 +415,8 @@ class thsa_qg_admin_support_plugins extends thsa_qg_common_class
 
         if ( $this->woocommerce_subscription ) {
 
-            if( is_plugin_active('thsa-quote-generator-pro/thsa-quote-generator-pro.php') ){
-                $pro = 'thsa\qg\pro\admin\thsa_qg_pro_admin_class';
+            if ( is_plugin_active( $this->pro_id ) ) {
+                $pro = $this->pro_namespace;
                 $pro_content = new $pro();
                 return $pro_content->generate_plan( $post_id, $data );
             }
@@ -424,9 +425,31 @@ class thsa_qg_admin_support_plugins extends thsa_qg_common_class
         return;
     }
 
+    /**
+     * 
+     * 
+     * get_default_currency
+     * @since 1.2.4
+     * 
+     * 
+     */
+    public function get_default_currency( $settings = [] )
+    {
+        if ( empty( $settings ) ) {
+            return;
+        }
+
+        foreach ( $settings['exchange_rates']  as $currency => $setting ) {
+
+            if ( $setting[ 'rate' ] == 1 ) {
+                return $currency;
+            }
+
+        }
+    }
+
+
 
 }
-
-
 
 ?>

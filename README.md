@@ -3,7 +3,7 @@ Contributors: THSAapps
 Tags: Extension, WooCommerce, Product, eCommerce, Quotation
 Requires at least: 4.7
 Tested up to: 6.1.1
-Stable tag: 1.2.1
+Stable tag: 1.2.3
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -77,5 +77,11 @@ Customize code by adding plugin folder and files to child theme. Refer to [docum
 ### 1.0.0
 * Initial Release
 
-### 1.0.0
+### 1.2.1
+* General Improvements
+
+### 1.2.2
+* Fix bugs that causes from previous version
+
+### 1.2.3
 * General Improvements

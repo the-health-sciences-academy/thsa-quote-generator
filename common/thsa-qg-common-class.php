@@ -19,6 +19,28 @@ class thsa_qg_common_class
 
     public $quote_slug_tag = 'thsa-quotation';
 
+
+	/**
+	 * 
+	 * 
+	 * pro version plugin id
+	 * @since 1.2.2
+	 * 
+	 * 
+	 */
+	public $pro_id = 'thsa-quotation-generator-for-woocommerce-pro/thsa-quote-generator-pro.php';
+
+
+	/**
+	 * 
+	 *
+	 * pro version namespace
+	 * @since 1.2.2
+	 * 
+	 * 
+	 */
+	public $pro_namespace = 'thsa\qg\pro\admin\thsa_quote_pro_admin_class';
+
     /**
      * 
      * 
@@ -307,16 +329,16 @@ class thsa_qg_common_class
                             'price_regular_number' => $product_details->get_regular_price(),
                             'price_sale_number' => $product_details->get_sale_price(),
                             'qty' => $product[1],
-                            'amount' => ($quote['payment_type'] == 'upfront')? wc_price($product_details->get_price() * $product[1]) : __('included', 'thsa-quote-generator')
+                            'amount' => ($quote['payment_type'] == 'upfront')? wc_price($product_details->get_price() * $product[1]) : __('included', 'thsa-quote-generator'),
                         ];
                     }
                 }
 
+				$discount = ($quote['fixed_amount_discount'])? $quote['fixed_amount_discount'] : 0;
                 if($quote['payment_type'] == 'plan'){
                     $products = $plan_product + $products;
                     $discounted_total = $plan_prod->get_price();
                 }else{
-                    $discount = ($quote['fixed_amount_discount'])? $quote['fixed_amount_discount'] : 0;
                     $discounted_total = $total - $discount;
                 }
                     
@@ -464,10 +486,10 @@ class thsa_qg_common_class
 	public function pro_features( $data = null, $type = null )
 	{
 		
-		if( is_plugin_active('thsa-quote-generator-pro/thsa-quote-generator-pro.php') ){
-			$pro = 'thsa\qg\pro\admin\thsa_qg_pro_admin_class';
+		if ( is_plugin_active( $this->pro_id ) ) {
+			$pro = $this->pro_namespace;
 			$pro_content = new $pro();
-			switch( $type ){
+			switch ( $type ) {
 				case 'settings-quotation':
 					$pro_content->load_qoutation_settings( $data );
 					break;
@@ -499,7 +521,7 @@ class thsa_qg_common_class
 					return $data;
 				break;
 			}
-		}else{
+		} else {
 			return null;
 		}
 
