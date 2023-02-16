@@ -335,6 +335,7 @@ class thsa_qg_common_class
                 }
 
 				$discount = ($quote['fixed_amount_discount'])? $quote['fixed_amount_discount'] : 0;
+
                 if($quote['payment_type'] == 'plan'){
                     $products = $plan_product + $products;
                     $discounted_total = $plan_prod->get_price();

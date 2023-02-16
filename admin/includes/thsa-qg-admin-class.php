@@ -292,7 +292,7 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
                 'manage_email_content' => 'thsa_qg_manage_email_content',
                 'is_admin_edit'     => (isset($_GET['post']))? true : false,
                 'save_plate'        => 'thsa_qg_save_plate',
-                'default_currency'  => get_woocommerce_currency(),
+                'default_currency'  => ( is_plugin_active('woocommerce/woocommerce.php') )? get_woocommerce_currency() : null,
                 'upgraded_features' => $this->pro_features(null, 'upgraded')
             ]
         );
@@ -514,6 +514,7 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
 
         //get products
         $products = [];
+        $shipping_products = [];
         if(!empty($data['products'])){
             foreach($data['products'] as $product){
                 $product_details = wc_get_product($product[0]);
@@ -551,6 +552,8 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
                     'amount' => $this->format_number( ['amount' => $prices['price_number'] * $product[1], 'round' => false ] ),
                     'amount_num' => $prices['price_number'] * $product[1]
                 ];
+
+                $shipping_products[] = $product[0];
                 
             }
         }
@@ -569,6 +572,10 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
         $this->set_template('products',['path' => 'admin', 'products' => $products]);
         $this->set_template('discounts',['path' => 'admin','data' => $data, 'taxes' => $this->get_taxes()]);
         $this->set_template('fees',['path' => 'admin', 'data' => $data]);
+
+       
+        //$shipping = $this->get_shipping( $shipping_products );
+
         $this->set_template('summary',['path' => 'admin', 'data' => $data]);
     }
 
@@ -1490,6 +1497,53 @@ class thsa_qg_admin_class extends thsa_qg_common_class{
 
     }
 
-}
+    /**
+     * 
+     * 
+     * get_shipping
+     * @since 1.0.0
+     * @return array
+     * 
+     * 
+     */
+    public function get_shipping_taxes()
+    {
+        $shipping_data = [];
 
+        $shipping_zones = \WC_Shipping_Zones::get_zones();
+
+        foreach ($shipping_zones as $shipping_zone) {
+            $zone = new \WC_Shipping_Zone($shipping_zone['zone_id']);
+            $ship_data = ['locations' => $zone->get_zone_locations()];
+            $zone_methods = $zone->get_shipping_methods();
+
+            foreach ($zone_methods as $method) {
+
+                $ship_data['data'] = [
+                    'id' => $method_id = $method->id,
+                    'instance_id' => $method->instance_id,
+                    'title' => $method->title,
+                    'cost' => $method->cost
+                ];
+            }
+            $shipping_data[] = $ship_data;
+        }
+
+        //print_r( $shipping_data );
+
+        $all_tax_rates = [];
+        $tax_classes = \WC_Tax::get_tax_classes();
+        if ( !in_array( '', $tax_classes ) ) { 
+            array_unshift( $tax_classes, '' );
+        }
+        foreach ( $tax_classes as $tax_class ) {
+            $taxes = \WC_Tax::get_rates_for_tax_class( $tax_class );
+            $all_tax_rates = array_merge( $all_tax_rates, $taxes );
+        }
+
+        //print_r( $all_tax_rates );
+
+        die();
+    }
+}
 ?>

@@ -153,6 +153,8 @@ class thsa_qg_admin_support_plugins extends thsa_qg_common_class
          * 
          */
         if ( $this->aelia_woo_currency_switcher ) {
+
+            //refactor this function
             //check if manually added
             $currency_prices = get_post_meta($args['product_id'], '_regular_currency_prices', true);
             $currency_prices = json_decode($currency_prices);
@@ -210,28 +212,8 @@ class thsa_qg_admin_support_plugins extends thsa_qg_common_class
                     if( !empty($get_sale_price) ){
 
                         $price_regular_number = get_post_meta( $args['product_id'], '_regular_price', true );
-
-                        if( isset($settings['exchange_rates'][ $args['currency'] ]['rate']) ){
-                            $mark_up = $settings['exchange_rates'][$args['currency']];
-                            $rate = $settings['exchange_rates'][$args['currency']]['rate'];
-                            
-                            if(isset( $mark_up['rate_markup'] ) && $mark_up['rate_markup'] != ''){
-                                
-                                if( strpos($mark_up['rate_markup'],'%') !== false ){
-                                    $temp_markup = str_replace('%','',$mark_up['rate_markup']);
-                                    $temp_rate =  $rate * ($temp_markup / 100 ) + $rate;
-                                }else{
-                                    $temp_rate = $rate + $mark_up['rate_markup'];
-                                }
-                                $price_regular_number = $price_regular_number * $temp_rate;
-                                $get_sale_price = $get_sale_price * $temp_rate;
-
-                            }else{
-                                //no markup
-                                $price_regular_number = $price_regular_number * $rate;
-                                $get_sale_price = $get_sale_price * $rate;
-                            }
-                        }
+                        $price_regular_number = apply_filters('wc_aelia_cs_convert', $price_regular_number, $this->get_default_currency( $settings ), $args['currency']);
+                        $get_sale_price = apply_filters('wc_aelia_cs_convert', $get_sale_price, $this->get_default_currency( $settings ), $args['currency']);
 
                         $price_html = $this->price_html(
                             [
@@ -246,26 +228,7 @@ class thsa_qg_admin_support_plugins extends thsa_qg_common_class
                     }else{
 
                         $price_regular_number = get_post_meta( $args['product_id'], '_price', true );
-
-                        if( isset($settings['exchange_rates'][ $args['currency'] ]['rate']) ){
-                            $mark_up = $settings['exchange_rates'][ $args['currency'] ];
-                            $rate = $settings['exchange_rates'][ $args['currency'] ]['rate'];
-                            
-                            if(isset( $mark_up['rate_markup'] )){
-
-                                if( strpos($mark_up['rate_markup'],'%') !== false ){
-                                    $temp_markup = str_replace('%','',$mark_up['rate_markup']);
-                                    $temp_rate =  $rate * ($temp_markup / 100 ) + $rate;
-                                }else{
-                                    $temp_rate = $rate + $mark_up['rate_markup'];
-                                }
-                                $price_regular_number = $price_regular_number * $temp_rate;
-    
-                            }else{
-                                //no markup
-                                $price_regular_number = $price_regular_number * $rate;
-                            }
-                        }
+                        $price_regular_number = apply_filters('wc_aelia_cs_convert', $price_regular_number, $this->get_default_currency( $settings ), $args['currency']);
 
                         $price_html = $this->price_html(
                             [

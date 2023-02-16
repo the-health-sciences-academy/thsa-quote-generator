@@ -8,6 +8,11 @@
                     <p><?php esc_html_e('Total Savings:','thsa-quote-generator'); ?> <span class="thsa_qg_total_savings_label">0</span></p>
                     <p><?php esc_html_e('Total Fee:','thsa-quote-generator'); ?> <span class="thsa_qg_total_fee_label">0</span></p>
                 </div>
+
+                <div class="thsa_qg_summary_box_numbers">
+                    <p><?php esc_html_e('Shipping:','thsa-quote-generator'); ?> <span class="thsa_qg_shipping_label">0</span></p>
+                    <p><?php esc_html_e('Tax:','thsa-quote-generator'); ?> <span class="thsa_qg_tax_label">0</span></p>
+                </div>
                 
                 <?php 
                     $status = null;

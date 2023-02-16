@@ -11,25 +11,65 @@
                 <table border="0" class="widefat">
                     <tr>
                         <td width="33%">
+                            <label>First name
                             <input type="text" class="widefat" name="thsa_qg_customer_name" placeholder="<?php esc_html_e('First name', 'thsa-quote-generator'); ?>" value="<?php 
                                 if( isset( $params['data']['firstname'] ) ){
                                     echo esc_attr( $params['data']['firstname'] );
                                 }
                             ?>">
+                            </label>
                         </td>
                         <td width="33%">
+                            <label>Last name
                             <input type="text" class="widefat" name="thsa_qg_customer_lastname" placeholder="<?php esc_attr_e( 'Last name', 'thsa-quote-generator' ); ?>" value="<?php 
                                 if( isset( $params['data']['lastname'] ) ){
                                     echo esc_attr( $params['data']['lastname'] );
                                 }
                             ?>">
+                            </label>
                         </td>
                         <td width="33%">
+                            <label>Email address
                             <input type="email" class="widefat" name="thsa_qg_customer_email" placeholder="<?php esc_attr_e('Email Address', 'thsa-quote-generator'); ?>" value="<?php
                                 if( isset( $params['data']['email'] ) ){
                                     echo esc_attr( $params['data']['email'] );
                                 }
                             ?>">
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            <b><?php esc_html_e('Billing Address','thsa-quote-generator'); ?></b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label><?php esc_html_e('Address Line','thsa-quote-generator'); ?>
+                            <input type="text" class="widefat" name="thsa_qg_user_address_line1">
+                            </label>
+                        </td>
+                        <td>
+                            <label><?php esc_html_e('City','thsa-quote-generator'); ?>
+                            <input type="text" class="widefat" name="thsa_qg_user_city">
+                            </label>
+                        </td>
+                        <td>
+                            <label><?php esc_html_e('Postcode / ZIP','thsa-quote-generator'); ?>
+                            <input type="text" class="widefat" name="thsa_qg_user_postcode">
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label><?php esc_html_e('Country / Region','thsa-quote-generator'); ?>
+                            <input type="text" class="widefat" name="thsa_qg_user_country">
+                            </label>
+                        </td>
+                        <td>
+                            <label><?php esc_html_e('State / County','thsa-quote-generator'); ?>
+                            <input type="text" class="widefat" name="thsa_qg_user_state">
+                            </label>
                         </td>
                     </tr>
                 </table>

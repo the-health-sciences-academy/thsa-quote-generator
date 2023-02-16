@@ -34,22 +34,6 @@ function thsa_qg_load_textdomain() {
 	load_plugin_textdomain( 'thsa-quote-generator', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' ); 
 }
 
-/**
- * 
- * 
- * Plugin Installation
- * @since 1.2.0
- * 
- * 
- */
-function thsa_qg_install(){
-	if(class_exists('WooCommerce'))
-		return;
-
-	echo '<strong>'.__('This plugin requires woocommerce installation', 'thsa-quote-generator').'</strong>';
-    @trigger_error(__('Woocommerce plugin is missing', 'thsa-quote-generator'), E_USER_ERROR);
-}
-register_activation_hook( __FILE__, 'thsa_qg_install' );
 
 //autoload classes
 /**
@@ -89,11 +73,21 @@ spl_autoload_register(function ($class) {
  */
 add_action('plugins_loaded','thsa_qg_init');
 function thsa_qg_init(){
-    if(is_admin()){
-        //load admin
-        new thsa\qg\admin\thsa_qg_admin_class();
+
+    if ( is_plugin_active('woocommerce/woocommerce.php') ) { 
+        if(is_admin()){
+            //load admin
+            new thsa\qg\admin\thsa_qg_admin_class();
+        }
+        //load public
+        new thsa\qg\front\thsa_qg_public_class();
+    } else { 
+        add_action( 'admin_notices', function(){
+			$class = 'notice notice-error';
+			$message = '<b>'.__('Important:','thsa-quote-generator').'</b> '.__('THSA quote generator requires Woocommerce activated.','thsa-quote-generator');
+        	printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), $message );
+		} );
     }
-    //load public
-    new thsa\qg\front\thsa_qg_public_class();
+    
 }
 ?>
