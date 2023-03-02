@@ -518,6 +518,9 @@ class thsa_qg_common_class
 				case 'upgraded':
 					return true;
 					break;
+				case 'shipping-tax':
+					return $pro_content->shipping_taxes($data);
+					break;
 				default:
 					return $data;
 				break;
